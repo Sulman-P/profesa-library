@@ -24,7 +24,7 @@
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#categories" class="nav-link">Categories</a></li>
                 <li><a href="#featured" class="nav-link">Featured</a></li>
-                <li><a href="#upload" class="nav-link">Upload</a></li>
+                <li><a href="#upload" class="nav-link" onclick="document.getElementById('resource-title').focus()">Upload</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
@@ -113,7 +113,7 @@
 
                         <div class="form-group file-upload-group">
                             <label for="resource-file">Select File (PDF, DOC, DOCX)</label>
-                            <div class="file-input-wrapper">
+                            <div class="file-input-wrapper" id="fileInputWrapper">
                                 <input type="file" id="resource-file" accept=".pdf,.doc,.docx" required>
                                 <span class="file-upload-icon"><i class="fas fa-cloud-upload-alt"></i></span>
                                 <span class="file-upload-text">Click to upload or drag and drop</span>

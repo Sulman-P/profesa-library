@@ -24,6 +24,7 @@
                 <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#categories" class="nav-link">Categories</a></li>
                 <li><a href="#featured" class="nav-link">Featured</a></li>
+                <li><a href="#upload" class="nav-link">Upload</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
@@ -68,6 +69,72 @@
             </div>
             <div class="books-grid" id="books-grid">
                 <!-- Books will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- File Upload Section -->
+    <section id="upload" class="upload-section">
+        <div class="container">
+            <h2 class="section-title">Share Resources</h2>
+            <p class="upload-subtitle">Upload PDFs, Documents, and Exams for the Community</p>
+            
+            <div class="upload-container">
+                <!-- Upload Form -->
+                <div class="upload-form-wrapper">
+                    <form class="upload-form" id="uploadForm">
+                        <div class="form-group">
+                            <label for="resource-title">Resource Title</label>
+                            <input type="text" id="resource-title" placeholder="e.g., Chemistry Exam 2024" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resource-category">Category</label>
+                            <select id="resource-category" required>
+                                <option value="">Select Category</option>
+                                <option value="textbook">Textbook</option>
+                                <option value="exam">Exam</option>
+                                <option value="notes">Notes</option>
+                                <option value="assignment">Assignment</option>
+                                <option value="research">Research Paper</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resource-subject">Subject</label>
+                            <input type="text" id="resource-subject" placeholder="e.g., Chemistry, Mathematics" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resource-description">Description</label>
+                            <textarea id="resource-description" placeholder="Describe the resource..." rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group file-upload-group">
+                            <label for="resource-file">Select File (PDF, DOC, DOCX)</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="resource-file" accept=".pdf,.doc,.docx" required>
+                                <span class="file-upload-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                                <span class="file-upload-text">Click to upload or drag and drop</span>
+                                <span class="file-upload-hint">Supported: PDF, DOC, DOCX (Max 10MB)</span>
+                            </div>
+                            <div class="file-name" id="fileName"></div>
+                        </div>
+
+                        <button type="submit" class="btn-upload">
+                            <i class="fas fa-upload"></i> Upload Resource
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Uploaded Resources Display -->
+                <div class="resources-display">
+                    <h3>Available Resources</h3>
+                    <div class="resources-grid" id="resourcesGrid">
+                        <!-- Resources will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -198,5 +265,6 @@
 
     <script src="books.js"></script>
     <script src="scripts.js"></script>
+    <script src="upload-manager.js"></script>
 </body>
 </html>

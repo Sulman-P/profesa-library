@@ -1,8 +1,8 @@
-// Upload Manager - Handles file uploads and resource management
+// Upload Manager - User Resource Management
 class UploadManager {
     constructor() {
-        this.resources = JSON.parse(localStorage.getItem('uploadedResources')) || [];
-        this.maxFileSize = 10 * 1024 * 1024; // 10MB
+        this.resources = JSON.parse(localStorage.getItem('userResources')) || [];
+        this.maxFileSize = 10 * 1024 * 1024;
         this.allowedFileTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
         this.init();
     }
@@ -25,33 +25,26 @@ class UploadManager {
             fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
         }
 
-        // Drag and drop
         if (fileInputWrapper) {
             fileInputWrapper.addEventListener('dragover', (e) => this.handleDragOver(e));
             fileInputWrapper.addEventListener('dragleave', (e) => this.handleDragLeave(e));
             fileInputWrapper.addEventListener('drop', (e) => this.handleDrop(e));
-            fileInputWrapper.addEventListener('click', () => {
-                fileInput.click();
-            });
+            fileInputWrapper.addEventListener('click', () => fileInput.click());
         }
     }
 
     handleFileSelect(e) {
         const file = e.target.files[0];
-        if (file) {
-            this.updateFileName(file);
-        }
+        if (file) this.updateFileName(file);
     }
 
     handleDragOver(e) {
         e.preventDefault();
-        e.stopPropagation();
         e.currentTarget.style.background = 'rgba(37, 99, 235, 0.15)';
     }
 
     handleDragLeave(e) {
         e.preventDefault();
-        e.stopPropagation();
         e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
     }
 
@@ -59,7 +52,6 @@ class UploadManager {
         e.preventDefault();
         e.stopPropagation();
         e.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
-        
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             document.getElementById('resource-file').files = files;
@@ -73,22 +65,18 @@ class UploadManager {
             const fileName = `✓ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
             fileNameDiv.textContent = fileName;
             fileNameDiv.classList.add('show');
-        } else {
-            fileNameDiv.classList.remove('show');
         }
     }
 
     validateFile(file) {
         if (!this.allowedFileTypes.includes(file.type)) {
-            alert('❌ Invalid file type. Please upload PDF or DOC/DOCX files only.');
+            alert('❌ Invalid file type.');
             return false;
         }
-
         if (file.size > this.maxFileSize) {
-            alert('❌ File size exceeds 10MB limit.');
+            alert('❌ File exceeds 10MB limit.');
             return false;
         }
-
         return true;
     }
 
@@ -98,6 +86,7 @@ class UploadManager {
         const title = document.getElementById('resource-title').value;
         const category = document.getElementById('resource-category').value;
         const subject = document.getElementById('resource-subject').value;
+        const price = parseFloat(document.getElementById('resource-price').value) || 0;
         const description = document.getElementById('resource-description').value;
         const fileInput = document.getElementById('resource-file');
         const file = fileInput.files[0];
@@ -107,11 +96,10 @@ class UploadManager {
             return;
         }
 
-        if (!this.validateFile(file)) {
-            return;
-        }
+        if (!this.validateFile(file)) return;
 
-        // Read file as base64 and store in localStorage
+        const currentUserEmail = localStorage.getItem('currentUserEmail') || 'anonymous@library.com';
+
         const reader = new FileReader();
         reader.onload = (event) => {
             const resource = {
@@ -119,66 +107,63 @@ class UploadManager {
                 title: title,
                 category: category,
                 subject: subject,
+                price: price,
                 description: description,
                 fileName: file.name,
                 fileSize: file.size,
                 fileType: file.type,
-                fileData: event.target.result, // Base64 encoded file
+                fileData: event.target.result,
                 uploadDate: new Date().toLocaleDateString(),
-                uploadTime: new Date().toLocaleTimeString()
+                uploadedBy: 'user',
+                sellerEmail: currentUserEmail,
+                sales: 0,
+                totalRevenue: 0
             };
 
-            this.resources.push(resource);
-            this.saveToLocalStorage();
-            this.displayResources();
-            this.resetForm();
+            let allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+            allProducts.push(resource);
+            localStorage.setItem('allProducts', JSON.stringify(allProducts));
 
-            // Show success message
+            this.resources.push(resource);
+            localStorage.setItem('userResources', JSON.stringify(this.resources));
+
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileName').classList.remove('show');
             alert(`✓ "${title}" uploaded successfully!`);
+            
+            this.displayResources();
+            if (window.marketplace) window.marketplace.displayMarketplaceItems();
         };
 
         reader.readAsDataURL(file);
     }
 
-    saveToLocalStorage() {
-        localStorage.setItem('uploadedResources', JSON.stringify(this.resources));
-    }
-
-    resetForm() {
-        document.getElementById('uploadForm').reset();
-        document.getElementById('fileName').classList.remove('show');
-        document.getElementById('fileName').textContent = '';
-    }
-
     displayResources() {
+        const currentUserEmail = localStorage.getItem('currentUserEmail');
         const resourcesGrid = document.getElementById('resourcesGrid');
+        
+        let userResources = this.resources;
+        if (currentUserEmail) {
+            userResources = this.resources.filter(r => r.sellerEmail === currentUserEmail);
+        }
 
-        if (this.resources.length === 0) {
-            resourcesGrid.innerHTML = `
-                <div class="empty-resources">
-                    <i class="fas fa-inbox"></i>
-                    <p>No resources uploaded yet. Be the first to share!</p>
-                </div>
-            `;
+        if (userResources.length === 0) {
+            resourcesGrid.innerHTML = '<div class="empty-resources"><i class="fas fa-inbox"></i><p>No resources uploaded yet.</p></div>';
             return;
         }
 
-        resourcesGrid.innerHTML = this.resources
-            .sort((a, b) => b.id - a.id) // Show newest first
+        resourcesGrid.innerHTML = userResources
+            .sort((a, b) => b.id - a.id)
             .map(resource => `
                 <div class="resource-item">
                     <div class="resource-info">
                         <div class="resource-title">
-                            <span class="resource-badge">${this.getCategoryIcon(resource.category)} ${resource.category}</span>
-                            ${resource.title}
+                            <span class="resource-badge">${resource.category}</span> ${resource.title}
                         </div>
                         <div class="resource-meta">
                             <span><strong>Subject:</strong> ${resource.subject}</span>
-                            <span><strong>Size:</strong> ${(resource.fileSize / 1024 / 1024).toFixed(2)} MB</span>
-                            <span><strong>Date:</strong> ${resource.uploadDate}</span>
-                        </div>
-                        <div class="resource-meta" style="margin-top: 0.5rem;">
-                            <span><strong>Description:</strong> ${resource.description || 'No description'}</span>
+                            <span><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : '$' + resource.price.toFixed(2)}</span>
+                            <span><strong>Sales:</strong> ${resource.sales}</span>
                         </div>
                     </div>
                     <div class="resource-actions">
@@ -193,27 +178,13 @@ class UploadManager {
             `).join('');
     }
 
-    getCategoryIcon(category) {
-        const icons = {
-            textbook: '📚',
-            exam: '📝',
-            notes: '📄',
-            assignment: '✏️',
-            research: '🔬',
-            other: '📦'
-        };
-        return icons[category] || '📦';
-    }
-
     downloadResource(resourceId) {
         const resource = this.resources.find(r => r.id === resourceId);
-
         if (!resource) {
             alert('Resource not found.');
             return;
         }
 
-        // Create a link to download the file
         const link = document.createElement('a');
         link.href = resource.fileData;
         link.download = resource.fileName;
@@ -223,16 +194,20 @@ class UploadManager {
     }
 
     deleteResource(resourceId) {
-        if (confirm('Are you sure you want to delete this resource?')) {
+        if (confirm('Delete this resource?')) {
             this.resources = this.resources.filter(r => r.id !== resourceId);
-            this.saveToLocalStorage();
+            
+            let allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+            allProducts = allProducts.filter(p => p.id !== resourceId);
+            localStorage.setItem('allProducts', JSON.stringify(allProducts));
+            
+            localStorage.setItem('userResources', JSON.stringify(this.resources));
             this.displayResources();
-            alert('✓ Resource deleted successfully.');
+            alert('✓ Resource deleted');
         }
     }
 }
 
-// Initialize Upload Manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.uploadManager = new UploadManager();
 });

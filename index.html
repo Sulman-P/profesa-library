@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Library - Learn & Explore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-book"></i>
+                <span>Academic Library</span>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#categories" class="nav-link">Categories</a></li>
+                <li><a href="#featured" class="nav-link">Featured</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search books...">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Academic Library</h1>
+            <p>Your Gateway to Knowledge and Learning</p>
+            <button class="cta-btn" onclick="document.getElementById('categories').scrollIntoView({behavior: 'smooth'})">
+                Explore Books
+            </button>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="categories-section">
+        <div class="container">
+            <h2 class="section-title">Categories</h2>
+            <div class="categories-grid" id="categories-grid">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Books Section -->
+    <section id="featured" class="featured-section">
+        <div class="container">
+            <h2 class="section-title">Featured Books</h2>
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="science">Science</button>
+                <button class="filter-btn" data-filter="technology">Technology</button>
+                <button class="filter-btn" data-filter="history">History</button>
+                <button class="filter-btn" data-filter="literature">Literature</button>
+            </div>
+            <div class="books-grid" id="books-grid">
+                <!-- Books will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Book Detail Modal -->
+    <div id="book-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <div class="modal-book-image">
+                    <img id="modal-book-img" src="" alt="Book">
+                </div>
+                <div class="modal-book-details">
+                    <h2 id="modal-book-title"></h2>
+                    <p><strong>Author:</strong> <span id="modal-book-author"></span></p>
+                    <p><strong>Category:</strong> <span id="modal-book-category"></span></p>
+                    <p><strong>ISBN:</strong> <span id="modal-book-isbn"></span></p>
+                    <p><strong>Published:</strong> <span id="modal-book-year"></span></p>
+                    <p><strong>Rating:</strong> <span id="modal-book-rating"></span></p>
+                    <div class="modal-description">
+                        <p id="modal-book-description"></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-primary">Borrow</button>
+                        <button class="btn-secondary">Add to Wishlist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Academic Library is a comprehensive digital repository of academic and scholarly resources. We provide access to thousands of books across multiple disciplines, helping students, researchers, and lifelong learners expand their knowledge.</p>
+                    <p>Our mission is to democratize access to quality educational materials and foster a community of knowledge seekers.</p>
+                </div>
+                <div class="about-stats">
+                    <div class="stat">
+                        <h3>5000+</h3>
+                        <p>Books</p>
+                    </div>
+                    <div class="stat">
+                        <h3>50+</h3>
+                        <p>Categories</p>
+                    </div>
+                    <div class="stat">
+                        <h3>10000+</h3>
+                        <p>Active Members</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Get in Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Address</h3>
+                            <p>123 Masomo Street, Education City, EC 12345</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Phone</h3>
+                            <p>+254 (701) 710-662</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>pointgroupvision@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                    <button type="submit" class="btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Academic Library</h3>
+                    <p>Your trusted source for academic resources and learning materials.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#categories">Categories</a></li>
+                        <li><a href="#featured">Books</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Academic Library. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/books.js"></script>
+    <script src="js/scripts.js"></script>
+</body>
+</html>

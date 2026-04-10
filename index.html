@@ -3,288 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Library - Learn & Explore</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Academic Library Pro - Learning Resources Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="navbar-logo">
-                <i class="fas fa-book"></i>
-                <span>Academic Library</span>
+            <div class="navbar-brand">
+                <i class="fas fa-book-open"></i>
+                <span>Academic Library Pro</span>
             </div>
-            <div class="menu-toggle" id="mobile-menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            
+            <div class="navbar-search">
+                <input type="text" id="globalSearch" placeholder="Search books, resources..." class="search-input">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
             </div>
+
             <ul class="navbar-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#categories" class="nav-link">Categories</a></li>
-                <li><a href="#featured" class="nav-link">Featured</a></li>
+                <li><a href="#explore" class="nav-link">Explore</a></li>
                 <li><a href="#marketplace" class="nav-link">Marketplace</a></li>
                 <li><a href="#upload" class="nav-link">Upload</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
-                <li><a href="#" class="nav-link" id="adminToggle" onclick="toggleAdminPanel()"><i class="fas fa-lock"></i> Admin</a></li>
             </ul>
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search books...">
-                <button id="search-btn"><i class="fas fa-search"></i></button>
+
+            <div class="navbar-actions">
+                <button class="user-profile-btn" id="userProfileBtn">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Guest</span>
+                </button>
+                <button class="admin-btn" id="adminBtn">
+                    <i class="fas fa-lock"></i> Admin
+                </button>
             </div>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span id="userName"></span>
-                <span id="userBalance"></span>
+
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </nav>
 
     <!-- Admin Login Modal -->
-    <div id="adminLoginModal" class="modal">
-        <div class="modal-content admin-modal">
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Admin Login</h2>
-            <form id="adminLoginForm">
+            <div class="modal-header">
+                <h2><i class="fas fa-shield-alt"></i> Admin Portal</h2>
+            </div>
+            <form id="adminForm">
                 <div class="form-group">
-                    <label for="admin-email">Email</label>
-                    <input type="email" id="admin-email" placeholder="admin@library.com" required>
+                    <label for="adminEmail">Email</label>
+                    <input type="email" id="adminEmail" placeholder="admin@library.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="admin-password">Password</label>
-                    <input type="password" id="admin-password" placeholder="password123" required>
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password" required>
                 </div>
-                <button type="submit" class="btn-primary">Login</button>
-                <p class="admin-hint">Demo: admin@library.com / password123</p>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <p class="hint-text">Demo: admin@library.com / password123</p>
             </form>
         </div>
     </div>
 
     <!-- Admin Dashboard -->
     <div id="adminDashboard" class="admin-dashboard hidden">
-        <div class="admin-sidebar">
-            <div class="sidebar-header">
+        <aside class="admin-sidebar">
+            <div class="admin-header">
                 <h3><i class="fas fa-cog"></i> Admin Panel</h3>
-                <button class="close-admin" onclick="closeAdminPanel()"><i class="fas fa-times"></i></button>
+                <button class="close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button>
             </div>
             <ul class="admin-menu">
-                <li><a href="#" onclick="showAdminSection('overview')" class="admin-link active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li><a href="#" onclick="showAdminSection('upload')" class="admin-link"><i class="fas fa-upload"></i> Upload</a></li>
-                <li><a href="#" onclick="showAdminSection('sales')" class="admin-link"><i class="fas fa-money-bill-wave"></i> Sales</a></li>
-                <li><a href="#" onclick="showAdminSection('documents')" class="admin-link"><i class="fas fa-file"></i> Documents</a></li>
-                <li><a href="#" onclick="showAdminSection('users')" class="admin-link"><i class="fas fa-users"></i> Users</a></li>
-                <li><a href="#" onclick="logoutAdmin()" class="admin-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" onclick="switchAdminTab('overview')" class="admin-menu-item active">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a></li>
+                <li><a href="#" onclick="switchAdminTab('upload')" class="admin-menu-item">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload Document
+                </a></li>
+                <li><a href="#" onclick="switchAdminTab('documents')" class="admin-menu-item">
+                    <i class="fas fa-file"></i> Manage Documents
+                </a></li>
+                <li><a href="#" onclick="switchAdminTab('sales')" class="admin-menu-item">
+                    <i class="fas fa-chart-bar"></i> Sales & Revenue
+                </a></li>
+                <li><a href="#" onclick="switchAdminTab('users')" class="admin-menu-item">
+                    <i class="fas fa-users"></i> Users
+                </a></li>
+                <li><a href="#" onclick="logoutAdmin()" class="admin-menu-item logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a></li>
             </ul>
-        </div>
+        </aside>
 
-        <div class="admin-content">
-            <!-- Dashboard Overview -->
-            <div id="overview-section" class="admin-section active">
+        <main class="admin-content">
+            <!-- Overview Tab -->
+            <div id="overview" class="admin-tab active">
                 <h2>Dashboard Overview</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <i class="fas fa-file"></i>
-                        <h3 id="totalDocuments">0</h3>
-                        <p>Total Documents</p>
+                        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="stat-info">
+                            <h4>Total Documents</h4>
+                            <p id="statDocs">0</p>
+                        </div>
                     </div>
                     <div class="stat-card">
-                        <i class="fas fa-users"></i>
-                        <h3 id="totalUsers">0</h3>
-                        <p>Active Users</p>
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h4>Active Users</h4>
+                            <p id="statUsers">0</p>
+                        </div>
                     </div>
                     <div class="stat-card">
-                        <i class="fas fa-shopping-cart"></i>
-                        <h3 id="totalSales">0</h3>
-                        <p>Total Sales</p>
+                        <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                        <div class="stat-info">
+                            <h4>Total Sales</h4>
+                            <p id="statSales">0</p>
+                        </div>
                     </div>
                     <div class="stat-card">
-                        <i class="fas fa-dollar-sign"></i>
-                        <h3 id="totalRevenue">$0.00</h3>
-                        <p>Platform Revenue</p>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-percentage"></i>
-                        <h3 id="commissionEarned">$0.00</h3>
-                        <p>Admin Earnings</p>
+                        <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <h4>Total Revenue</h4>
+                            <p id="statRevenue">$0.00</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Upload Documents -->
-            <div id="upload-section" class="admin-section">
-                <h2>Upload Document</h2>
-                <form id="adminUploadForm" class="admin-upload-form">
+            <!-- Upload Tab -->
+            <div id="upload" class="admin-tab">
+                <h2>Upload New Document</h2>
+                <form id="adminUploadForm" class="upload-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="admin-doc-title">Title</label>
-                            <input type="text" id="admin-doc-title" placeholder="Document title" required>
+                            <label>Document Title</label>
+                            <input type="text" id="docTitle" placeholder="Enter document title" required>
                         </div>
                         <div class="form-group">
-                            <label for="admin-doc-category">Category</label>
-                            <select id="admin-doc-category" required>
+                            <label>Category</label>
+                            <select id="docCategory" required>
                                 <option value="">Select Category</option>
                                 <option value="textbook">Textbook</option>
-                                <option value="exam">Exam</option>
-                                <option value="notes">Notes</option>
-                                <option value="assignment">Assignment</option>
+                                <option value="exam">Exam Paper</option>
+                                <option value="notes">Lecture Notes</option>
+                                <option value="guide">Study Guide</option>
                                 <option value="research">Research Paper</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="admin-doc-subject">Subject</label>
-                            <input type="text" id="admin-doc-subject" placeholder="Subject" required>
+                            <label>Subject</label>
+                            <input type="text" id="docSubject" placeholder="e.g., Mathematics, Biology" required>
                         </div>
                         <div class="form-group">
-                            <label for="admin-doc-price">Price (USD)</label>
-                            <input type="number" id="admin-doc-price" placeholder="9.99" min="0.99" step="0.01" required>
+                            <label>Price (USD)</label>
+                            <input type="number" id="docPrice" placeholder="0.00" min="0" step="0.01" required>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="admin-doc-description">Description</label>
-                        <textarea id="admin-doc-description" placeholder="Describe document..." rows="3" required></textarea>
+                    <div class="form-group full">
+                        <label>Description</label>
+                        <textarea id="docDescription" placeholder="Describe the document..." rows="4"></textarea>
                     </div>
-                    <div class="form-group file-upload-group">
-                        <label for="admin-doc-file">File (PDF, DOC, DOCX)</label>
-                        <div class="file-input-wrapper" id="adminFileInputWrapper">
-                            <input type="file" id="admin-doc-file" accept=".pdf,.doc,.docx" required>
-                            <span class="file-upload-icon"><i class="fas fa-cloud-upload-alt"></i></span>
-                            <span class="file-upload-text">Click or drag file</span>
-                            <span class="file-upload-hint">Max 10MB</span>
+                    <div class="file-upload">
+                        <input type="file" id="docFile" accept=".pdf,.doc,.docx" required>
+                        <div class="file-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag & drop</p>
+                            <span>PDF, DOC, DOCX (Max 10MB)</span>
                         </div>
-                        <div class="file-name" id="adminFileName"></div>
                     </div>
-                    <button type="submit" class="btn-upload">
-                        <i class="fas fa-upload"></i> Upload
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-upload"></i> Upload Document
                     </button>
                 </form>
             </div>
 
-            <!-- Sales & Revenue -->
-            <div id="sales-section" class="admin-section">
+            <!-- Documents Tab -->
+            <div id="documents" class="admin-tab">
+                <h2>Manage Documents</h2>
+                <div id="documentsList" class="documents-table"></div>
+            </div>
+
+            <!-- Sales Tab -->
+            <div id="sales" class="admin-tab">
                 <h2>Sales & Revenue</h2>
                 <div class="sales-container">
-                    <div class="revenue-summary">
-                        <h3>Summary</h3>
-                        <div class="summary-card">
-                            <p><strong>Total Revenue:</strong> <span id="rev-total">$0.00</span></p>
-                            <p><strong>Commission Rate:</strong> 10%</p>
-                            <p><strong>Your Earnings:</strong> <span id="rev-commission">$0.00</span></p>
-                        </div>
+                    <div class="revenue-card">
+                        <h3>Total Revenue</h3>
+                        <p id="totalRevenue" class="large-number">$0.00</p>
+                        <p class="commission-info">Commission (10%): <span id="commissionAmount">$0.00</span></p>
                     </div>
-                    <div class="sales-list">
+                    <div class="recent-sales">
                         <h3>Recent Sales</h3>
-                        <div id="salesList" class="sales-items"></div>
+                        <div id="salesList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Manage Documents -->
-            <div id="documents-section" class="admin-section">
-                <h2>Your Documents</h2>
-                <div id="adminDocumentsList" class="documents-list"></div>
+            <!-- Users Tab -->
+            <div id="users" class="admin-tab">
+                <h2>User Management</h2>
+                <div id="usersList" class="users-table"></div>
             </div>
+        </main>
+    </div>
 
-            <!-- Manage Users -->
-            <div id="users-section" class="admin-section">
-                <h2>Users Management</h2>
-                <div id="usersList" class="users-list"></div>
+    <!-- User Profile Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> User Profile</h2>
             </div>
+            <div id="userProfileContent"></div>
         </div>
     </div>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Welcome to Academic Library</h1>
-            <p>Your Gateway to Knowledge and Learning</p>
-            <button class="cta-btn" onclick="document.getElementById('categories').scrollIntoView({behavior: 'smooth'})">
-                Explore Books
-            </button>
-        </div>
-    </section>
-
-    <!-- Categories Section -->
-    <section id="categories" class="categories-section">
-        <div class="container">
-            <h2 class="section-title">Categories</h2>
-            <div class="categories-grid" id="categories-grid"></div>
-        </div>
-    </section>
-
-    <!-- Featured Books Section -->
-    <section id="featured" class="featured-section">
-        <div class="container">
-            <h2 class="section-title">Featured Books</h2>
-            <div class="filter-tabs">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="science">Science</button>
-                <button class="filter-btn" data-filter="technology">Technology</button>
-                <button class="filter-btn" data-filter="history">History</button>
-                <button class="filter-btn" data-filter="literature">Literature</button>
+            <h1>Your Complete Academic Resource Platform</h1>
+            <p>Discover thousands of educational materials, from textbooks to exam papers</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="document.getElementById('explore').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fas fa-book"></i> Explore Resources
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('upload').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fas fa-cloud-upload-alt"></i> Share Content
+                </button>
             </div>
-            <div class="books-grid" id="books-grid"></div>
+        </div>
+    </section>
+
+    <!-- Explore Section -->
+    <section id="explore" class="explore">
+        <div class="container">
+            <h2>Browse by Category</h2>
+            <div class="categories-grid" id="categoriesGrid"></div>
         </div>
     </section>
 
     <!-- Marketplace Section -->
-    <section id="marketplace" class="marketplace-section">
+    <section id="marketplace" class="marketplace">
         <div class="container">
-            <h2 class="section-title">Marketplace</h2>
-            <p class="marketplace-subtitle">Buy & Sell Academic Resources</p>
-            <div class="marketplace-filters">
-                <input type="text" id="marketplaceSearch" placeholder="Search documents..." class="search-input">
-                <select id="priceFilter" class="filter-select">
-                    <option value="">All Prices</option>
-                    <option value="0-5">$0 - $5</option>
-                    <option value="5-10">$5 - $10</option>
-                    <option value="10-20">$10 - $20</option>
-                    <option value="20+">$20+</option>
-                </select>
+            <h2>Marketplace</h2>
+            <div class="marketplace-controls">
+                <div class="search-filter">
+                    <input type="text" id="marketplaceSearch" placeholder="Search documents..." class="search-input">
+                </div>
+                <div class="filter-options">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="textbook">Textbooks</option>
+                        <option value="exam">Exam Papers</option>
+                        <option value="notes">Lecture Notes</option>
+                        <option value="guide">Study Guides</option>
+                        <option value="research">Research Papers</option>
+                    </select>
+                    <select id="priceFilter">
+                        <option value="">All Prices</option>
+                        <option value="0-5">$0 - $5</option>
+                        <option value="5-10">$5 - $10</option>
+                        <option value="10-20">$10 - $20</option>
+                        <option value="20+">$20+</option>
+                    </select>
+                </div>
             </div>
-            <div class="marketplace-grid" id="marketplaceGrid"></div>
+            <div class="products-grid" id="productsGrid"></div>
         </div>
     </section>
 
-    <!-- User Upload Section -->
-    <section id="upload" class="upload-section">
+    <!-- Upload Section -->
+    <section id="upload" class="upload">
         <div class="container">
-            <h2 class="section-title">Share Your Resources</h2>
-            <p class="upload-subtitle">Upload Documents - Earn 90% Commission on Sales!</p>
-            <div class="upload-container">
-                <div class="upload-form-wrapper">
-                    <form class="upload-form" id="uploadForm">
-                        <div class="form-group">
-                            <label for="resource-title">Title</label>
-                            <input type="text" id="resource-title" placeholder="Resource title" required>
+            <h2>Share Your Resources</h2>
+            <p class="section-subtitle">Upload your documents and earn 90% commission on sales</p>
+            <div class="upload-grid">
+                <form id="userUploadForm" class="upload-form">
+                    <div class="form-group">
+                        <label>Document Title</label>
+                        <input type="text" id="userDocTitle" placeholder="Enter document title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="userDocCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="textbook">Textbook</option>
+                            <option value="exam">Exam Paper</option>
+                            <option value="notes">Lecture Notes</option>
+                            <option value="guide">Study Guide</option>
+                            <option value="research">Research Paper</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="userDocSubject" placeholder="e.g., Mathematics" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (USD)</label>
+                        <input type="number" id="userDocPrice" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="userDocDescription" placeholder="Describe your resource..." rows="4"></textarea>
+                    </div>
+                    <div class="file-upload">
+                        <input type="file" id="userDocFile" accept=".pdf,.doc,.docx" required>
+                        <div class="file-upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag & drop</p>
+                            <span>PDF, DOC, DOCX (Max 10MB)</span>
                         </div>
-                        <div class="form-group">
-                            <label for="resource-category">Category</label>
-                            <select id="resource-category" required>
-                                <option value="">Select Category</option>
-                                <option value="textbook">Textbook</option>
-                                <option value="exam">Exam</option>
-                                <option value="notes">Notes</option>
-                                <option value="assignment">Assignment</option>
-                                <option value="research">Research Paper</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="resource-subject">Subject</label>
-                            <input type="text" id="resource-subject" placeholder="Subject" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="resource-price">Price (USD) - Leave blank for free</label>
-                            <input type="number" id="resource-price" placeholder="4.99" min="0" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="resource-description">Description</label>
-                            <textarea id="resource-description" placeholder="Describe resource..." rows="3"></textarea>
-                        </div>
-                        <div class="form-group file-upload-group">
-                            <label for="resource-file">File (PDF, DOC, DOCX)</label>
-                            <div class="file-input-wrapper" id="fileInputWrapper">
-                                <input type="file" id="resource-
-
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-upload"></i> Upload Resource
+                    </button>
+                </form>
+
+                <div class="user-resources">
+                    <h3>Your Resources</h3>
+                    <div id="userResourcesList"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Us</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Vast Collection</h3>
+                    <p>Access thousands of educational resources from expert contributors</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Quality Content</h3>
+                    <p>All resources are vetted and curated for academic excellence</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-percentage"></i>
+                    <h3>Fair Commission</h3>
+                    <p>Earn 90% commission when your resources are purchased</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-globe"></i>
+                    <h3>Global Access</h3>
+                    <p>Available to students and educators worldwide</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Academic Library Pro</h4>
+                    <p>Your premier marketplace for educational resources</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#explore">Explore</a></li>
+                        <li><a href="#marketplace">Marketplace</a></li>
+                        <li><a href="#upload">Upload</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Academic Library Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -13,37 +13,147 @@ let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
 document.addEventListener('DOMContentLoaded', function() {
     console.log('App initialized');
     setupEventListeners();
+    setupFileUploads();
     loadCategories();
     loadMarketplace();
     loadUserProfile();
 });
 
+// ===== File Upload Setup =====
+function setupFileUploads() {
+    // Admin file upload
+    setupFileUpload('docFile', 'adminUploadForm');
+    
+    // User file upload
+    setupFileUpload('userDocFile', 'userUploadForm');
+}
+
+function setupFileUpload(fileInputId, formId) {
+    const fileInput = document.getElementById(fileInputId);
+    const form = document.getElementById(formId);
+    
+    if (!fileInput) {
+        console.error('File input not found:', fileInputId);
+        return;
+    }
+    
+    // Find the file upload area (parent div)
+    const fileUploadArea = fileInput.nextElementSibling;
+    
+    if (!fileUploadArea) {
+        console.error('File upload area not found for:', fileInputId);
+        return;
+    }
+    
+    // Click to upload
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    // File selected
+    fileInput.addEventListener('change', function(e) {
+        if (this.files.length > 0) {
+            updateFileDisplay(this.files[0], fileInputId);
+        }
+    });
+    
+    // Drag over
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.style.backgroundColor = 'rgba(37, 99, 235, 0.15)';
+        this.style.borderColor = '#1e40af';
+    });
+    
+    // Drag leave
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.style.backgroundColor = '';
+        this.style.borderColor = '';
+    });
+    
+    // Drop
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.style.backgroundColor = '';
+        this.style.borderColor = '';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            updateFileDisplay(files[0], fileInputId);
+        }
+    });
+}
+
+function updateFileDisplay(file, fileInputId) {
+    const fileInput = document.getElementById(fileInputId);
+    const fileUploadArea = fileInput.nextElementSibling;
+    
+    // Check file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const maxSize = 10 * 1024 * 1024;
+    
+    if (!allowedTypes.includes(file.type)) {
+        alert('❌ Invalid file type. Only PDF, DOC, DOCX allowed.');
+        fileInput.value = '';
+        return;
+    }
+    
+    if (file.size > maxSize) {
+        alert('❌ File size exceeds 10MB.');
+        fileInput.value = '';
+        return;
+    }
+    
+    // Update display
+    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+    fileUploadArea.innerHTML = `
+        <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.5rem;"></i>
+        <p style="color: #10b981; font-weight: bold;">✓ ${file.name}</p>
+        <span style="color: #6b7280; font-size: 0.85rem;">${fileSize} MB - Ready to upload</span>
+    `;
+}
+
 // ===== Setup Event Listeners =====
 function setupEventListeners() {
     // Admin button
-    document.getElementById('adminBtn').addEventListener('click', openAdminModal);
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) adminBtn.addEventListener('click', openAdminModal);
     
     // Admin form
-    document.getElementById('adminForm').addEventListener('submit', handleAdminLogin);
+    const adminForm = document.getElementById('adminForm');
+    if (adminForm) adminForm.addEventListener('submit', handleAdminLogin);
     
     // User profile button
-    document.getElementById('userProfileBtn').addEventListener('click', openUserModal);
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    if (userProfileBtn) userProfileBtn.addEventListener('click', openUserModal);
     
     // User upload form
-    document.getElementById('userUploadForm').addEventListener('submit', handleUserUpload);
+    const userUploadForm = document.getElementById('userUploadForm');
+    if (userUploadForm) userUploadForm.addEventListener('submit', handleUserUpload);
     
     // Admin upload form
-    document.getElementById('adminUploadForm').addEventListener('submit', handleAdminUpload);
+    const adminUploadForm = document.getElementById('adminUploadForm');
+    if (adminUploadForm) adminUploadForm.addEventListener('submit', handleAdminUpload);
     
     // Marketplace search & filter
-    document.getElementById('marketplaceSearch').addEventListener('input', filterMarketplace);
-    document.getElementById('categoryFilter').addEventListener('change', filterMarketplace);
-    document.getElementById('priceFilter').addEventListener('change', filterMarketplace);
+    const marketplaceSearch = document.getElementById('marketplaceSearch');
+    if (marketplaceSearch) marketplaceSearch.addEventListener('input', filterMarketplace);
+    
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) categoryFilter.addEventListener('change', filterMarketplace);
+    
+    const priceFilter = document.getElementById('priceFilter');
+    if (priceFilter) priceFilter.addEventListener('change', filterMarketplace);
     
     // Modal close buttons
     document.querySelectorAll('.close').forEach(btn => {
         btn.addEventListener('click', function() {
-            this.closest('.modal').classList.remove('show');
+            const modal = this.closest('.modal');
+            if (modal) modal.classList.remove('show');
         });
     });
     
@@ -55,9 +165,8 @@ function setupEventListeners() {
     });
     
     // Global search
-    document.getElementById('globalSearch').addEventListener('input', function(e) {
-        filterMarketplace();
-    });
+    const globalSearch = document.getElementById('globalSearch');
+    if (globalSearch) globalSearch.addEventListener('input', filterMarketplace);
 }
 
 // ===== Admin Functions =====
@@ -83,7 +192,7 @@ function handleAdminLogin(e) {
         loadAdminDashboard();
         alert('✓ Welcome Admin!');
     } else {
-        alert('❌ Invalid credentials');
+        alert('❌ Invalid credentials\nDemo: admin@library.com / password123');
     }
 }
 
@@ -101,7 +210,9 @@ function switchAdminTab(tab) {
     document.getElementById(tab).classList.add('active');
     
     document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active'));
-    event.target.closest('.admin-menu-item').classList.add('active');
+    if (event.target.closest('.admin-menu-item')) {
+        event.target.closest('.admin-menu-item').classList.add('active');
+    }
     
     if (tab === 'documents') loadAdminDocuments();
     if (tab === 'sales') loadSalesReport();
@@ -112,12 +223,17 @@ function loadAdminDashboard() {
     const adminProducts = allProducts.filter(p => p.uploadedBy === 'admin');
     const adminSales = JSON.parse(localStorage.getItem('adminSales')) || [];
     
-    document.getElementById('statDocs').textContent = allProducts.length;
-    document.getElementById('statUsers').textContent = Object.keys(allUsers).length;
-    document.getElementById('statSales').textContent = adminSales.length;
+    const statDocs = document.getElementById('statDocs');
+    const statUsers = document.getElementById('statUsers');
+    const statSales = document.getElementById('statSales');
+    const statRevenue = document.getElementById('statRevenue');
     
-    let totalRevenue = adminSales.reduce((sum, s) => sum + s.amount, 0);
-    document.getElementById('statRevenue').textContent = '$' + totalRevenue.toFixed(2);
+    if (statDocs) statDocs.textContent = allProducts.length;
+    if (statUsers) statUsers.textContent = Object.keys(allUsers).length;
+    if (statSales) statSales.textContent = adminSales.length;
+    
+    let totalRevenue = adminSales.reduce((sum, s) => sum + (s.amount || 0), 0);
+    if (statRevenue) statRevenue.textContent = '$' + totalRevenue.toFixed(2);
 }
 
 function handleAdminUpload(e) {
@@ -156,69 +272,105 @@ function handleAdminUpload(e) {
         localStorage.setItem('allProducts', JSON.stringify(allProducts));
         
         document.getElementById('adminUploadForm').reset();
+        document.getElementById('docFile').value = '';
+        const fileUploadArea = document.getElementById('docFile').nextElementSibling;
+        if (fileUploadArea) {
+            fileUploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload or drag & drop</p>
+                <span>PDF, DOC, DOCX (Max 10MB)</span>
+            `;
+        }
+        
         alert('✓ Document uploaded successfully!');
         loadMarketplace();
+        loadAdminDashboard();
     };
     reader.readAsDataURL(file);
 }
 
 function loadAdminDocuments() {
     const adminDocs = allProducts.filter(p => p.uploadedBy === 'admin');
-    let html = '<table class="table"><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Sales</th><th>Action</th></tr></thead><tbody>';
+    let html = '';
     
-    adminDocs.forEach(doc => {
-        html += `
-            <tr>
-                <td>${doc.title}</td>
-                <td>${doc.category}</td>
-                <td>$${doc.price.toFixed(2)}</td>
-                <td>${doc.sales}</td>
-                <td><button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button></td>
-            </tr>
-        `;
-    });
+    if (adminDocs.length === 0) {
+        html = '<p class="empty-message">No documents uploaded yet</p>';
+    } else {
+        html = '<table class="table"><thead><tr><th>Title</th><th>Category</th><th>Price</th><th>Sales</th><th>Action</th></tr></thead><tbody>';
+        
+        adminDocs.forEach(doc => {
+            html += `
+                <tr>
+                    <td>${doc.title}</td>
+                    <td>${doc.category}</td>
+                    <td>$${doc.price.toFixed(2)}</td>
+                    <td>${doc.sales || 0}</td>
+                    <td><button class="btn btn-danger" onclick="deleteDocument(${doc.id})">Delete</button></td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+    }
     
-    html += '</tbody></table>';
-    document.getElementById('documentsList').innerHTML = html;
+    const documentsList = document.getElementById('documentsList');
+    if (documentsList) documentsList.innerHTML = html;
 }
 
 function loadSalesReport() {
     const adminSales = JSON.parse(localStorage.getItem('adminSales')) || [];
-    const totalRevenue = adminSales.reduce((sum, s) => sum + s.amount, 0);
+    const totalRevenue = adminSales.reduce((sum, s) => sum + (s.amount || 0), 0);
     const commission = totalRevenue * 0.10;
     
-    document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
-    document.getElementById('commissionAmount').textContent = '$' + commission.toFixed(2);
+    const totalRevenueEl = document.getElementById('totalRevenue');
+    const commissionEl = document.getElementById('commissionAmount');
+    
+    if (totalRevenueEl) totalRevenueEl.textContent = '$' + totalRevenue.toFixed(2);
+    if (commissionEl) commissionEl.textContent = '$' + commission.toFixed(2);
     
     let html = '<div class="sales-list">';
-    adminSales.forEach(sale => {
-        html += `
-            <div class="sale-item">
-                <strong>${sale.productTitle}</strong>
-                <p>Buyer: ${sale.buyerName} | Amount: $${sale.amount.toFixed(2)}</p>
-            </div>
-        `;
-    });
+    if (adminSales.length === 0) {
+        html += '<p class="empty-message">No sales yet</p>';
+    } else {
+        adminSales.forEach(sale => {
+            html += `
+                <div class="sale-item">
+                    <strong>${sale.productTitle}</strong>
+                    <p>Buyer: ${sale.buyerName} | Amount: $${sale.amount.toFixed(2)}</p>
+                </div>
+            `;
+        });
+    }
     html += '</div>';
-    document.getElementById('salesList').innerHTML = html;
+    
+    const salesList = document.getElementById('salesList');
+    if (salesList) salesList.innerHTML = html;
 }
 
 function loadUsersReport() {
-    let html = '<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Earnings</th></tr></thead><tbody>';
+    let html = '';
+    const usersList = document.getElementById('usersList');
     
-    Object.values(allUsers).forEach(user => {
-        html += `
-            <tr>
-                <td>${user.name}</td>
-                <td>${user.email}</td>
-                <td>$${user.balance.toFixed(2)}</td>
-                <td>$${(user.earnings || 0).toFixed(2)}</td>
-            </tr>
-        `;
-    });
+    if (Object.keys(allUsers).length === 0) {
+        html = '<p class="empty-message">No users yet</p>';
+    } else {
+        html = '<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Earnings</th></tr></thead><tbody>';
+        
+        Object.values(allUsers).forEach(user => {
+            html += `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>$${user.balance.toFixed(2)}</td>
+                    <td>$${(user.earnings || 0).toFixed(2)}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+    }
     
-    html += '</tbody></table>';
-    document.getElementById('usersList').innerHTML = html;
+    if (usersList) usersList.innerHTML = html;
 }
 
 function deleteDocument(id) {
@@ -236,7 +388,8 @@ function loadUserProfile() {
     const userEmail = localStorage.getItem('currentUserEmail');
     if (userEmail && allUsers[userEmail]) {
         const user = allUsers[userEmail];
-        document.getElementById('userName').textContent = user.name || 'Guest';
+        const userNameEl = document.getElementById('userName');
+        if (userNameEl) userNameEl.textContent = user.name || 'Guest';
         currentUser = user;
     }
 }
@@ -257,20 +410,24 @@ function openUserModal() {
             allUsers[email] = currentUser;
             localStorage.setItem('allUsers', JSON.stringify(allUsers));
             localStorage.setItem('currentUserEmail', email);
-            document.getElementById('userName').textContent = name;
+            const userNameEl = document.getElementById('userName');
+            if (userNameEl) userNameEl.textContent = name;
         }
     }
     
-    if (currentUser) {
-        document.getElementById('userProfileContent').innerHTML = `
-            <div class="user-profile-card">
-                <p><strong>Name:</strong> ${currentUser.name}</p>
-                <p><strong>Email:</strong> ${currentUser.email}</p>
-                <p><strong>Balance:</strong> $${currentUser.balance.toFixed(2)}</p>
-                <p><strong>Earnings:</strong> $${(currentUser.earnings || 0).toFixed(2)}</p>
-                <p><strong>Joined:</strong> ${currentUser.joinDate}</p>
-            </div>
-        `;
+    if (currentUser && modal) {
+        const userProfileContent = document.getElementById('userProfileContent');
+        if (userProfileContent) {
+            userProfileContent.innerHTML = `
+                <div class="user-profile-card">
+                    <p><strong>Name:</strong> ${currentUser.name}</p>
+                    <p><strong>Email:</strong> ${currentUser.email}</p>
+                    <p><strong>Balance:</strong> $${currentUser.balance.toFixed(2)}</p>
+                    <p><strong>Earnings:</strong> $${(currentUser.earnings || 0).toFixed(2)}</p>
+                    <p><strong>Joined:</strong> ${currentUser.joinDate}</p>
+                </div>
+            `;
+        }
         modal.classList.add('show');
     }
 }
@@ -280,6 +437,7 @@ function handleUserUpload(e) {
     
     if (!currentUser) {
         alert('Please set up your profile first');
+        openUserModal();
         return;
     }
     
@@ -317,6 +475,16 @@ function handleUserUpload(e) {
         localStorage.setItem('allProducts', JSON.stringify(allProducts));
         
         document.getElementById('userUploadForm').reset();
+        document.getElementById('userDocFile').value = '';
+        const fileUploadArea = document.getElementById('userDocFile').nextElementSibling;
+        if (fileUploadArea) {
+            fileUploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload or drag & drop</p>
+                <span>PDF, DOC, DOCX (Max 10MB)</span>
+            `;
+        }
+        
         alert('✓ Resource uploaded! You earn 90% on sales.');
         loadUserResources();
         loadMarketplace();
@@ -338,7 +506,7 @@ function loadUserResources() {
                 <div class="resource-card">
                     <h4>${product.title}</h4>
                     <p>Category: ${product.category} | Price: $${product.price.toFixed(2)}</p>
-                    <p>Sales: ${product.sales}</p>
+                    <p>Sales: ${product.sales || 0}</p>
                     <button class="btn btn-danger" onclick="deleteUserResource(${product.id})">Delete</button>
                 </div>
             `;
@@ -346,7 +514,8 @@ function loadUserResources() {
     }
     
     html += '</div>';
-    document.getElementById('userResourcesList').innerHTML = html;
+    const userResourcesList = document.getElementById('userResourcesList');
+    if (userResourcesList) userResourcesList.innerHTML = html;
 }
 
 function deleteUserResource(id) {
@@ -380,7 +549,8 @@ function loadCategories() {
         `;
     });
     
-    document.getElementById('categoriesGrid').innerHTML = html;
+    const categoriesGrid = document.getElementById('categoriesGrid');
+    if (categoriesGrid) categoriesGrid.innerHTML = html;
 }
 
 function loadMarketplace() {
@@ -417,13 +587,14 @@ function displayProducts(products) {
         });
     }
     
-    document.getElementById('productsGrid').innerHTML = html;
+    const productsGrid = document.getElementById('productsGrid');
+    if (productsGrid) productsGrid.innerHTML = html;
 }
 
 function filterMarketplace() {
-    const search = document.getElementById('marketplaceSearch').value.toLowerCase();
-    const category = document.getElementById('categoryFilter').value;
-    const priceRange = document.getElementById('priceFilter').value;
+    const search = document.getElementById('marketplaceSearch')?.value.toLowerCase() || '';
+    const category = document.getElementById('categoryFilter')?.value || '';
+    const priceRange = document.getElementById('priceFilter')?.value || '';
     
     let filtered = allProducts.filter(p => {
         const matchSearch = p.title.toLowerCase().includes(search) || p.subject.toLowerCase().includes(search);

@@ -625,46 +625,52 @@ function buyProduct(productId) {
     const product = allProducts.find(p => p.id === productId);
     if (!product) return;
     
-    if (product.price > 0 && currentUser.balance < product.price) {
-        alert(`Insufficient balance. Need $${product.price.toFixed(2)}`);
-        return;
+    // If free, download directly
+    if (product.price === 0) {
+        openReceiptModalFree(product);
+    } else {
+        // Open payment modal
+        openPaymentModal(productId);
     }
-    
-    // Update balance
-    if (product.price > 0) {
-        currentUser.balance -= product.price;
-    }
-    
-    // Update seller earnings (90% to creator, 10% to admin)
-    if (product.uploadedBy === 'user') {
-        const seller = allUsers[product.sellerEmail];
-        if (seller) {
-            seller.earnings = (seller.earnings || 0) + (product.price * 0.9);
+}
+
+// For free documents
+function openReceiptModalFree(product) {
+    document.getElementById('receiptForm').reset();
+    document.getElementById('receiptModal').classList.add('show');
+
+    document.getElementById('receiptForm').onsubmit = function(e) {
+        e.preventDefault();
+        const email = document.getElementById('recipientEmail').value.trim();
+
+        if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            alert('Invalid email address');
+            return;
         }
-    }
-    
-    // Record sale
-    let adminSales = JSON.parse(localStorage.getItem('adminSales')) || [];
-    adminSales.push({
-        productTitle: product.title,
-        buyerName: currentUser.name,
-        amount: product.price,
-        date: new Date().toLocaleDateString()
-    });
-    localStorage.setItem('adminSales', JSON.stringify(adminSales));
-    
-    // Update product sales
-    product.sales = (product.sales || 0) + 1;
-    localStorage.setItem('allProducts', JSON.stringify(allProducts));
-    localStorage.setItem('allUsers', JSON.stringify(allUsers));
-    
-    // Download file
-    const link = document.createElement('a');
-    link.href = product.fileData;
-    link.download = product.fileName;
-    link.click();
-    
-    alert(`✓ ${product.price > 0 ? 'Purchased' : 'Downloaded'} successfully!`);
-    loadUserProfile();
-    loadMarketplace();
+
+        // Record free download
+        let payments = JSON.parse(localStorage.getItem('payments')) || [];
+        payments.push({
+            id: Date.now(),
+            productId: product.id,
+            productTitle: product.title,
+            amount: 0,
+            method: 'free',
+            buyerName: currentUser.name,
+            buyerEmail: email,
+            paymentDate: new Date().toLocaleDateString(),
+            status: 'completed'
+        });
+        localStorage.setItem('payments', JSON.stringify(payments));
+
+        // Download
+        const link = document.createElement('a');
+        link.href = product.fileData;
+        link.download = product.fileName;
+        link.click();
+
+        alert(`✓ Document downloaded!\n\nSent to: ${email}`);
+        document.getElementById('receiptModal').classList.remove('show');
+        loadMarketplace();
+    };
 }

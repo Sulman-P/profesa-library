@@ -1,4 +1,9 @@
-// Book Database
+// ===============================
+// NexaLearn International - books.js
+// Updated & Corrected Version
+// ===============================
+
+// ===== BOOK DATABASE =====
 const booksDatabase = [
     {
         id: 1,
@@ -8,7 +13,9 @@ const booksDatabase = [
         isbn: "978-0-123456-78-9",
         year: 2023,
         rating: 4.8,
-        description: "A comprehensive introduction to the fundamental principles of physics, covering mechanics, thermodynamics, and electromagnetism with practical examples and solved problems.",
+        price: 12.99,
+        pages: 420,
+        description: "A comprehensive introduction to physics covering mechanics, thermodynamics, and electromagnetism.",
         icon: "📚"
     },
     {
@@ -19,7 +26,9 @@ const booksDatabase = [
         isbn: "978-0-987654-32-1",
         year: 2024,
         rating: 4.9,
-        description: "Learn modern web development techniques using React, Node.js, and MongoDB. Includes real-world projects and best practices for scalable applications.",
+        price: 15.99,
+        pages: 510,
+        description: "Learn modern web development with React, Node.js, MongoDB, and scalable architecture.",
         icon: "💻"
     },
     {
@@ -30,7 +39,9 @@ const booksDatabase = [
         isbn: "978-0-555555-55-5",
         year: 2022,
         rating: 4.7,
-        description: "An in-depth exploration of the Roman Empire, its rise, culture, politics, and eventual fall, with detailed accounts of key historical events and figures.",
+        price: 10.50,
+        pages: 360,
+        description: "An in-depth exploration of the Roman Empire and its cultural influence.",
         icon: "📖"
     },
     {
@@ -41,7 +52,9 @@ const booksDatabase = [
         isbn: "978-0-111111-11-1",
         year: 2021,
         rating: 4.9,
-        description: "A curated collection of timeless literary works including novels, short stories, and poetry from the most influential authors of all time.",
+        price: 18.99,
+        pages: 600,
+        description: "A curated collection of timeless literary works from influential authors.",
         icon: "✍️"
     },
     {
@@ -52,7 +65,9 @@ const booksDatabase = [
         isbn: "978-0-222222-22-2",
         year: 2024,
         rating: 4.6,
-        description: "An accessible introduction to quantum computing, qubits, quantum algorithms, and practical applications in solving complex problems.",
+        price: 14.99,
+        pages: 310,
+        description: "An accessible introduction to quantum computing and quantum algorithms.",
         icon: "⚛️"
     },
     {
@@ -63,178 +78,324 @@ const booksDatabase = [
         isbn: "978-0-333333-33-3",
         year: 2023,
         rating: 4.8,
-        description: "Explore the foundations of biology, genetics, evolution, ecology, and cellular processes with illustrations and real-world case studies.",
+        price: 11.99,
+        pages: 450,
+        description: "Explore biology, genetics, ecology, and cellular processes.",
         icon: "🧬"
-    },
-    {
-        id: 7,
-        title: "Medieval Europe: Society and Culture",
-        author: "Prof. Catherine Lewis",
-        category: "history",
-        isbn: "978-0-444444-44-4",
-        year: 2022,
-        rating: 4.7,
-        description: "Discover the rich tapestry of medieval European civilization, from feudalism to the rise of kingdoms, with fascinating insights into daily life.",
-        icon: "🏰"
-    },
-    {
-        id: 8,
-        title: "Contemporary Poetry Anthology",
-        author: "James Martinez",
-        category: "literature",
-        isbn: "978-0-666666-66-6",
-        year: 2023,
-        rating: 4.8,
-        description: "A modern collection of poetry exploring contemporary themes, emotions, and social issues through the voices of emerging poets.",
-        icon: "✨"
-    },
-    {
-        id: 9,
-        title: "Data Science and Machine Learning",
-        author: "Dr. Lisa Chen",
-        category: "technology",
-        isbn: "978-0-777777-77-7",
-        year: 2024,
-        rating: 4.9,
-        description: "Master data science techniques, machine learning algorithms, and practical applications using Python and popular libraries.",
-        icon: "🤖"
-    },
-    {
-        id: 10,
-        title: "Organic Chemistry Explained",
-        author: "Dr. Thomas Anderson",
-        category: "science",
-        isbn: "978-0-888888-88-8",
-        year: 2023,
-        rating: 4.7,
-        description: "A detailed guide to organic chemistry covering reactions, mechanisms, synthesis, and applications in modern pharmaceuticals and materials.",
-        icon: "⚗️"
     }
 ];
 
-// Categories
+// ===== CATEGORIES =====
 const categories = [
-    { name: "Science", icon: "fas fa-flask", color: "science" },
-    { name: "Technology", icon: "fas fa-laptop-code", color: "technology" },
-    { name: "History", icon: "fas fa-history", color: "history" },
-    { name: "Literature", icon: "fas fa-book-open", color: "literature" },
-    { name: "Mathematics", icon: "fas fa-calculator", color: "mathematics" },
-    { name: "Arts", icon: "fas fa-palette", color: "arts" }
+    {
+        name: "Science",
+        key: "science",
+        icon: "fas fa-flask"
+    },
+    {
+        name: "Technology",
+        key: "technology",
+        icon: "fas fa-laptop-code"
+    },
+    {
+        name: "History",
+        key: "history",
+        icon: "fas fa-landmark"
+    },
+    {
+        name: "Literature",
+        key: "literature",
+        icon: "fas fa-book-open"
+    },
+    {
+        name: "Mathematics",
+        key: "mathematics",
+        icon: "fas fa-calculator"
+    },
+    {
+        name: "Arts",
+        key: "arts",
+        icon: "fas fa-palette"
+    }
 ];
 
-// Load categories
+// ===============================
+// INITIALIZATION
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+    loadCategories();
+    loadBooks();
+
+    // Search Input Listener
+    const searchInput = document.getElementById("book-search");
+
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            searchBooks(e.target.value);
+        });
+    }
+
+    // Close modal on outside click
+    window.addEventListener("click", (e) => {
+        const modal = document.getElementById("book-modal");
+
+        if (e.target === modal) {
+            closeBookModal();
+        }
+    });
+});
+
+// ===============================
+// LOAD CATEGORIES
+// ===============================
 function loadCategories() {
-    const categoriesGrid = document.getElementById('categories-grid');
+    const categoriesGrid = document.getElementById("categoriesGrid");
+
+    if (!categoriesGrid) return;
+
     categoriesGrid.innerHTML = categories.map(cat => `
-        <div class="category-card" onclick="filterByCategory('${cat.color}')">
+        <div class="category-card" onclick="filterByCategory('${cat.key}')">
             <i class="${cat.icon}"></i>
             <h3>${cat.name}</h3>
-            <p>Explore</p>
+            <p>Explore Resources</p>
         </div>
-    `).join('');
+    `).join("");
 }
 
-// Load books
-function loadBooks(filter = 'all') {
-    const booksGrid = document.getElementById('books-grid');
-    
+// ===============================
+// LOAD BOOKS
+// ===============================
+function loadBooks(filter = "all") {
+    const booksGrid = document.getElementById("productsGrid");
+
+    if (!booksGrid) return;
+
     let filteredBooks = booksDatabase;
-    if (filter !== 'all') {
-        filteredBooks = booksDatabase.filter(book => book.category === filter);
+
+    if (filter !== "all") {
+        filteredBooks = booksDatabase.filter(
+            book => book.category === filter
+        );
     }
-
-    booksGrid.innerHTML = filteredBooks.map(book => `
-        <div class="book-card" onclick="openBookModal(${book.id})">
-            <div class="book-image">
-                <div style="font-size: 4rem;">${book.icon}</div>
-                <div class="book-overlay">
-                    <button>View Details</button>
-                </div>
-            </div>
-            <div class="book-info">
-                <span class="book-category">${book.category.charAt(0).toUpperCase() + book.category.slice(1)}</span>
-                <h3 class="book-title">${book.title}</h3>
-                <p class="book-author">by ${book.author}</p>
-                <div class="book-rating">
-                    ${'⭐'.repeat(Math.floor(book.rating))} <span>${book.rating}</span>
-                </div>
-                <div class="book-footer">
-                    <span class="book-year">${book.year}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Filter books by category
-function filterByCategory(category) {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    filterButtons.forEach(btn => btn.classList.remove('active'));
-    
-    const activeBtn = Array.from(filterButtons).find(btn => btn.dataset.filter === category);
-    if (activeBtn) activeBtn.classList.add('active');
-    
-    loadBooks(category);
-    document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
-}
-
-// Open book modal
-function openBookModal(bookId) {
-    const book = booksDatabase.find(b => b.id === bookId);
-    if (book) {
-        document.getElementById('modal-book-img').src = `https://via.placeholder.com/300x400?text=${encodeURIComponent(book.title)}`;
-        document.getElementById('modal-book-title').textContent = book.title;
-        document.getElementById('modal-book-author').textContent = book.author;
-        document.getElementById('modal-book-category').textContent = book.category.charAt(0).toUpperCase() + book.category.slice(1);
-        document.getElementById('modal-book-isbn').textContent = book.isbn;
-        document.getElementById('modal-book-year').textContent = book.year;
-        document.getElementById('modal-book-rating').textContent = `${book.rating} ⭐ (${Math.floor(book.rating * 100)}%)`;
-        document.getElementById('modal-book-description').textContent = book.description;
-        
-        document.getElementById('book-modal').style.display = 'block';
-    }
-}
-
-// Close modal
-function closeBookModal() {
-    document.getElementById('book-modal').style.display = 'none';
-}
-
-// Search books
-function searchBooks(query) {
-    const booksGrid = document.getElementById('books-grid');
-    const searchQuery = query.toLowerCase();
-    
-    const filteredBooks = booksDatabase.filter(book =>
-        book.title.toLowerCase().includes(searchQuery) ||
-        book.author.toLowerCase().includes(searchQuery) ||
-        book.category.toLowerCase().includes(searchQuery)
-    );
 
     if (filteredBooks.length === 0) {
-        booksGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem;"><p>No books found matching your search.</p></div>';
+        booksGrid.innerHTML = `
+            <div class="empty-state">
+                <p>No books found.</p>
+            </div>
+        `;
         return;
     }
 
     booksGrid.innerHTML = filteredBooks.map(book => `
-        <div class="book-card" onclick="openBookModal(${book.id})">
-            <div class="book-image">
-                <div style="font-size: 4rem;">${book.icon}</div>
-                <div class="book-overlay">
-                    <button>View Details</button>
+        <div class="product-card">
+
+            <div class="product-header">
+                <span class="product-badge">
+                    ${capitalize(book.category)}
+                </span>
+                <span class="book-rating">
+                    ⭐ ${book.rating}
+                </span>
+            </div>
+
+            <div class="product-body">
+                <div class="book-icon">
+                    ${book.icon}
+                </div>
+
+                <h3 class="product-title">
+                    ${book.title}
+                </h3>
+
+                <p class="product-author">
+                    by ${book.author}
+                </p>
+
+                <p class="product-description">
+                    ${truncateText(book.description, 120)}
+                </p>
+
+                <div class="book-meta">
+                    <span>${book.year}</span>
+                    <span>${book.pages} pages</span>
                 </div>
             </div>
-            <div class="book-info">
-                <span class="book-category">${book.category.charAt(0).toUpperCase() + book.category.slice(1)}</span>
-                <h3 class="book-title">${book.title}</h3>
-                <p class="book-author">by ${book.author}</p>
-                <div class="book-rating">
-                    ${'⭐'.repeat(Math.floor(book.rating))} <span>${book.rating}</span>
-                </div>
-                <div class="book-footer">
-                    <span class="book-year">${book.year}</span>
-                </div>
+
+            <div class="product-footer">
+                <span class="product-price">
+                    $${book.price.toFixed(2)}
+                </span>
+
+                <button class="btn-buy"
+                    onclick="openBookModal(${book.id})">
+                    <i class="fas fa-eye"></i>
+                    View
+                </button>
             </div>
+
         </div>
-    `).join('');
+    `).join("");
+}
+
+// ===============================
+// FILTER CATEGORY
+// ===============================
+function filterByCategory(category) {
+    loadBooks(category);
+
+    const marketplace = document.getElementById("marketplace");
+
+    if (marketplace) {
+        marketplace.scrollIntoView({
+            behavior: "smooth"
+        });
+    }
+}
+
+// ===============================
+// SEARCH BOOKS
+// ===============================
+function searchBooks(query) {
+    const booksGrid = document.getElementById("productsGrid");
+
+    if (!booksGrid) return;
+
+    const searchQuery = query.trim().toLowerCase();
+
+    if (!searchQuery) {
+        loadBooks();
+        return;
+    }
+
+    const filteredBooks = booksDatabase.filter(book =>
+        book.title.toLowerCase().includes(searchQuery) ||
+        book.author.toLowerCase().includes(searchQuery) ||
+        book.category.toLowerCase().includes(searchQuery) ||
+        book.description.toLowerCase().includes(searchQuery)
+    );
+
+    if (filteredBooks.length === 0) {
+        booksGrid.innerHTML = `
+            <div class="empty-state">
+                <p>No books found matching "${query}"</p>
+            </div>
+        `;
+        return;
+    }
+
+    booksGrid.innerHTML = filteredBooks.map(book => `
+        <div class="product-card">
+
+            <div class="product-header">
+                <span class="product-badge">
+                    ${capitalize(book.category)}
+                </span>
+
+                <span class="book-rating">
+                    ⭐ ${book.rating}
+                </span>
+            </div>
+
+            <div class="product-body">
+                <div class="book-icon">
+                    ${book.icon}
+                </div>
+
+                <h3 class="product-title">
+                    ${book.title}
+                </h3>
+
+                <p class="product-author">
+                    by ${book.author}
+                </p>
+
+                <p class="product-description">
+                    ${truncateText(book.description, 120)}
+                </p>
+            </div>
+
+            <div class="product-footer">
+                <span class="product-price">
+                    $${book.price.toFixed(2)}
+                </span>
+
+                <button class="btn-buy"
+                    onclick="openBookModal(${book.id})">
+                    <i class="fas fa-eye"></i>
+                    View
+                </button>
+            </div>
+
+        </div>
+    `).join("");
+}
+
+// ===============================
+// OPEN BOOK MODAL
+// ===============================
+function openBookModal(bookId) {
+    const book = booksDatabase.find(b => b.id === bookId);
+
+    if (!book) return;
+
+    const modal = document.getElementById("book-modal");
+
+    if (!modal) {
+        console.warn("Book modal not found.");
+        return;
+    }
+
+    // Safe element updates
+    setText("modal-book-title", book.title);
+    setText("modal-book-author", `by ${book.author}`);
+    setText("modal-book-category", capitalize(book.category));
+    setText("modal-book-isbn", book.isbn);
+    setText("modal-book-year", book.year);
+    setText("modal-book-rating", `${book.rating} ⭐`);
+    setText("modal-book-pages", `${book.pages} pages`);
+    setText("modal-book-description", book.description);
+    setText("modal-book-price", `$${book.price.toFixed(2)}`);
+
+    const img = document.getElementById("modal-book-img");
+
+    if (img) {
+        img.src =
+            `https://via.placeholder.com/300x400?text=${encodeURIComponent(book.title)}`;
+        img.alt = book.title;
+    }
+
+    modal.style.display = "flex";
+}
+
+// ===============================
+// CLOSE MODAL
+// ===============================
+function closeBookModal() {
+    const modal = document.getElementById("book-modal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+// ===============================
+// HELPER FUNCTIONS
+// ===============================
+function capitalize(text = "") {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function truncateText(text = "", maxLength = 100) {
+    if (text.length <= maxLength) return text;
+
+    return text.substring(0, maxLength) + "...";
+}
+
+function setText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
 }

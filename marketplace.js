@@ -1,183 +1,415 @@
-// Marketplace Management System
+// ===== Marketplace Management System - UPDATED VERSION =====
+
 class Marketplace {
     constructor() {
         this.commissionRate = 0.10;
+        this.allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+        this.allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
+        this.allSales = JSON.parse(localStorage.getItem('allSales')) || [];
+
         this.init();
     }
 
+    // ===== Initialize Marketplace =====
     init() {
+        console.log('Marketplace initialized');
+
         this.setupEventListeners();
         this.displayMarketplaceItems();
         this.loadUserProfile();
     }
 
+    // ===== Setup Event Listeners =====
     setupEventListeners() {
         const marketplaceSearch = document.getElementById('marketplaceSearch');
         const priceFilter = document.getElementById('priceFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
 
         if (marketplaceSearch) {
-            marketplaceSearch.addEventListener('input', () => this.displayMarketplaceItems());
+            marketplaceSearch.addEventListener('input', () => {
+                this.displayMarketplaceItems();
+            });
         }
 
         if (priceFilter) {
-            priceFilter.addEventListener('change', () => this.displayMarketplaceItems());
+            priceFilter.addEventListener('change', () => {
+                this.displayMarketplaceItems();
+            });
+        }
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', () => {
+                this.displayMarketplaceItems();
+            });
         }
     }
 
+    // ===== Load User Profile =====
     loadUserProfile() {
         const currentUserEmail = localStorage.getItem('currentUserEmail');
+
         const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userBalance = document.getElementById('userBalance');
 
-        if (currentUserEmail) {
-            let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-            const user = allUsers[currentUserEmail];
+        if (!currentUserEmail) {
+            if (userInfo) userInfo.style.display = 'none';
+            return;
+        }
 
-            if (user && userInfo) {
-                userInfo.style.display = 'block';
-                document.getElementById('userName').textContent = `👤 ${user.name}`;
-                document.getElementById('userBalance').textContent = `$${user.balance.toFixed(2)}`;
+        this.allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
+
+        const user = this.allUsers[currentUserEmail];
+
+        if (user && userInfo) {
+            userInfo.style.display = 'flex';
+
+            if (userName) {
+                userName.textContent = `👤 ${user.name}`;
+            }
+
+            if (userBalance) {
+                userBalance.textContent = `$${Number(user.balance || 0).toFixed(2)}`;
             }
         }
     }
 
+    // ===== Display Marketplace Products =====
     displayMarketplaceItems() {
-        const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
-        const marketplaceGrid = document.getElementById('marketplaceGrid');
-        const searchQuery = document.getElementById('marketplaceSearch').value.toLowerCase();
-        const priceFilter = document.getElementById('priceFilter').value;
+        this.allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
 
-        let filteredProducts = allProducts.filter(product => {
-            const matchesSearch = product.title.toLowerCase().includes(searchQuery) ||
-                                product.subject.toLowerCase().includes(searchQuery);
-            
+        const marketplaceGrid = document.getElementById('marketplaceGrid');
+
+        if (!marketplaceGrid) return;
+
+        const searchQuery =
+            document.getElementById('marketplaceSearch')?.value.toLowerCase().trim() || '';
+
+        const priceFilter =
+            document.getElementById('priceFilter')?.value || '';
+
+        const categoryFilter =
+            document.getElementById('categoryFilter')?.value || '';
+
+        let filteredProducts = this.allProducts.filter(product => {
+            const title = (product.title || '').toLowerCase();
+            const subject = (product.subject || '').toLowerCase();
+            const description = (product.description || '').toLowerCase();
+
+            // Search filter
+            const matchesSearch =
+                title.includes(searchQuery) ||
+                subject.includes(searchQuery) ||
+                description.includes(searchQuery);
+
+            // Category filter
+            const matchesCategory =
+                !categoryFilter || product.category === categoryFilter;
+
+            // Price filter
             let matchesPrice = true;
-            if (priceFilter) {
-                const price = product.price;
-                if (priceFilter === '0-5') matchesPrice = price >= 0 && price <= 5;
-                if (priceFilter === '5-10') matchesPrice = price > 5 && price <= 10;
-                if (priceFilter === '10-20') matchesPrice = price > 10 && price <= 20;
-                if (priceFilter === '20+') matchesPrice = price > 20;
+
+            const price = Number(product.price || 0);
+
+            switch (priceFilter) {
+                case '0-5':
+                    matchesPrice = price >= 0 && price <= 5;
+                    break;
+
+                case '5-10':
+                    matchesPrice = price > 5 && price <= 10;
+                    break;
+
+                case '10-20':
+                    matchesPrice = price > 10 && price <= 20;
+                    break;
+
+                case '20+':
+                    matchesPrice = price > 20;
+                    break;
+
+                default:
+                    matchesPrice = true;
             }
 
-            return matchesSearch && matchesPrice;
+            return matchesSearch && matchesCategory && matchesPrice;
         });
 
+        // Sort newest first
+        filteredProducts.sort((a, b) => b.id - a.id);
+
+        // Empty state
         if (filteredProducts.length === 0) {
-            marketplaceGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No products found</p>';
+            marketplaceGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or filters.</p>
+                </div>
+            `;
             return;
         }
 
         marketplaceGrid.innerHTML = filteredProducts.map(product => `
             <div class="marketplace-card">
+
                 <div class="product-header">
-                    <span class="product-category">${product.category}</span>
-                    <span class="product-creator">${product.uploadedBy === 'admin' ? '⭐ Admin' : '👤 Creator'}</span>
+                    <span class="product-category">
+                        ${product.category || 'General'}
+                    </span>
+
+                    <span class="product-creator">
+                        ${product.uploadedBy === 'admin'
+                            ? '⭐ Official'
+                            : '👤 Creator'}
+                    </span>
                 </div>
-                <h3>${product.title}</h3>
-                <p class="product-subject"><strong>${product.subject}</strong></p>
-                <p class="product-description">${product.description || ''}</p>
+
+                <div class="product-body">
+                    <h3 class="product-title">
+                        ${product.title || 'Untitled'}
+                    </h3>
+
+                    <p class="product-subject">
+                        ${product.subject || 'No subject'}
+                    </p>
+
+                    <p class="product-description">
+                        ${product.description || 'No description available'}
+                    </p>
+                </div>
+
                 <div class="product-meta">
-                    <span>${(product.fileSize / 1024 / 1024).toFixed(2)} MB</span>
-                    <span>Sales: ${product.sales}</span>
+                    <span>
+                        <i class="fas fa-file"></i>
+                        ${(product.fileSize / 1024 / 1024 || 0).toFixed(2)} MB
+                    </span>
+
+                    <span>
+                        <i class="fas fa-download"></i>
+                        ${product.sales || 0} sales
+                    </span>
                 </div>
+
                 <div class="product-footer">
-                    <span class="product-price">${product.price === 0 ? 'FREE' : '$' + product.price.toFixed(2)}</span>
-                    <button onclick="marketplace.buyProduct(${product.id})" class="btn-buy">
-                        <i class="fas fa-shopping-cart"></i> ${product.price === 0 ? 'Download' : 'Buy'}
+                    <span class="product-price">
+                        ${Number(product.price) === 0
+                            ? 'FREE'
+                            : '$' + Number(product.price).toFixed(2)}
+                    </span>
+
+                    <button 
+                        class="btn-buy"
+                        onclick="marketplace.buyProduct(${product.id})"
+                    >
+                        <i class="fas fa-shopping-cart"></i>
+
+                        ${Number(product.price) === 0
+                            ? 'Download'
+                            : 'Buy Now'}
                     </button>
                 </div>
+
             </div>
         `).join('');
     }
 
+    // ===== Buy Product =====
     buyProduct(productId) {
         let currentUser = this.getCurrentUser();
-        
+
+        // Create account if no user
         if (!currentUser) {
-            const userName = prompt('Enter your name:');
-            if (!userName) return;
-            this.createUser(userName);
+            const userName = prompt('Enter your name');
+
+            if (!userName || userName.trim() === '') {
+                return;
+            }
+
+            this.createUser(userName.trim());
+
             currentUser = this.getCurrentUser();
         }
 
-        const allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
-        const product = allProducts.find(p => p.id === productId);
+        this.allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
 
-        if (!product) return;
+        const product = this.allProducts.find(
+            p => Number(p.id) === Number(productId)
+        );
 
-        if (product.price > 0 && currentUser.balance < product.price) {
-            alert(`❌ Insufficient balance. Need $${product.price.toFixed(2)}`);
+        if (!product) {
+            alert('❌ Product not found');
             return;
         }
+
+        // Prevent buying own product
+        if (
+            product.sellerEmail &&
+            product.sellerEmail === currentUser.email
+        ) {
+            alert('❌ You cannot buy your own product.');
+            return;
+        }
+
+        // Balance check
+        if (
+            Number(product.price) > 0 &&
+            Number(currentUser.balance) < Number(product.price)
+        ) {
+            alert(
+                `❌ Insufficient balance.\n\n` +
+                `Required: $${Number(product.price).toFixed(2)}\n` +
+                `Your Balance: $${Number(currentUser.balance).toFixed(2)}`
+            );
+            return;
+        }
+
+        const confirmPurchase = confirm(
+            `${product.price > 0 ? 'Buy' : 'Download'} "${product.title}"?\n\n` +
+            `Price: ${product.price > 0 ? '$' + Number(product.price).toFixed(2) : 'FREE'}`
+        );
+
+        if (!confirmPurchase) return;
 
         this.processPurchase(product, currentUser);
     }
 
+    // ===== Process Purchase =====
     processPurchase(product, buyer) {
-        let allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
-        const productIndex = allProducts.findIndex(p => p.id === product.id);
-        
-        if (productIndex !== -1) {
-            allProducts[productIndex].sales += 1;
-            allProducts[productIndex].totalRevenue += product.price;
-        }
-        localStorage.setItem('allProducts', JSON.stringify(allProducts));
+        this.allProducts = JSON.parse(localStorage.getItem('allProducts')) || [];
+        this.allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
+        this.allSales = JSON.parse(localStorage.getItem('allSales')) || [];
 
-        if (product.price > 0) {
-            let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-            if (allUsers[buyer.email]) {
-                allUsers[buyer.email].balance -= product.price;
-                localStorage.setItem('allUsers', JSON.stringify(allUsers));
-            }
+        const productIndex = this.allProducts.findIndex(
+            p => Number(p.id) === Number(product.id)
+        );
+
+        if (productIndex === -1) {
+            alert('❌ Product not found');
+            return;
         }
 
-        let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-        if (product.uploadedBy !== 'admin' && product.sellerEmail) {
-            if (allUsers[product.sellerEmail]) {
-                allUsers[product.sellerEmail].earnings = (allUsers[product.sellerEmail].earnings || 0) + (product.price * 0.9);
-            }
-        }
-        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+        // Update sales
+        this.allProducts[productIndex].sales =
+            (this.allProducts[productIndex].sales || 0) + 1;
 
-        let allSales = JSON.parse(localStorage.getItem('allSales')) || [];
-        allSales.push({
+        this.allProducts[productIndex].totalRevenue =
+            (this.allProducts[productIndex].totalRevenue || 0) +
+            Number(product.price || 0);
+
+        // Deduct buyer balance
+        if (
+            Number(product.price) > 0 &&
+            this.allUsers[buyer.email]
+        ) {
+            this.allUsers[buyer.email].balance =
+                Number(this.allUsers[buyer.email].balance || 0) -
+                Number(product.price);
+        }
+
+        // Seller earnings
+        if (
+            product.uploadedBy !== 'admin' &&
+            product.sellerEmail &&
+            this.allUsers[product.sellerEmail]
+        ) {
+            const sellerShare =
+                Number(product.price) * (1 - this.commissionRate);
+
+            this.allUsers[product.sellerEmail].earnings =
+                Number(this.allUsers[product.sellerEmail].earnings || 0) +
+                sellerShare;
+
+            this.allUsers[product.sellerEmail].balance =
+                Number(this.allUsers[product.sellerEmail].balance || 0) +
+                sellerShare;
+        }
+
+        // Record sale
+        const saleRecord = {
             id: Date.now(),
             productId: product.id,
             productTitle: product.title,
             productUploadedBy: product.uploadedBy,
             buyerName: buyer.name,
             buyerEmail: buyer.email,
-            amount: product.price,
+            amount: Number(product.price || 0),
+            commission: Number(product.price || 0) * this.commissionRate,
+            sellerEarnings: Number(product.price || 0) * 0.9,
             saleDate: new Date().toLocaleDateString(),
             saleTime: new Date().toLocaleTimeString()
-        });
-        localStorage.setItem('allSales', JSON.stringify(allSales));
+        };
 
-        const link = document.createElement('a');
-        link.href = product.fileData;
-        link.download = product.fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        this.allSales.push(saleRecord);
 
-        alert(`✓ ${product.price > 0 ? 'Purchased' : 'Downloaded'} successfully!`);
+        // Save
+        localStorage.setItem('allProducts', JSON.stringify(this.allProducts));
+        localStorage.setItem('allUsers', JSON.stringify(this.allUsers));
+        localStorage.setItem('allSales', JSON.stringify(this.allSales));
+
+        // Download file
+        this.downloadFile(product);
+
+        // Success message
+        alert(
+            `✓ ${Number(product.price) > 0 ? 'Purchase successful' : 'Download successful'}!\n\n` +
+            `${product.title}`
+        );
+
+        // Refresh
         this.displayMarketplaceItems();
         this.loadUserProfile();
     }
 
-    getCurrentUser() {
-        const userEmail = localStorage.getItem('currentUserEmail');
-        if (!userEmail) return null;
+    // ===== Download File =====
+    downloadFile(product) {
+        if (!product.fileData) {
+            alert('❌ File unavailable');
+            return;
+        }
 
-        let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-        return allUsers[userEmail] || null;
+        const link = document.createElement('a');
+
+        link.href = product.fileData;
+        link.download = product.fileName || 'download';
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
     }
 
+    // ===== Get Current User =====
+    getCurrentUser() {
+        const userEmail = localStorage.getItem('currentUserEmail');
+
+        if (!userEmail) return null;
+
+        this.allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
+
+        return this.allUsers[userEmail] || null;
+    }
+
+    // ===== Create User =====
     createUser(name) {
-        const email = prompt('Enter your email:') || 'user' + Date.now() + '@library.com';
-        
-        let allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
-        
+        const email =
+            prompt('Enter your email') ||
+            `user${Date.now()}@library.com`;
+
+        this.allUsers = JSON.parse(localStorage.getItem('allUsers')) || {};
+
+        // Existing user
+        if (this.allUsers[email]) {
+            localStorage.setItem('currentUserEmail', email);
+
+            alert(`✓ Welcome back ${this.allUsers[email].name}`);
+
+            this.loadUserProfile();
+            return;
+        }
+
+        // New user
         const newUser = {
             name: name,
             email: email,
@@ -187,16 +419,23 @@ class Marketplace {
             purchaseHistory: []
         };
 
-        allUsers[email] = newUser;
-        localStorage.setItem('allUsers', JSON.stringify(allUsers));
-        localStorage.setItem('currentUserName', name);
+        this.allUsers[email] = newUser;
+
+        localStorage.setItem('allUsers', JSON.stringify(this.allUsers));
         localStorage.setItem('currentUserEmail', email);
+        localStorage.setItem('currentUserName', name);
 
         this.loadUserProfile();
-        alert(`✓ Welcome ${name}! You have $100 initial balance.`);
+
+        alert(
+            `✓ Welcome ${name}!\n\n` +
+            `Your account has been created.\n` +
+            `Initial Balance: $100`
+        );
     }
 }
 
+// ===== Initialize Marketplace =====
 document.addEventListener('DOMContentLoaded', () => {
     window.marketplace = new Marketplace();
 });

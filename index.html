@@ -386,24 +386,29 @@
 
                 <div class="file-upload">
 
-                    <input
-                        type="file"
-                        id="docFile"
-                        accept=".pdf,.doc,.docx"
-                        required
-                    >
+       <label
+        for="resource-file"
+        class="file-upload-area"
+        id="fileInputWrapper"
+       >
 
-                    <div class="file-upload-area">
+        <i class="fas fa-cloud-upload-alt"></i>
 
-                        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Click or Drag File Here</p>
 
-                        <p>Upload Document</p>
+        <span>PDF, DOC, DOCX (Max 10MB)</span>
 
-                        <span>PDF, DOC, DOCX</span>
+    </label>
 
-                    </div>
+    <input
+        type="file"
+        id="resource-file"
+        accept=".pdf,.doc,.docx"
+    >
 
-                </div>
+    <div id="fileName" class="file-name"></div>
+
+             </div>
 
                 <button
                     type="submit"

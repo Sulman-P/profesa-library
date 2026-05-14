@@ -778,6 +778,34 @@ section {
         display: none;
         flex-direction: column;
     }
+   /* ===== FILE INPUT FIX ===== */
+
+#resource-file,
+#docFile {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+}
+
+.file-name {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    border-radius: 6px;
+    color: #065f46;
+    font-weight: 600;
+    display: none;
+}
+
+.file-name.show {
+    display: block;
+}
 
     .navbar-menu.active {
         display: flex;

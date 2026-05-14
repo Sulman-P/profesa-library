@@ -1,93 +1,203 @@
-// Mobile menu toggle
-const menuToggle = document.getElementById('mobile-menu');
-const navbarMenu = document.querySelector('.navbar-menu');
+// ===== MAIN UI CONTROLLER =====
 
-menuToggle.addEventListener('click', () => {
-    navbarMenu.classList.toggle('active');
-});
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('UI initialized');
 
-// Close mobile menu on link click
-document.querySelectorAll('.navbar-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        navbarMenu.classList.remove('active');
-    });
-});
+    initializeMobileMenu();
+    initializeSearch();
+    initializeFilters();
+    initializeModalHandlers();
+    initializeContactForm();
+    initializeSmoothScroll();
 
-// Search functionality
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
+    // Load books and categories
+    if (typeof loadCategories === 'function') {
+        loadCategories();
+    }
 
-searchBtn.addEventListener('click', () => {
-    const query = searchInput.value.trim();
-    if (query) {
-        searchBooks(query);
-        document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
+    if (typeof loadBooks === 'function') {
+        loadBooks('all');
+    }
+
+    // Set default active filter
+    const defaultFilter = document.querySelector('.filter-btn[data-filter="all"]');
+    if (defaultFilter) {
+        defaultFilter.classList.add('active');
     }
 });
 
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+// ===== MOBILE MENU =====
+function initializeMobileMenu() {
+    const menuToggle = document.getElementById('mobile-menu');
+    const navbarMenu = document.querySelector('.navbar-menu');
+
+    if (!menuToggle || !navbarMenu) return;
+
+    menuToggle.addEventListener('click', () => {
+        navbarMenu.classList.toggle('active');
+    });
+
+    // Close menu when link clicked
+    document.querySelectorAll('.navbar-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            navbarMenu.classList.remove('active');
+        });
+    });
+}
+
+// ===== SEARCH =====
+function initializeSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
+
+    if (!searchInput || !searchBtn) return;
+
+    const handleSearch = () => {
         const query = searchInput.value.trim();
-        if (query) {
-            searchBooks(query);
-            document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
+
+        if (!query) {
+            if (typeof loadBooks === 'function') {
+                loadBooks('all');
+            }
+            return;
         }
-    }
-});
 
-// Filter buttons functionality
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        loadBooks(filter);
+        if (typeof searchBooks === 'function') {
+            searchBooks(query);
+        }
+
+        scrollToFeatured();
+    };
+
+    searchBtn.addEventListener('click', handleSearch);
+
+    searchInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSearch();
+        }
     });
-});
+}
 
-// Modal functionality
-const modal = document.getElementById('book-modal');
-const closeBtn = document.querySelector('.close');
+// ===== FILTERS =====
+function initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
 
-closeBtn.addEventListener('click', closeBookModal);
+    if (!filterButtons.length) return;
 
-window.addEventListener('click', (e) => {
-    if (e.target === modal) {
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class
+            filterButtons.forEach(b => b.classList.remove('active'));
+
+            // Add active class
+            btn.classList.add('active');
+
+            // Get filter value
+            const filter = btn.dataset.filter || 'all';
+
+            // Load filtered books
+            if (typeof loadBooks === 'function') {
+                loadBooks(filter);
+            }
+
+            scrollToFeatured();
+        });
+    });
+}
+
+// ===== MODALS =====
+function initializeModalHandlers() {
+    const modal = document.getElementById('book-modal');
+
+    // Close buttons
+    document.querySelectorAll('.close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeAllModals();
+        });
+    });
+
+    // Outside click
+    window.addEventListener('click', e => {
+        if (
+            e.target.classList.contains('modal') ||
+            e.target === modal
+        ) {
+            closeAllModals();
+        }
+    });
+
+    // ESC key
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeAllModals();
+        }
+    });
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    });
+
+    // Specific fallback
+    if (typeof closeBookModal === 'function') {
         closeBookModal();
     }
-});
+}
 
-// Form submission
-const contactForm = document.querySelector('.contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+// ===== CONTACT FORM =====
+function initializeContactForm() {
+    const contactForm = document.querySelector('.contact-form');
+
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', e => {
         e.preventDefault();
-        alert('Thank you for your message! We will get back to you soon.');
+
+        alert('✓ Thank you for your message! We will get back to you soon.');
+
         contactForm.reset();
     });
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadCategories();
-    loadBooks('all');
-    
-    // Set first filter button as active
-    document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
-});
+// ===== SMOOTH SCROLL =====
+function initializeSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
 
-// Smooth scroll offset for sticky navbar
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href !== '#' && document.querySelector(href)) {
+            if (!href || href === '#') return;
+
+            const targetElement = document.querySelector(href);
+
+            if (!targetElement) return;
+
             e.preventDefault();
-            const element = document.querySelector(href);
-            const offsetTop = element.offsetTop - 70;
+
+            const navbarOffset = 70;
+            const offsetTop =
+                targetElement.getBoundingClientRect().top +
+                window.pageYOffset -
+                navbarOffset;
+
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth'
             });
-        }
+        });
     });
-});
+}
+
+// ===== HELPERS =====
+function scrollToFeatured() {
+    const featured = document.getElementById('featured');
+
+    if (featured) {
+        featured.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}

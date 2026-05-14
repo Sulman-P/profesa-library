@@ -5,63 +5,55 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ NexaLearn Loaded');
 
     // ===== MOBILE MENU =====
-    const menuToggle = document.getElementById('mobile-menu');
-    const navbarMenu = document.querySelector('.navbar-menu');
+const menuToggle = document.getElementById('menuToggle');
+const navbarMenu = document.querySelector('.navbar-menu');
 
-    if (menuToggle && navbarMenu) {
+if (menuToggle && navbarMenu) {
+    menuToggle.addEventListener('click', () => {
+        navbarMenu.classList.toggle('active');
+    });
+}
 
-        menuToggle.addEventListener('click', () => {
-            navbarMenu.classList.toggle('active');
-        });
+// ===== CLOSE MENU =====
+document.querySelectorAll('.navbar-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+        navbarMenu.classList.remove('active');
+    });
+});
 
-        document.querySelectorAll('.navbar-menu a').forEach(link => {
+// ===== SEARCH =====
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
 
-            link.addEventListener('click', () => {
-                navbarMenu.classList.remove('active');
-            });
+if (searchBtn && searchInput) {
 
-        });
-    }
+    searchBtn.addEventListener('click', () => {
+        performSearch();
+    });
 
-    // ===== SEARCH =====
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-
-    function handleSearch() {
-
-        const query = searchInput?.value.trim();
-
-        if (!query) return;
-
-        if (typeof searchBooks === 'function') {
-            searchBooks(query);
-        } else {
-            console.log('Search:', query);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
         }
+    });
+}
 
-        const featured = document.getElementById('featured');
+function performSearch() {
 
-        if (featured) {
-            featured.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    }
+    const query = searchInput.value.trim();
 
-    if (searchBtn) {
-        searchBtn.addEventListener('click', handleSearch);
-    }
+    if (!query) return;
 
-    if (searchInput) {
+    alert(`Searching for: ${query}`);
 
-        searchInput.addEventListener('keypress', (e) => {
+    const marketplace = document.getElementById('marketplace');
 
-            if (e.key === 'Enter') {
-                handleSearch();
-            }
-
+    if (marketplace) {
+        marketplace.scrollIntoView({
+            behavior: 'smooth'
         });
     }
+}
 
     // ===== FILTER BUTTONS =====
     document.querySelectorAll('.filter-btn').forEach(btn => {

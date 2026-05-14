@@ -1,230 +1,365 @@
-// ===== Payment System =====
+// ===== PAYMENT SYSTEM - UPDATED & ERROR FREE VERSION =====
 
+// ===== Merchant Details =====
 const MERCHANT_DETAILS = {
     name: 'POCHI LA BIASHARA',
     phone: '0768515494',
-    email: 'pochillabiashara@example.com',
-    paybill: '501234',
-    accountNumber: 'YOUR_ACCOUNT'
+    email: 'pochillabiashara@nexalearn.com',
+    paybill: '522522',
+    accountNumber: '1197966080'
 };
 
+// ===== Bank Details =====
 const BANK_DETAILS = {
-    bankName: 'Equity Bank Kenya',
-    accountName: 'POCHI LA BIASHARA',
-    accountNumber: '0768515494',
+    bankName: 'Kenya Commercial Bank',
+    accountName: 'Sulman NexaLearn',
+    accountNumber: '1197966080',
     branchCode: '001'
 };
 
+// ===== Global Payment State =====
 let pendingPayment = null;
 
 // ===== Open Payment Modal =====
 function openPaymentModal(productId) {
-    const product = allProducts.find(p => p.id === productId);
-    if (!product) return;
+    const allProducts =
+        JSON.parse(localStorage.getItem('allProducts')) || [];
 
-    if (!currentUser) {
-        alert('Please set up your profile first');
-        openUserModal();
+    const product = allProducts.find(
+        p => Number(p.id) === Number(productId)
+    );
+
+    if (!product) {
+        alert('❌ Product not found');
         return;
     }
 
-    // Store pending payment
+    // Get current user
+    let currentUser = null;
+
+    const currentUserEmail =
+        localStorage.getItem('currentUserEmail');
+
+    const allUsers =
+        JSON.parse(localStorage.getItem('allUsers')) || {};
+
+    if (currentUserEmail && allUsers[currentUserEmail]) {
+        currentUser = allUsers[currentUserEmail];
+    }
+
+    // Require login
+    if (!currentUser) {
+        alert('Please create a user profile first.');
+
+        if (typeof openUserModal === 'function') {
+            openUserModal();
+        }
+
+        return;
+    }
+
+    // Store payment info
     pendingPayment = {
-        productId: productId,
+        productId: product.id,
         productTitle: product.title,
-        productDescription: product.description,
-        amount: product.price,
+        productDescription: product.description || '',
+        amount: Number(product.price || 0),
         buyerEmail: currentUser.email,
         buyerName: currentUser.name,
         fileName: product.fileName,
         fileData: product.fileData
     };
 
-    // Update modal content
-    document.getElementById('paymentProductTitle').textContent = product.title;
-    document.getElementById('paymentProductDesc').textContent = product.description || 'No description';
-    document.getElementById('paymentAmount').textContent = '$' + product.price.toFixed(2);
-    document.getElementById('bankAmount').textContent = '$' + product.price.toFixed(2);
+    // Update UI safely
+    const paymentTitle =
+        document.getElementById('paymentProductTitle');
 
-    // Reset payment method selection
-    document.getElementById('mpesa').checked = true;
+    const paymentDesc =
+        document.getElementById('paymentProductDesc');
+
+    const paymentAmount =
+        document.getElementById('paymentAmount');
+
+    const bankAmount =
+        document.getElementById('bankAmount');
+
+    if (paymentTitle) {
+        paymentTitle.textContent = product.title;
+    }
+
+    if (paymentDesc) {
+        paymentDesc.textContent =
+            product.description || 'No description available';
+    }
+
+    if (paymentAmount) {
+        paymentAmount.textContent =
+            '$' + Number(product.price).toFixed(2);
+    }
+
+    if (bankAmount) {
+        bankAmount.textContent =
+            '$' + Number(product.price).toFixed(2);
+    }
+
+    // Default payment method
+    const mpesaRadio = document.getElementById('mpesa');
+
+    if (mpesaRadio) {
+        mpesaRadio.checked = true;
+    }
+
     showPaymentMethod('mpesa');
 
     // Open modal
-    document.getElementById('paymentModal').classList.add('show');
+    const paymentModal =
+        document.getElementById('paymentModal');
+
+    if (paymentModal) {
+        paymentModal.classList.add('show');
+    }
 }
 
 // ===== Show Payment Method =====
 function showPaymentMethod(method) {
-    // Hide all forms
-    document.getElementById('mpesaForm').classList.remove('active');
-    document.getElementById('cardForm').classList.remove('active');
-    document.getElementById('bankForm').classList.remove('active');
+    const forms = [
+        'mpesaForm',
+        'cardForm',
+        'bankForm'
+    ];
 
-    // Show selected form
-    if (method === 'mpesa') {
-        document.getElementById('mpesaForm').classList.add('active');
-    } else if (method === 'card') {
-        document.getElementById('cardForm').classList.add('active');
-    } else if (method === 'bank') {
-        document.getElementById('bankForm').classList.add('active');
+    // Hide all
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+
+        if (form) {
+            form.classList.remove('active');
+        }
+    });
+
+    // Show selected
+    const selectedForm =
+        document.getElementById(method + 'Form');
+
+    if (selectedForm) {
+        selectedForm.classList.add('active');
     }
 }
 
-// ===== Payment Method Change Handler =====
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+// ===== Setup Payment Method Events =====
+document.addEventListener('DOMContentLoaded', () => {
+    const paymentRadios =
+        document.querySelectorAll('input[name="paymentMethod"]');
+
     paymentRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
+        radio.addEventListener('change', function () {
             showPaymentMethod(this.value);
         });
     });
+
+    setupCardFormatting();
 });
 
 // ===== Process M-Pesa Payment =====
 function processMpesaPayment() {
     if (!pendingPayment) {
-        alert('No pending payment');
+        alert('❌ No pending payment.');
         return;
     }
 
-    const phone = document.getElementById('mpesaPhone').value.trim();
-    const pin = document.getElementById('mpesaPin').value;
+    const phone =
+        document.getElementById('mpesaPhone')?.value.trim();
+
+    const pin =
+        document.getElementById('mpesaPin')?.value.trim();
 
     if (!phone || !pin) {
-        alert('Please enter phone number and PIN');
+        alert('Please enter phone number and PIN.');
         return;
     }
 
-    if (!phone.match(/^254[0-9]{9}$/)) {
-        alert('Invalid phone format. Use: 254XXXXXXXXX');
+    // Accept 2547XXXXXXXX or 07XXXXXXXX
+    const cleanPhone = phone.replace(/\s/g, '');
+
+    const isValidPhone =
+        /^2547\d{8}$/.test(cleanPhone) ||
+        /^07\d{8}$/.test(cleanPhone);
+
+    if (!isValidPhone) {
+        alert('Invalid phone number format.');
         return;
     }
 
-    // Show processing message
-    alert('💳 Processing M-Pesa payment...\n\nAmount: KES ' + (pendingPayment.amount * 150).toFixed(2) + '\n\nYou will receive a prompt on your phone.');
+    alert(
+        `💳 Processing M-Pesa Payment...\n\n` +
+        `Amount: KES ${(pendingPayment.amount * 150).toFixed(2)}`
+    );
 
-    // Simulate M-Pesa processing
     setTimeout(() => {
-        // In real app, this would call M-Pesa API
-        completePayment('mpesa', phone);
-    }, 2000);
+        completePayment(
+            'mpesa',
+            cleanPhone
+        );
+    }, 1500);
 }
 
 // ===== Process Card Payment =====
 function processCardPayment() {
     if (!pendingPayment) {
-        alert('No pending payment');
+        alert('❌ No pending payment.');
         return;
     }
 
-    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-    const expiry = document.getElementById('cardExpiry').value;
-    const cvv = document.getElementById('cardCvv').value;
-    const name = document.getElementById('cardName').value;
+    const cardNumber =
+        document.getElementById('cardNumber')
+            ?.value.replace(/\s/g, '');
 
-    if (!cardNumber || !expiry || !cvv || !name) {
-        alert('Please fill in all card details');
+    const expiry =
+        document.getElementById('cardExpiry')?.value;
+
+    const cvv =
+        document.getElementById('cardCvv')?.value;
+
+    const cardName =
+        document.getElementById('cardName')?.value.trim();
+
+    if (!cardNumber || !expiry || !cvv || !cardName) {
+        alert('Please complete all card details.');
         return;
     }
 
-    if (cardNumber.length !== 16) {
-        alert('Invalid card number');
+    if (!/^\d{16}$/.test(cardNumber)) {
+        alert('Invalid card number.');
         return;
     }
 
-    if (!expiry.match(/^\d{2}\/\d{2}$/)) {
-        alert('Invalid expiry date format (MM/YY)');
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+        alert('Expiry format should be MM/YY.');
         return;
     }
 
-    if (cvv.length !== 3) {
-        alert('Invalid CVV');
+    if (!/^\d{3,4}$/.test(cvv)) {
+        alert('Invalid CVV.');
         return;
     }
 
-    // Show processing message
-    alert('💳 Processing card payment...\n\nCard: **** **** **** ' + cardNumber.slice(-4) + '\n\nPlease wait...');
+    alert(
+        `💳 Processing Card Payment...\n\n` +
+        `Card Ending: ${cardNumber.slice(-4)}`
+    );
 
-    // Simulate card processing
     setTimeout(() => {
-        completePayment('card', '**** **** **** ' + cardNumber.slice(-4));
-    }, 2000);
+        completePayment(
+            'card',
+            '**** **** **** ' + cardNumber.slice(-4)
+        );
+    }, 1500);
 }
 
 // ===== Process Bank Payment =====
 function processBankPayment() {
     if (!pendingPayment) {
-        alert('No pending payment');
+        alert('❌ No pending payment.');
         return;
     }
 
-    const reference = document.getElementById('bankReference').value.trim();
+    const reference =
+        document.getElementById('bankReference')
+            ?.value.trim();
 
     if (!reference) {
-        alert('Please enter bank reference number');
+        alert('Please enter bank reference number.');
         return;
     }
 
-    // Show processing message
-    alert('🏦 Bank transfer initiated\n\nReference: ' + reference + '\n\nPlease verify the payment was sent to:\n' + BANK_DETAILS.accountName);
+    alert(
+        `🏦 Bank Transfer Submitted\n\n` +
+        `Reference: ${reference}\n\n` +
+        `Bank: ${BANK_DETAILS.bankName}`
+    );
 
-    // Simulate bank verification
     setTimeout(() => {
         completePayment('bank', reference);
-    }, 1500);
+    }, 1200);
 }
 
-// ===== Complete Payment & Request Email =====
+// ===== Complete Payment =====
 function completePayment(method, reference) {
-    // Close payment modal
-    document.getElementById('paymentModal').classList.remove('show');
+    const paymentModal =
+        document.getElementById('paymentModal');
 
-    // Show receipt modal with email input
+    if (paymentModal) {
+        paymentModal.classList.remove('show');
+    }
+
     openReceiptModal(method, reference);
 }
 
 // ===== Open Receipt Modal =====
 function openReceiptModal(method, reference) {
-    document.getElementById('receiptForm').reset();
-    document.getElementById('receiptModal').classList.add('show');
+    const receiptForm =
+        document.getElementById('receiptForm');
 
-    // Handle form submission
-    document.getElementById('receiptForm').onsubmit = function(e) {
+    const receiptModal =
+        document.getElementById('receiptModal');
+
+    if (!receiptForm || !receiptModal) return;
+
+    receiptForm.reset();
+
+    receiptModal.classList.add('show');
+
+    receiptForm.onsubmit = function (e) {
         e.preventDefault();
+
         finalizePayment(method, reference);
     };
 }
 
-// ===== Finalize Payment & Send Document =====
+// ===== Finalize Payment =====
 function finalizePayment(method, reference) {
-    const email = document.getElementById('recipientEmail').value.trim();
+    const recipientEmail =
+        document.getElementById('recipientEmail')
+            ?.value.trim();
 
-    if (!email) {
-        alert('Please enter your email address');
+    if (!recipientEmail) {
+        alert('Please enter your email.');
         return;
     }
 
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        alert('Invalid email address');
+    const validEmail =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!validEmail.test(recipientEmail)) {
+        alert('Invalid email address.');
         return;
     }
 
     if (!pendingPayment) {
-        alert('Payment error: No pending transaction');
+        alert('❌ Payment session expired.');
         return;
     }
+
+    // Get latest data
+    let allProducts =
+        JSON.parse(localStorage.getItem('allProducts')) || [];
+
+    let allUsers =
+        JSON.parse(localStorage.getItem('allUsers')) || {};
+
+    let payments =
+        JSON.parse(localStorage.getItem('payments')) || [];
 
     // Create payment record
     const paymentRecord = {
         id: Date.now(),
         productId: pendingPayment.productId,
         productTitle: pendingPayment.productTitle,
-        amount: pendingPayment.amount,
+        amount: Number(pendingPayment.amount || 0),
         method: method,
         reference: reference,
         buyerName: pendingPayment.buyerName,
-        buyerEmail: email,
+        buyerEmail: recipientEmail,
         merchantEmail: MERCHANT_DETAILS.email,
         merchantPhone: MERCHANT_DETAILS.phone,
         paymentDate: new Date().toLocaleDateString(),
@@ -232,170 +367,197 @@ function finalizePayment(method, reference) {
         status: 'completed'
     };
 
-    // Save payment record
-    let payments = JSON.parse(localStorage.getItem('payments')) || [];
     payments.push(paymentRecord);
-    localStorage.setItem('payments', JSON.stringify(payments));
+
+    // Save payments
+    localStorage.setItem(
+        'payments',
+        JSON.stringify(payments)
+    );
 
     // Update user balance
-    if (currentUser) {
-        currentUser.balance -= pendingPayment.amount;
-        allUsers[pendingPayment.buyerEmail] = currentUser;
-        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+    if (allUsers[pendingPayment.buyerEmail]) {
+        allUsers[pendingPayment.buyerEmail].balance =
+            Number(allUsers[pendingPayment.buyerEmail].balance || 0) -
+            Number(pendingPayment.amount || 0);
+
+        localStorage.setItem(
+            'allUsers',
+            JSON.stringify(allUsers)
+        );
     }
 
     // Update product sales
-    const product = allProducts.find(p => p.id === pendingPayment.productId);
-    if (product) {
-        product.sales = (product.sales || 0) + 1;
-        localStorage.setItem('allProducts', JSON.stringify(allProducts));
+    const productIndex = allProducts.findIndex(
+        p => Number(p.id) === Number(pendingPayment.productId)
+    );
+
+    if (productIndex !== -1) {
+        allProducts[productIndex].sales =
+            (allProducts[productIndex].sales || 0) + 1;
+
+        localStorage.setItem(
+            'allProducts',
+            JSON.stringify(allProducts)
+        );
     }
 
-    // Send emails
+    // Save email notifications
     sendPaymentEmails(paymentRecord);
 
     // Download file
-    downloadDocument(pendingPayment.fileName, pendingPayment.fileData);
+    downloadDocument(
+        pendingPayment.fileName,
+        pendingPayment.fileData
+    );
 
-    // Close modal
-    document.getElementById('receiptModal').classList.remove('show');
+    // Close receipt modal
+    const receiptModal =
+        document.getElementById('receiptModal');
+
+    if (receiptModal) {
+        receiptModal.classList.remove('show');
+    }
 
     // Show success
     showSuccessMessage(paymentRecord);
 
-    // Reset
+    // Reset state
     pendingPayment = null;
-    loadUserProfile();
-    loadMarketplace();
+
+    // Refresh UI
+    if (typeof loadUserProfile === 'function') {
+        loadUserProfile();
+    }
+
+    if (typeof loadMarketplace === 'function') {
+        loadMarketplace();
+    }
+
+    if (
+        window.marketplace &&
+        typeof window.marketplace.displayMarketplaceItems === 'function'
+    ) {
+        window.marketplace.displayMarketplaceItems();
+    }
 }
 
-// ===== Send Payment Emails =====
+// ===== Store Emails =====
 function sendPaymentEmails(payment) {
-    // Buyer receipt email
+    const sentEmails =
+        JSON.parse(localStorage.getItem('sentEmails')) || [];
+
     const buyerEmail = {
         to: payment.buyerEmail,
-        subject: `📄 Your Document Purchase Receipt - ${payment.productTitle}`,
-        body: `
-Hello ${payment.buyerName},
-
-Thank you for your purchase! Here are your payment details:
-
-=== PURCHASE RECEIPT ===
-Document: ${payment.productTitle}
-Amount Paid: $${payment.amount.toFixed(2)}
-Payment Method: ${payment.method.toUpperCase()}
-Date: ${payment.paymentDate}
-Time: ${payment.paymentTime}
-
-Transaction Reference: ${payment.reference}
-
-Your document has been prepared and is ready for download.
-
-===== PAYMENT DETAILS SENT TO =====
-Merchant: ${MERCHANT_DETAILS.name}
-Phone: ${MERCHANT_DETAILS.phone}
-Email: ${MERCHANT_DETAILS.email}
-
-Thank you for using Academic Library Pro!
-Best regards,
-Academic Library Team
-        `
+        subject: `Receipt - ${payment.productTitle}`,
+        message:
+            `Thank you ${payment.buyerName}.\n\n` +
+            `Your payment of $${payment.amount.toFixed(2)} was successful.\n` +
+            `Reference: ${payment.reference}`
     };
 
-    // Merchant notification email
     const merchantEmail = {
         to: MERCHANT_DETAILS.email,
-        subject: `💰 New Payment Received - ${payment.productTitle}`,
-        body: `
-A new payment has been received!
-
-=== PAYMENT NOTIFICATION ===
-Customer: ${payment.buyerName}
-Customer Email: ${payment.buyerEmail}
-Product: ${payment.productTitle}
-Amount: $${payment.amount.toFixed(2)}
-Payment Method: ${payment.method.toUpperCase()}
-Reference: ${payment.reference}
-Date: ${payment.paymentDate}
-Time: ${payment.paymentTime}
-
-=== MERCHANT DETAILS ===
-Name: ${MERCHANT_DETAILS.name}
-Phone: ${MERCHANT_DETAILS.phone}
-Paybill: ${MERCHANT_DETAILS.paybill}
-
-Bank Transfer Details:
-Bank: ${BANK_DETAILS.bankName}
-Account: ${BANK_DETAILS.accountNumber}
-
-Please ensure the payment is received and verified.
-
-Academic Library Pro Payment System
-        `
+        subject: `New Payment - ${payment.productTitle}`,
+        message:
+            `New payment received from ${payment.buyerName}.\n\n` +
+            `Amount: $${payment.amount.toFixed(2)}`
     };
 
-    // Save emails to localStorage
-    let sentEmails = JSON.parse(localStorage.getItem('sentEmails')) || [];
     sentEmails.push(buyerEmail);
     sentEmails.push(merchantEmail);
-    localStorage.setItem('sentEmails', JSON.stringify(sentEmails));
 
-    // Log emails (in production, use EmailJS or backend service)
-    console.log('Buyer Email:', buyerEmail);
-    console.log('Merchant Email:', merchantEmail);
+    localStorage.setItem(
+        'sentEmails',
+        JSON.stringify(sentEmails)
+    );
 
-    // Show notification
-    console.log('✓ Emails queued for sending');
+    console.log('Emails stored successfully');
 }
 
 // ===== Download Document =====
 function downloadDocument(fileName, fileData) {
+    if (!fileData) {
+        alert('❌ File unavailable.');
+        return;
+    }
+
     const link = document.createElement('a');
+
     link.href = fileData;
-    link.download = fileName;
+    link.download = fileName || 'download';
+
     document.body.appendChild(link);
+
     link.click();
+
     document.body.removeChild(link);
 }
 
-// ===== Show Success Message =====
+// ===== Success Message =====
 function showSuccessMessage(payment) {
-    alert(`
-✓ PAYMENT SUCCESSFUL!
-
-Document: ${payment.productTitle}
-Amount: $${payment.amount.toFixed(2)}
-Payment Method: ${payment.method.toUpperCase()}
-Reference: ${payment.reference}
-
-📧 Payment receipt sent to: ${payment.buyerEmail}
-📱 Merchant notification sent to: ${MERCHANT_DETAILS.phone}
-
-Your document is ready to download!
-
-Thank you for your purchase!
-    `);
+    alert(
+        `✓ PAYMENT SUCCESSFUL!\n\n` +
+        `Document: ${payment.productTitle}\n` +
+        `Amount: $${payment.amount.toFixed(2)}\n` +
+        `Method: ${payment.method.toUpperCase()}\n` +
+        `Reference: ${payment.reference}\n\n` +
+        `Receipt sent to:\n${payment.buyerEmail}`
+    );
 }
 
-// ===== Format Card Number Input =====
-document.addEventListener('DOMContentLoaded', function() {
-    const cardInput = document.getElementById('cardNumber');
+// ===== Format Card Inputs =====
+function setupCardFormatting() {
+    // Card Number
+    const cardInput =
+        document.getElementById('cardNumber');
+
     if (cardInput) {
-        cardInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s/g, '');
-            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+        cardInput.addEventListener('input', function (e) {
+            let value =
+                e.target.value.replace(/\D/g, '');
+
+            value = value.substring(0, 16);
+
+            const formatted =
+                value.match(/.{1,4}/g)?.join(' ') || value;
+
             e.target.value = formatted;
         });
     }
 
-    const expiryInput = document.getElementById('cardExpiry');
+    // Expiry
+    const expiryInput =
+        document.getElementById('cardExpiry');
+
     if (expiryInput) {
-        expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
+        expiryInput.addEventListener('input', function (e) {
+            let value =
+                e.target.value.replace(/\D/g, '');
+
+            value = value.substring(0, 4);
+
             if (value.length >= 2) {
-                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                value =
+                    value.substring(0, 2) +
+                    '/' +
+                    value.substring(2);
             }
+
             e.target.value = value;
         });
     }
-});
+
+    // CVV
+    const cvvInput =
+        document.getElementById('cardCvv');
+
+    if (cvvInput) {
+        cvvInput.addEventListener('input', function (e) {
+            e.target.value =
+                e.target.value
+                    .replace(/\D/g, '')
+                    .substring(0, 4);
+        });
+    }
+}

@@ -152,3 +152,63 @@ function performSearch() {
     });
 
 });
+// ===== FILE PICKER =====
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const fileInput = document.getElementById("docFile");
+    const uploadArea = document.getElementById("fileUploadArea");
+    const selectedFile = document.getElementById("selectedFileName");
+
+    if (uploadArea && fileInput) {
+
+        // Open picker
+        uploadArea.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        // File selected
+        fileInput.addEventListener("change", (e) => {
+
+            const file = e.target.files[0];
+
+            if (file) {
+                selectedFile.innerHTML = `
+                    <i class="fas fa-file-alt"></i>
+                    ${file.name}
+                `;
+            }
+        });
+
+        // Drag over
+        uploadArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            uploadArea.classList.add("dragover");
+        });
+
+        // Drag leave
+        uploadArea.addEventListener("dragleave", () => {
+            uploadArea.classList.remove("dragover");
+        });
+
+        // Drop
+        uploadArea.addEventListener("drop", (e) => {
+
+            e.preventDefault();
+
+            uploadArea.classList.remove("dragover");
+
+            const files = e.dataTransfer.files;
+
+            if (files.length > 0) {
+
+                fileInput.files = files;
+
+                selectedFile.innerHTML = `
+                    <i class="fas fa-file-alt"></i>
+                    ${files[0].name}
+                `;
+            }
+        });
+    }
+});

@@ -812,3 +812,44 @@ section {
     }
 
 }
+/* ===== Category Buttons ===== */
+
+.category-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 30px;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.category-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.category-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 3rem;
+    width: 100%;
+    color: var(--text-light);
+}
+
+.empty-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}

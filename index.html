@@ -306,122 +306,29 @@
         </div>
 
         <!-- ADMIN UPLOAD -->
-        <div id="adminUpload" class="admin-tab">
-
-            <h2>Upload Document</h2>
-
-            <form id="adminUploadForm" class="upload-form">
-
-                <div class="form-row">
-
-                    <div class="form-group">
-
-                        <label>Title</label>
-
-                        <input
-                            type="text"
-                            id="docTitle"
-                            required
-                        >
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label>Category</label>
-
-                        <select id="docCategory" required>
-
-                            <option value="">Select</option>
-                            <option value="Textbook">Textbook</option>
-                            <option value="Exam">Exam</option>
-                            <option value="Notes">Notes</option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-                <div class="form-row">
-
-                    <div class="form-group">
-
-                        <label>Subject</label>
-
-                        <input
-                            type="text"
-                            id="docSubject"
-                            required
-                        >
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label>Price (KES)</label>
-
-                        <input
-                            type="number"
-                            id="docPrice"
-                            min="0"
-                            step="0.01"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-                <div class="form-group full">
-
-                    <label>Description</label>
-
-                    <textarea
-                        id="docDescription"
-                        rows="4"
-                    ></textarea>
-
-                </div>
-
-                <div class="file-upload">
-
-       <label
-        for="resource-file"
-        class="file-upload-area"
-        id="fileInputWrapper"
-       >
-
-        <i class="fas fa-cloud-upload-alt"></i>
-
-        <p>Click or Drag File Here</p>
-
-        <span>PDF, DOC, DOCX (Max 10MB)</span>
-
-    </label>
+        <div class="file-upload">
 
     <input
         type="file"
-        id="resource-file"
+        id="docFile"
         accept=".pdf,.doc,.docx"
+        hidden
     >
 
-    <div id="fileName" class="file-name"></div>
+    <div
+        class="file-upload-area"
+        id="fileUploadArea"
+    >
+        <i class="fas fa-cloud-upload-alt"></i>
 
-             </div>
+        <p>Click to upload or drag & drop</p>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-block"
-                >
-                    Upload Document
-                </button>
+        <span>
+            PDF, DOC, DOCX (Max 10MB)
+        </span>
 
-            </form>
-
-        </div>
-
-    </main>
+        <div id="selectedFileName" class="selected-file"></div>
+    </div>
 
 </div>
 

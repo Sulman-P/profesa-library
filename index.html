@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ===== META ===== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ===== SEO ===== -->
     <meta
         name="description"
         content="NexaLearn International - Academic resources, digital marketplace, online learning, exams and educational resource platform."
@@ -13,44 +11,47 @@
 
     <title>NexaLearn International</title>
 
-    <!-- ===== FAVICON ===== -->
     <link rel="icon" type="image/png" href="favicon.png">
 
-    <!-- ===== FONT AWESOME ===== -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
 
-    <!-- ===== MAIN CSS ===== -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- ===== DYNAMIC BACKGROUND STYLE ===== -->
     <style>
         /* Sets a clean, professional admin block background image behind the admin dashboard section */
         .admin-dashboard {
             background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
                         url('admin-block.jpg') no-repeat center center/cover;
         }
+        /* Style additions for new professional blocks */
+        .navbar-brand-wrapper { display: flex; flex-direction: column; }
+        .navbar-motto { font-size: 0.75rem; font-style: italic; color: #666; margin-top: 2px; }
+        .core-values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .value-card { padding: 1.5rem; background: #f9f9f9; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .value-card i { font-size: 2rem; color: #0056b3; margin-bottom: 0.5rem; }
+        .about-statement-block { margin-bottom: 3rem; line-height: 1.8; font-size: 1.1rem; }
+        .mission-vision-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
+        @media (max-width: 768px) { .mission-vision-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 
 <body>
 
-<!-- ===================================================== -->
-<!-- NAVIGATION -->
-<!-- ===================================================== -->
 <nav class="navbar">
 
     <div class="navbar-container">
 
-        <!-- LOGO -->
-        <div class="navbar-brand">
-            <i class="fas fa-book-open"></i>
-            <span>NexaLearn International</span>
+        <div class="navbar-brand-wrapper">
+            <div class="navbar-brand">
+                <i class="fas fa-book-open"></i>
+                <span>NexaLearn International</span>
+            </div>
+            <span class="navbar-motto">Knowledge for Global Excellence.</span>
         </div>
 
-        <!-- SEARCH -->
         <div class="navbar-search">
 
             <input
@@ -70,7 +71,6 @@
 
         </div>
 
-        <!-- NAV LINKS -->
         <ul class="navbar-menu">
 
             <li>
@@ -95,7 +95,6 @@
 
         </ul>
 
-        <!-- ACTION BUTTONS -->
         <div class="navbar-actions">
 
             <button
@@ -118,7 +117,6 @@
 
         </div>
 
-        <!-- MOBILE MENU -->
         <div
             class="menu-toggle"
             id="menuToggle"
@@ -131,10 +129,6 @@
     </div>
 
 </nav>
-
-<!-- ===================================================== -->
-<!-- ADMIN LOGIN MODAL -->
-<!-- ===================================================== -->
 
 <div id="adminModal" class="modal">
 
@@ -190,10 +184,6 @@
     </div>
 
 </div>
-
-<!-- ===================================================== -->
-<!-- ADMIN DASHBOARD -->
-<!-- ===================================================== -->
 
 <div id="adminDashboard" class="admin-dashboard hidden">
 
@@ -266,10 +256,8 @@
 
     </aside>
 
-    <!-- ADMIN CONTENT -->
     <main class="admin-content">
 
-        <!-- OVERVIEW -->
         <div id="overview" class="admin-tab active">
 
             <h2>Dashboard Overview</h2>
@@ -313,7 +301,6 @@
 
         </div>
 
-        <!-- ADMIN UPLOAD -->
         <div id="adminUpload" class="admin-tab file-upload">
 
             <input
@@ -344,23 +331,16 @@
 
 </div>
 
-<!-- ===================================================== -->
-<!-- MAIN WEBSITE -->
-<!-- ===================================================== -->
-
 <main>
 
-    <!-- HERO -->
     <section id="home" class="hero">
 
         <div class="hero-content">
 
-            <h1>
-                Welcome to NexaLearn International
-            </h1>
+            <h1>Welcome to NexaLearn International</h1>
 
             <p>
-                Your complete academic resource and learning platform
+                Your complete digital learning and academic resource platform for modern education, collaboration, and success.
             </p>
 
             <div class="hero-buttons">
@@ -369,16 +349,32 @@
                     class="btn btn-primary"
                     onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})"
                 >
-                    <i class="fas fa-book"></i>
+                    <i class="fas fa-search"></i>
                     Explore Resources
+                </button>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})"
+                >
+                    <i class="fas fa-graduation-cap"></i>
+                    Start Learning
                 </button>
 
                 <button
                     class="btn btn-secondary"
                     onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})"
                 >
-                    <i class="fas fa-upload"></i>
-                    Upload Resource
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Upload Content
+                </button>
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})"
+                >
+                    <i class="fas fa-user-plus"></i>
+                    Join NexaLearn
                 </button>
 
             </div>
@@ -387,7 +383,6 @@
 
     </section>
 
-    <!-- EXPLORE -->
     <section id="explore" class="explore">
 
         <div class="container">
@@ -422,14 +417,12 @@
 
     </section>
     
-    <!-- MARKETPLACE -->
     <section id="marketplace" class="marketplace">
 
         <div class="container">
 
             <h2>Marketplace Resources</h2>
 
-            <!-- CATEGORY BUTTONS -->
             <div class="categories-grid">
 
                 <button class="category-btn active" data-category="all">
@@ -458,14 +451,12 @@
 
             </div>
 
-            <!-- MARKETPLACE GRID -->
             <div id="marketplaceGrid" class="products-grid"></div>
 
         </div>
 
     </section>
 
-    <!-- USER UPLOAD -->
     <section id="upload" class="upload">
 
         <div class="container">
@@ -572,7 +563,6 @@
 
             </form>
 
-            <!-- USER RESOURCES -->
             <div class="resources-list">
                 <div id="resourcesGrid"></div>
             </div>
@@ -581,49 +571,62 @@
 
     </section>
 
-    <!-- ABOUT -->
     <section id="about" class="about">
 
         <div class="container">
 
             <h2>About NexaLearn</h2>
+            
+            <div class="about-statement-block">
+                <p>
+                    NexaLearn International is a digital learning and academic resource platform designed to connect learners, teachers, and institutions through technology-driven education solutions. The platform provides access to educational materials, online classes, assessments, academic collaboration, and digital resource sharing to support modern learning across the world.
+                </p>
+            </div>
 
-            <div class="about-grid">
+            <div class="mission-vision-container">
+                <div class="value-card">
+                    <i class="fas fa-eye"></i>
+                    <h3>Vision Statement</h3>
+                    <p>To shape the future of education through innovation, accessibility, and lifelong learning.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fas fa-bullseye"></i>
+                    <h3>Mission Statement</h3>
+                    <p>NexaLearn International is committed to providing a modern, interactive, and inclusive learning environment where learners and educators can access academic resources, collaborate, share knowledge, conduct online learning, and achieve educational excellence through technology.</p>
+                </div>
+            </div>
 
-                <div class="about-card">
+            <h2>Our Core Values</h2>
+            <div class="core-values-grid">
 
-                    <i class="fas fa-users"></i>
-
-                    <h3>Mobile Learning</h3>
-
-                    <p>
-                        NexaLearn ensures education doesn't stop at the four corners of a classroom.
-                    </p>
-
+                <div class="value-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Excellence</h3>
                 </div>
 
-                <div class="about-card">
-
-                    <i class="fas fa-book-open"></i>
-
-                    <h3>Digital Library</h3>
-
-                    <p>
-                        Access academic materials anywhere.
-                    </p>
-
+                <div class="value-card">
+                    <i class="fas fa-lightbulb"></i>
+                    <h3>Innovation</h3>
                 </div>
 
-                <div class="about-card">
+                <div class="value-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Integrity</h3>
+                </div>
 
-                    <i class="fas fa-laptop"></i>
+                <div class="value-card">
+                    <i class="fas fa-universal-access"></i>
+                    <h3>Accessibility</h3>
+                </div>
 
-                    <h3>Online Learning</h3>
+                <div class="value-card">
+                    <i class="fas fa-hands-helping"></i>
+                    <h3>Collaboration</h3>
+                </div>
 
-                    <p>
-                        Learn through modern online systems.
-                    </p>
-
+                <div class="value-card">
+                    <i class="fas fa-infinity"></i>
+                    <h3>Lifelong Learning</h3>
                 </div>
 
             </div>
@@ -634,10 +637,6 @@
 
 </main>
 
-<!-- ===================================================== -->
-<!-- FOOTER -->
-<!-- ===================================================== -->
-
 <footer class="footer">
 
     <div class="container">
@@ -645,7 +644,7 @@
         <div class="footer-bottom">
 
             <p>
-                © 2026 NexaLearn International.
+                &copy; 2026 NexaLearn International.
                 All rights reserved.
             </p>
 
@@ -654,10 +653,6 @@
     </div>
 
 </footer>
-
-<!-- ===================================================== -->
-<!-- PAYMENT MODAL -->
-<!-- ===================================================== -->
 
 <div id="paymentModal" class="modal">
 
@@ -677,10 +672,6 @@
     </div>
 
 </div>
-
-<!-- ===================================================== -->
-<!-- RECEIPT MODAL -->
-<!-- ===================================================== -->
 
 <div id="receiptModal" class="modal">
 
@@ -723,10 +714,6 @@
     </div>
 
 </div>
-
-<!-- ===================================================== -->
-<!-- JAVASCRIPT -->
-<!-- ===================================================== -->
 
 <script src="main.js"></script>
 <script src="marketplace.js"></script>

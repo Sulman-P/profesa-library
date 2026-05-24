@@ -212,3 +212,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const videos = document.querySelectorAll('.click-to-play');
+    
+    videos.forEach(video => {
+        video.addEventListener('click', function() {
+            if (this.paused) {
+                this.play();
+            } else {
+                this.pause(); // Optional: Clicks again will pause it
+            }
+        });
+    });
+});

@@ -24,6 +24,15 @@
 
     <!-- ===== MAIN CSS ===== -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- ===== DYNAMIC BACKGROUND STYLE ===== -->
+    <style>
+        /* Sets a clean, professional admin block background image behind the admin dashboard section */
+        .admin-dashboard {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
+                        url('admin-block.jpg') no-repeat center center/cover;
+        }
+    </style>
 </head>
 
 <body>
@@ -85,7 +94,7 @@
             </li>
 
         </ul>
-<video controls autoplay>https://youtu.be/3fh-jP0Y4Zs?si=fQe8Q-8ngfqV22wh</video)
+
         <!-- ACTION BUTTONS -->
         <div class="navbar-actions">
 
@@ -305,29 +314,33 @@
         </div>
 
         <!-- ADMIN UPLOAD -->
-        <div class="file-upload">
+        <div id="adminUpload" class="admin-tab file-upload">
 
-    <input
-        type="file"
-        id="docFile"
-        accept=".pdf,.doc,.docx"
-        hidden
-    >
+            <input
+                type="file"
+                id="docFile"
+                accept=".pdf,.doc,.docx"
+                hidden
+            >
 
-    <div
-        class="file-upload-area"
-        id="fileUploadArea"
-    >
-        <i class="fas fa-cloud-upload-alt"></i>
+            <div
+                class="file-upload-area"
+                id="fileUploadArea"
+            >
+                <i class="fas fa-cloud-upload-alt"></i>
 
-        <p>Click to upload or drag & drop</p>
+                <p>Click to upload or drag & drop</p>
 
-        <span>
-            PDF, DOC, DOCX (Max 10MB)
-        </span>
+                <span>
+                    PDF, DOC, DOCX (Max 10MB)
+                </span>
 
-        <div id="selectedFileName" class="selected-file"></div>
-    </div>
+                <div id="selectedFileName" class="selected-file"></div>
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
@@ -408,46 +421,45 @@
         </div>
 
     </section>
+    
     <!-- MARKETPLACE -->
-<section id="marketplace" class="marketplace">
+    <section id="marketplace" class="marketplace">
 
-    <div class="container">
+        <div class="container">
 
-        <h2>Marketplace Resources</h2>
+            <h2>Marketplace Resources</h2>
 
-        <!-- CATEGORY BUTTONS -->
-        <div class="categories-grid">
+            <!-- CATEGORY BUTTONS -->
+            <div class="categories-grid">
 
-            <button class="category-btn active" data-category="all">
-                All
-            </button>
+                <button class="category-btn active" data-category="all">
+                    All
+                </button>
 
-            <button class="category-btn" data-category="textbook">
-                Textbooks
-            </button>
+                <button class="category-btn" data-category="textbook">
+                    Textbooks
+                </button>
 
-            <button class="category-btn" data-category="exam">
-                Exams
-            </button>
+                <button class="category-btn" data-category="exam">
+                    Exams
+                </button>
 
-            <button class="category-btn" data-category="notes">
-                Notes
-            </button>
+                <button class="category-btn" data-category="notes">
+                    Notes
+                </button>
 
-            <button class="category-btn" data-category="guide">
-                Guides
-            </button>
+                <button class="category-btn" data-category="guide">
+                    Guides
+                </button>
 
-            <button class="category-btn" data-category="research">
-                Research
-            </button>
+                <button class="category-btn" data-category="research">
+                    Research
+                </button>
 
-        </div>
+            </div>
 
-        <!-- MARKETPLACE GRID -->
-        <div id="marketplaceGrid" class="products-grid">
-
-         </div>
+            <!-- MARKETPLACE GRID -->
+            <div id="marketplaceGrid" class="products-grid"></div>
 
         </div>
 

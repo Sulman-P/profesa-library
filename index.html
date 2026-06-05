@@ -225,8 +225,70 @@
                     class="admin-menu-item"
                     onclick="switchAdminTab('adminUpload')"
                 >
-                    <i class="fas fa-upload"></i>
-                    Upload Document
+                   <div id="adminUpload" class="admin-tab">
+
+    <h2>Upload Document</h2>
+
+    <form id="adminUploadForm">
+
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="docTitle" required>
+        </div>
+
+        <div class="form-group">
+            <label>Category</label>
+            <select id="docCategory" required>
+                <option value="">Select</option>
+                <option value="textbook">Textbook</option>
+                <option value="exam">Exam</option>
+                <option value="notes">Notes</option>
+                <option value="research">Research</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="docSubject" required>
+        </div>
+
+        <div class="form-group">
+            <label>Price (KES)</label>
+            <input type="number" id="docPrice" min="0">
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="docDescription"></textarea>
+        </div>
+
+        <input
+            type="file"
+            id="docFile"
+            accept=".pdf,.doc,.docx"
+            required>
+
+        <button
+            type="submit"
+            class="btn btn-primary btn-block">
+            Upload Document
+        </button>
+
+    </form>
+
+</div>
+            accept=".pdf,.doc,.docx"
+            required>
+
+        <button
+            type="submit"
+            class="btn btn-primary btn-block">
+            Upload Document
+        </button>
+
+    </form>
+
+</div>
                 </a>
             </li>
 
@@ -240,6 +302,13 @@
                     Documents
                 </a>
             </li>
+            <div id="documents" class="admin-tab">
+              <h2>Uploaded Documents</h2>
+
+             <div id="adminDocumentsList" class="resources-list">
+              <p>No documents uploaded yet.</p>
+          </div>
+         </div>
 
             <li>
                 <a
@@ -301,56 +370,33 @@
 
         </div>
 
-        <div id="adminUpload" class="admin-tab">
+        <div id="adminUpload" class="admin-tab file-upload">
 
-    <h2>Upload Document</h2>
+            <input
+                type="file"
+                id="docFile"
+                accept=".pdf,.doc,.docx"
+                hidden
+            >
 
-    <form id="adminUploadForm">
+            <div
+                class="file-upload-area"
+                id="fileUploadArea"
+            >
+                <i class="fas fa-cloud-upload-alt"></i>
 
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="docTitle" required>
+                <p>Click to upload or drag & drop</p>
+
+                <span>
+                    PDF, DOC, DOCX (Max 10MB)
+                </span>
+
+                <div id="selectedFileName" class="selected-file"></div>
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label>Category</label>
-            <select id="docCategory" required>
-                <option value="">Select</option>
-                <option value="textbook">Textbook</option>
-                <option value="exam">Exam</option>
-                <option value="notes">Notes</option>
-                <option value="research">Research</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Subject</label>
-            <input type="text" id="docSubject" required>
-        </div>
-
-        <div class="form-group">
-            <label>Price (KES)</label>
-            <input type="number" id="docPrice" min="0">
-        </div>
-
-        <div class="form-group">
-            <label>Description</label>
-            <textarea id="docDescription"></textarea>
-        </div>
-
-        <input
-            type="file"
-            id="docFile"
-            accept=".pdf,.doc,.docx"
-            required>
-
-        <button
-            type="submit"
-            class="btn btn-primary btn-block">
-            Upload Document
-        </button>
-
-    </form>
+    </main>
 
 </div>
 
@@ -414,35 +460,37 @@
 
             <div class="categories-grid">
 
-                <div class="category-card">
-                    <i class="fas fa-book"></i>
+                <div class="category-card" data-category="textbook">
+                 <i class="fas fa-book"></i>
                     <h3>Textbooks</h3>
                 </div>
 
-                <div class="category-card">
-                    <i class="fas fa-file-alt"></i>
-                    <h3>Exam Papers</h3>
-                </div>
+        <div class="category-card" data-category="exam">
+           <i class="fas fa-file-alt"></i>
+           <h3>Exam Papers</h3>
+        </div>
 
-                <div class="category-card">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h3>Lecture Notes</h3>
-                </div>
+     <div class="category-card" data-category="notes">
+        <i class="fas fa-graduation-cap"></i>
+        <h3>Lecture Notes</h3>
+     </div>
 
-                <div class="category-card">
-                    <i class="fas fa-flask"></i>
-                    <h3>Research</h3>
-                </div>
-        <div class="video-container">
+    <div class="category-card" data-category="research">
+         <i class="fas fa-flask"></i>
+         <h3>Research</h3>
+    </div>
+        <div class="youtube-video">
     <iframe
         width="100%"
-        height="400"
+        height="450"
         src="https://www.youtube.com/embed/3fh-jP0Y4Zs"
         title="NexaLearn Video"
         frameborder="0"
         allowfullscreen>
     </iframe>
-</div>
+   </div>
+
+    </div>
 
     </section>
     
@@ -561,26 +609,12 @@
 
                 </div>
 
-                <div
-                    class="file-upload-area"
-                    id="fileInputWrapper"
-                >
-
-                    <i class="fas fa-cloud-upload-alt"></i>
-
-                    <p>Click or Drag File Here</p>
-
-                    <span>PDF, DOC, DOCX</span>
-
-                    <input
-                        type="file"
-                        id="resource-file"
-                        accept=".pdf,.doc,.docx"
-                        hidden
-                    >
-
-                </div>
-
+                <label
+      class="file-upload-area"
+      id="fileInputWrapper"
+     for="resource-file">
+                    <\label>
+  
                 <div id="fileName"></div>
 
                 <button
@@ -595,7 +629,17 @@
             <div class="resources-list">
                 <div id="resourcesGrid"></div>
             </div>
+            <section id="resources">
+    <div class="container">
 
+        <h2>Uploaded Resources</h2>
+
+        <div id="resourcesGrid"
+             class="products-grid">
+        </div>
+
+       </div>
+      </section>
         </div>
 
     </section>
@@ -663,7 +707,19 @@
         </div>
 
     </section>
+  <div class="footer-grid">
 
+    <div>
+        <h4>NexaLearn International</h4>
+        <p>Knowledge for Global Excellence.</p>
+    </div>
+
+    <div>
+        <h4>Contact</h4>
+        <p>Email: admin@nexalearn.com</p>
+    </div>
+
+  </div>
 </main>
 
 <footer class="footer">
@@ -748,34 +804,6 @@
 <script src="marketplace.js"></script>
 <script src="upload-manager.js"></script>
 <script src="payment.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
 
-    const categoryButtons =
-        document.querySelectorAll(".category-btn");
-
-    categoryButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            categoryButtons.forEach(btn =>
-                btn.classList.remove("active")
-            );
-
-            button.classList.add("active");
-
-            const category =
-                button.dataset.category;
-
-            if(window.marketplace){
-                window.marketplace.filterByCategory(category);
-            }
-
-        });
-
-    });
-
-});
-</script>
 </body>
 </html>

@@ -301,33 +301,56 @@
 
         </div>
 
-        <div id="adminUpload" class="admin-tab file-upload">
+        <div id="adminUpload" class="admin-tab">
 
-            <input
-                type="file"
-                id="docFile"
-                accept=".pdf,.doc,.docx"
-                hidden
-            >
+    <h2>Upload Document</h2>
 
-            <div
-                class="file-upload-area"
-                id="fileUploadArea"
-            >
-                <i class="fas fa-cloud-upload-alt"></i>
+    <form id="adminUploadForm">
 
-                <p>Click to upload or drag & drop</p>
-
-                <span>
-                    PDF, DOC, DOCX (Max 10MB)
-                </span>
-
-                <div id="selectedFileName" class="selected-file"></div>
-            </div>
-
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="docTitle" required>
         </div>
 
-    </main>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="docCategory" required>
+                <option value="">Select</option>
+                <option value="textbook">Textbook</option>
+                <option value="exam">Exam</option>
+                <option value="notes">Notes</option>
+                <option value="research">Research</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="docSubject" required>
+        </div>
+
+        <div class="form-group">
+            <label>Price (KES)</label>
+            <input type="number" id="docPrice" min="0">
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="docDescription"></textarea>
+        </div>
+
+        <input
+            type="file"
+            id="docFile"
+            accept=".pdf,.doc,.docx"
+            required>
+
+        <button
+            type="submit"
+            class="btn btn-primary btn-block">
+            Upload Document
+        </button>
+
+    </form>
 
 </div>
 
@@ -410,10 +433,16 @@
                     <i class="fas fa-flask"></i>
                     <h3>Research</h3>
                 </div>
-              <video class="click-to-play" src="https://youtu.be/3fh-jP0Y4Zs?si=aFynBs5D6LXJk-4D" poster="video-thumbnail.jpg" width="100%" controls></video>
-            </div>
-
-        </div>
+        <div class="video-container">
+    <iframe
+        width="100%"
+        height="400"
+        src="https://www.youtube.com/embed/3fh-jP0Y4Zs"
+        title="NexaLearn Video"
+        frameborder="0"
+        allowfullscreen>
+    </iframe>
+</div>
 
     </section>
     
@@ -719,6 +748,34 @@
 <script src="marketplace.js"></script>
 <script src="uploadManager.js"></script>
 <script src="payment.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
+    const categoryButtons =
+        document.querySelectorAll(".category-btn");
+
+    categoryButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            categoryButtons.forEach(btn =>
+                btn.classList.remove("active")
+            );
+
+            button.classList.add("active");
+
+            const category =
+                button.dataset.category;
+
+            if(window.marketplace){
+                window.marketplace.filterByCategory(category);
+            }
+
+        });
+
+    });
+
+});
+</script>
 </body>
 </html>

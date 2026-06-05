@@ -248,3 +248,88 @@ function logoutAdmin() {
     .classList.add("hidden");
 
 }
+const adminBtn = document.getElementById("adminBtn");
+const adminModal = document.getElementById("adminModal");
+
+if(adminBtn && adminModal){
+
+    adminBtn.addEventListener("click", () => {
+        adminModal.classList.add("show");
+    });
+
+}
+document.querySelectorAll(".close").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        btn.closest(".modal").classList.remove("show");
+
+    });
+
+});
+const adminForm = document.getElementById("adminForm");
+
+if(adminForm){
+
+    adminForm.addEventListener("submit", (e) => {
+
+        e.preventDefault();
+
+        const email =
+            document.getElementById("adminEmail").value;
+
+        const password =
+            document.getElementById("adminPassword").value;
+
+        if(
+            email === "admin@nexalearn.com" &&
+            password === "admin123"
+        ){
+
+            document
+            .getElementById("adminModal")
+            .classList.remove("show");
+
+            document
+            .getElementById("adminDashboard")
+            .classList.remove("hidden");
+
+        }else{
+
+            alert("Invalid credentials");
+
+        }
+
+    });
+
+}
+const resourceFile =
+document.getElementById("resource-file");
+
+const fileWrapper =
+document.getElementById("fileInputWrapper");
+
+const fileName =
+document.getElementById("fileName");
+
+if(resourceFile && fileWrapper){
+
+    fileWrapper.addEventListener("click", () => {
+
+        resourceFile.click();
+
+    });
+
+    resourceFile.addEventListener("change", () => {
+
+        if(resourceFile.files.length > 0){
+
+            fileName.innerHTML =
+            `<i class="fas fa-file"></i>
+            ${resourceFile.files[0].name}`;
+
+        }
+
+    });
+
+}

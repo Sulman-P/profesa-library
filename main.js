@@ -333,3 +333,21 @@ if(resourceFile && fileWrapper){
     });
 
 }
+document.querySelectorAll('.category-btn').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+
+        document.querySelectorAll('.category-btn')
+        .forEach(b => b.classList.remove('active'));
+
+        btn.classList.add('active');
+
+        const category = btn.dataset.category;
+
+        if (window.marketplace) {
+            window.marketplace.filterByCategory(category);
+        }
+
+    });
+
+});

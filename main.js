@@ -225,152 +225,132 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+// ===== ADMIN SYSTEM =====
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const adminBtn = document.getElementById("adminBtn");
+    const adminModal = document.getElementById("adminModal");
+    const adminForm = document.getElementById("adminForm");
+    const adminDashboard = document.getElementById("adminDashboard");
+    const adminClose = document.querySelector(".admin-close");
+
+    // Hide dashboard by default
+    if (adminDashboard) {
+        adminDashboard.classList.add("hidden");
+
+        if (
+            localStorage.getItem("adminLoggedIn") === "true"
+        ) {
+            adminDashboard.classList.remove("hidden");
+        }
+    }
+
+    // Open Admin Modal
+    if (adminBtn && adminModal) {
+
+        adminBtn.addEventListener("click", () => {
+
+            adminModal.classList.add("show");
+
+        });
+
+    }
+
+    // Close Admin Modal
+    if (adminClose && adminModal) {
+
+        adminClose.addEventListener("click", () => {
+
+            adminModal.classList.remove("show");
+
+        });
+
+    }
+
+    // Admin Login
+    if (adminForm) {
+
+        adminForm.addEventListener("submit", (e) => {
+
+            e.preventDefault();
+
+            const email =
+                document.getElementById("adminEmail").value;
+
+            const password =
+                document.getElementById("adminPassword").value;
+
+            if (
+                email === "admin@nexalearn.com" &&
+                password === "Nexa2026"
+            ) {
+
+                localStorage.setItem(
+                    "adminLoggedIn",
+                    "true"
+                );
+
+                adminModal.classList.remove("show");
+
+                adminDashboard.classList.remove("hidden");
+
+                alert("Welcome Admin");
+
+            } else {
+
+                alert("Invalid Admin Credentials");
+
+            }
+
+        });
+
+    }
+
+});");
+
+}
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (
+        localStorage.getItem("adminLoggedIn") === "true"
+    ) {
+
+        document
+            .getElementById("adminDashboard")
+            .classList.remove("hidden");
+    }
+});
+// ===== ADMIN TABS =====
+
 function switchAdminTab(tabId) {
 
     document
-    .querySelectorAll(".admin-tab")
-    .forEach(tab => {
-        tab.classList.remove("active");
-    });
+        .querySelectorAll(".admin-tab")
+        .forEach(tab => {
+            tab.classList.remove("active");
+        });
 
     const target =
         document.getElementById(tabId);
 
-    if(target){
+    if (target) {
         target.classList.add("active");
     }
+
 }
+// ===== LOGOUT =====
 
 function logoutAdmin() {
 
+    localStorage.removeItem(
+        "adminLoggedIn"
+    );
+
     document
-    .getElementById("adminDashboard")
-    .classList.add("hidden");
+        .getElementById("adminDashboard")
+        .classList.add("hidden");
+
+    alert("Logged out successfully");
 
 }
-const adminBtn = document.getElementById("adminBtn");
-const adminModal = document.getElementById("adminModal");
-
-if(adminBtn && adminModal){
-
-    adminBtn.addEventListener("click", () => {
-        adminModal.classList.add("show");
-    });
-
-}
-document.querySelectorAll(".close").forEach(btn => {
-
-    btn.addEventListener("click", () => {
-
-        btn.closest(".modal").classList.remove("show");
-
-    });
-
-});
-const adminForm = document.getElementById("adminForm");
-
-if(adminForm){
-
-    adminForm.addEventListener("submit", (e) => {
-
-        e.preventDefault();
-
-        const email =
-            document.getElementById("adminEmail").value;
-
-        const password =
-            document.getElementById("adminPassword").value;
-
-        if(
-            email === "admin@nexalearn.com" &&
-            password === "admin123"
-        ){
-
-            document
-            .getElementById("adminModal")
-            .classList.remove("show");
-
-            document
-            .getElementById("adminDashboard")
-            .classList.remove("hidden");
-
-        }else{
-
-            alert("Invalid credentials");
-
-        }
-
-    });
-
-}
-const resourceFile =
-document.getElementById("resource-file");
-
-const fileWrapper =
-document.getElementById("fileInputWrapper");
-
-const fileName =
-document.getElementById("fileName");
-
-if(resourceFile && fileWrapper){
-
-    fileWrapper.addEventListener("click", () => {
-
-        resourceFile.click();
-
-    });
-
-    resourceFile.addEventListener("change", () => {
-
-        if(resourceFile.files.length > 0){
-
-            fileName.innerHTML =
-            `<i class="fas fa-file"></i>
-            ${resourceFile.files[0].name}`;
-
-        }
-
-    });
-
-}
-document.querySelectorAll('.category-btn').forEach(btn => {
-
-    btn.addEventListener('click', () => {
-
-        document.querySelectorAll('.category-btn')
-        .forEach(b => b.classList.remove('active'));
-
-        btn.classList.add('active');
-
-        const category = btn.dataset.category;
-
-        if (window.marketplace) {
-            window.marketplace.filterByCategory(category);
-        }
-
-    });
-
-});
-localStorage.setItem(
-    "videos",
-    JSON.stringify([
-        {
-            id: 1,
-            title: "Algebra Lesson",
-            subject: "Mathematics",
-            youtubeLink: "https://youtu.be/xxxxx"
-        }
-    ])
-);
-localStorage.setItem(
-    "exams",
-    JSON.stringify([
-        {
-            id: 1,
-            title: "Grade 9 Midterm",
-            price: 150,
-            image: "...",
-            file: "..."
-        }
-    ])
-);

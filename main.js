@@ -351,3 +351,26 @@ document.querySelectorAll('.category-btn').forEach(btn => {
     });
 
 });
+localStorage.setItem(
+    "videos",
+    JSON.stringify([
+        {
+            id: 1,
+            title: "Algebra Lesson",
+            subject: "Mathematics",
+            youtubeLink: "https://youtu.be/xxxxx"
+        }
+    ])
+);
+localStorage.setItem(
+    "exams",
+    JSON.stringify([
+        {
+            id: 1,
+            title: "Grade 9 Midterm",
+            price: 150,
+            image: "...",
+            file: "..."
+        }
+    ])
+);

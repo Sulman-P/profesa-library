@@ -853,3 +853,14 @@ section {
     margin-bottom: 1rem;
     display: block;
 }
+.hidden{
+    display:none !important;
+}
+
+.modal{
+    display:none;
+}
+
+.modal.show{
+    display:flex;
+}

@@ -92,6 +92,14 @@
             <li>
                 <a href="#about" class="nav-link">About</a>
             </li>
+            
+            <li>
+                 <a href="#videos">Videos</a>
+           </li>
+
+           <li>
+                 <a href="#examGallery">Exam Store</a>
+          </li>
 
         </ul>
 
@@ -218,7 +226,53 @@
                     Dashboard
                 </a>
             </li>
+          <div id="videoUpload" class="admin-tab">
 
+    <h2>Upload Learning Video</h2>
+
+    <form id="videoUploadForm">
+
+        <input
+            type="text"
+            id="videoTitle"
+            placeholder="Video Title"
+            required
+        >
+
+        <input
+            type="text"
+            id="videoSubject"
+            placeholder="Subject"
+            required
+        >
+
+        <input
+            type="url"
+            id="videoUrl"
+            placeholder="YouTube Link"
+            required
+        >
+
+        <button type="submit">
+            Upload Video
+        </button>
+
+    </form>
+
+  </div>
+     <section id="examGallery">
+
+    <div class="container">
+
+        <h2>Exam Papers Store</h2>
+
+        <div id="examGrid" class="exam-grid">
+
+        </div>
+
+    </div>
+
+</section> 
             <li>
                 <a
                     href="#"
@@ -226,6 +280,61 @@
                     onclick="switchAdminTab('adminUpload')"
                 >
                    <div id="adminUpload" class="admin-tab">
+
+            <div id="examUpload" class="admin-tab">
+
+    <h2>Upload Exam Paper</h2>
+
+    <form id="examUploadForm">
+
+        <input
+            type="text"
+            id="examTitle"
+            placeholder="Exam Title"
+            required
+        >
+
+        <input
+            type="number"
+            id="examPrice"
+            placeholder="Price"
+            required
+        >
+
+        <input
+            type="file"
+            id="examImage"
+            accept="image/*"
+            required
+        >
+
+        <input
+            type="file"
+            id="examDocument"
+            accept=".pdf,.doc,.docx"
+            required
+        >
+
+        <button type="submit">
+            Upload Exam
+        </button>
+
+    </form>
+
+</div>
+        <li>
+    <a href="#"
+       onclick="switchAdminTab('videoUpload')">
+       Videos
+    </a>
+</li>
+
+<li>
+    <a href="#"
+       onclick="switchAdminTab('examUpload')">
+       Exams
+    </a>
+</li>
 
     <h2>Upload Document</h2>
 
@@ -309,7 +418,22 @@
               <p>No documents uploaded yet.</p>
           </div>
          </div>
+     <div class="exam-card">
 
+    <img
+        src="preview.jpg"
+        alt="Exam Preview"
+    >
+
+    <h3>Grade 9 Midterm Exam</h3>
+
+    <p>KES 150</p>
+
+    <button>
+        Buy Now
+    </button>
+
+</div>
             <li>
                 <a
                     href="#"
@@ -533,7 +657,19 @@
         </div>
 
     </section>
+    <section id="videos" class="videos-section">
 
+    <div class="container">
+
+        <h2>Video Learning Center</h2>
+
+        <div id="videoGrid" class="video-grid">
+
+        </div>
+
+    </div>
+
+</section>
     <section id="upload" class="upload">
 
         <div class="container">

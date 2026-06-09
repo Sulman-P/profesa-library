@@ -401,51 +401,54 @@
                 </a>
             </li>
 
-            <li>
-                <a
-                    href="#"
-                    class="admin-menu-item"
-                    onclick="switchAdminTab('documents')"
-                >
-                    <i class="fas fa-file"></i>
-                    Documents
-                </a>
-            </li>
-            <div id="documents" class="admin-tab">
-              <h2>Uploaded Documents</h2>
+            <ul class="admin-menu">
 
-             <div id="adminDocumentsList" class="resources-list">
-              <p>No documents uploaded yet.</p>
-          </div>
-         </div>
-     <div class="exam-card">
+    <li>
+        <a href="#"
+           class="admin-menu-item active"
+           onclick="switchAdminTab('overview')">
+            <i class="fas fa-chart-line"></i>
+            Dashboard
+        </a>
+    </li>
 
-    <img
-        src="preview.jpg"
-        alt="Exam Preview"
-    >
+    <li>
+        <a href="#"
+           class="admin-menu-item"
+           onclick="switchAdminTab('adminUpload')">
+            <i class="fas fa-upload"></i>
+            Documents
+        </a>
+    </li>
 
-    <h3>Grade 9 Midterm Exam</h3>
+    <li>
+        <a href="#"
+           class="admin-menu-item"
+           onclick="switchAdminTab('videoUpload')">
+            <i class="fas fa-video"></i>
+            Videos
+        </a>
+    </li>
 
-    <p>KES 150</p>
+    <li>
+        <a href="#"
+           class="admin-menu-item"
+           onclick="switchAdminTab('examUpload')">
+            <i class="fas fa-file-alt"></i>
+            Exams
+        </a>
+    </li>
 
-    <button>
-        Buy Now
-    </button>
+    <li>
+        <a href="#"
+           class="admin-menu-item"
+           onclick="logoutAdmin()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </li>
 
-</div>
-            <li>
-                <a
-                    href="#"
-                    class="admin-menu-item"
-                    onclick="logoutAdmin()"
-                >
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
-                </a>
-            </li>
-
-        </ul>
+</ul>
 
     </aside>
 
@@ -519,7 +522,75 @@
             </div>
 
         </div>
+        <!-- VIDEO UPLOAD TAB -->
 
+<div id="videoUpload" class="admin-tab">
+
+    <h2>Upload Learning Video</h2>
+
+    <form id="videoUploadForm">
+
+        <input type="text"
+               id="videoTitle"
+               placeholder="Video Title"
+               required>
+
+        <input type="text"
+               id="videoSubject"
+               placeholder="Subject"
+               required>
+
+        <input type="url"
+               id="videoUrl"
+               placeholder="YouTube Link"
+               required>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Upload Video
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- EXAM UPLOAD TAB -->
+
+<div id="examUpload" class="admin-tab">
+
+    <h2>Upload Exam Paper</h2>
+
+    <form id="examUploadForm">
+
+        <input type="text"
+               id="examTitle"
+               placeholder="Exam Title"
+               required>
+
+        <input type="number"
+               id="examPrice"
+               placeholder="Price (KES)"
+               required>
+
+        <input type="file"
+               id="examImage"
+               accept="image/*"
+               required>
+
+        <input type="file"
+               id="examDocument"
+               accept=".pdf,.doc,.docx"
+               required>
+
+        <button type="submit"
+                class="btn btn-primary">
+            Upload Exam
+        </button>
+
+    </form>
+
+   </div>
     </main>
 
 </div>
@@ -657,6 +728,19 @@
         </div>
 
     </section>
+    <section id="examGallery">
+
+    <div class="container">
+
+        <h2>Exam Papers Store</h2>
+
+        <div id="examGrid" class="exam-grid">
+
+        </div>
+
+    </div>
+
+</section>
     <section id="videos" class="videos-section">
 
     <div class="container">
@@ -757,14 +841,6 @@
                     type="submit"
                     class="btn btn-primary btn-block"
                 >
-                    Upload Resource
-                </button>
-
-            </form>
-
-            <div class="resources-list">
-                <div id="resourcesGrid"></div>
-            </div>
             <section id="resources">
     <div class="container">
 
@@ -779,6 +855,19 @@
         </div>
 
     </section>
+        <section id="videos" class="video-library">
+
+    <div class="container">
+
+        <h2>Video Learning Center</h2>
+
+        <div id="videoGrid" class="video-grid">
+
+        </div>
+
+    </div>
+
+</section>
 
     <section id="about" class="about">
 

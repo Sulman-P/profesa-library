@@ -1,3 +1,13 @@
+ document.addEventListener("DOMContentLoaded", () => {
+
+    const adminDashboard =
+        document.getElementById("adminDashboard");
+
+    if (adminDashboard) {
+        adminDashboard.classList.add("hidden");
+    }
+
+});
 // ===== NEXALEARN MAIN SCRIPT =====
 
 document.addEventListener('DOMContentLoaded', () => {

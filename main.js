@@ -320,25 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .getElementById("adminDashboard")
             .classList.remove("hidden");
     }
-});
-// ===== ADMIN TABS =====
-
-function switchAdminTab(tabId) {
-
-    document
-        .querySelectorAll(".admin-tab")
-        .forEach(tab => {
-            tab.classList.remove("active");
-        });
-
-    const target =
-        document.getElementById(tabId);
-
-    if (target) {
-        target.classList.add("active");
-    }
-
-}
 // ===== LOGOUT =====
 
 function logoutAdmin() {

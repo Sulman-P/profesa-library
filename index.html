@@ -178,7 +178,7 @@
                 >
 
             </div>
-
+        <div>
             <button
                 type="submit"
                 class="btn btn-primary btn-block"
@@ -196,201 +196,13 @@
 <div id="adminDashboard" class="admin-dashboard hidden">
 
     <aside class="admin-sidebar">
-
-        <div class="admin-header">
-
-            <h3>
-                <i class="fas fa-cog"></i>
-                Admin Panel
-            </h3>
-
-            <button
-                type="button"
-                class="close-sidebar"
-                id="closeSidebar"
-            >
-                <i class="fas fa-times"></i>
-            </button>
-
-        </div>
-
-        <ul class="admin-menu">
-
-            <li>
-                <a
-                    href="#"
-                    class="admin-menu-item active"
-                    onclick="switchAdminTab('overview')"
-                >
-                    <i class="fas fa-chart-line"></i>
-                    Dashboard
-                </a>
-            </li>
-          <div id="videoUpload" class="admin-tab">
-
-    <h2>Upload Learning Video</h2>
-
-    <form id="videoUploadForm">
-
-        <input
-            type="text"
-            id="videoTitle"
-            placeholder="Video Title"
-            required
-        >
-
-        <input
-            type="text"
-            id="videoSubject"
-            placeholder="Subject"
-            required
-        >
-
-        <input
-            type="url"
-            id="videoUrl"
-            placeholder="YouTube Link"
-            required
-        >
-
-        <button type="submit">
-            Upload Video
-        </button>
-
-    </form>
-
-  </div>
-     <section id="examGallery">
-
-    <div class="container">
-
-        <h2>Exam Papers Store</h2>
-
-        <div id="examGrid" class="exam-grid">
-
-        </div>
-
-    </div>
-
-</section> 
-            <li>
-                <a
-                    href="#"
-                    class="admin-menu-item"
-                    onclick="switchAdminTab('adminUpload')"
-                >
-                   <div id="adminUpload" class="admin-tab">
-
-            <div id="examUpload" class="admin-tab">
-
-    <h2>Upload Exam Paper</h2>
-
-    <form id="examUploadForm">
-
-        <input
-            type="text"
-            id="examTitle"
-            placeholder="Exam Title"
-            required
-        >
-
-        <input
-            type="number"
-            id="examPrice"
-            placeholder="Price"
-            required
-        >
-
-        <input
-            type="file"
-            id="examImage"
-            accept="image/*"
-            required
-        >
-
-        <input
-            type="file"
-            id="examDocument"
-            accept=".pdf,.doc,.docx"
-            required
-        >
-
-        <button type="submit">
-            Upload Exam
-        </button>
-
-    </form>
-
-</div>
-        <li>
-    <a href="#"
-       onclick="switchAdminTab('videoUpload')">
-       Videos
-    </a>
-</li>
-
-<li>
-    <a href="#"
-       onclick="switchAdminTab('examUpload')">
-       Exams
-    </a>
-</li>
-
-    <h2>Upload Document</h2>
-
-    <form id="adminUploadForm">
-
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="docTitle" required>
-        </div>
-
-        <div class="form-group">
-            <label>Category</label>
-            <select id="docCategory" required>
-                <option value="">Select</option>
-                <option value="textbook">Textbook</option>
-                <option value="exam">Exam</option>
-                <option value="notes">Notes</option>
-                <option value="research">Research</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Subject</label>
-            <input type="text" id="docSubject" required>
-        </div>
-
-        <div class="form-group">
-            <label>Price (KES)</label>
-            <input type="number" id="docPrice" min="0">
-        </div>
-
-        <div class="form-group">
-            <label>Description</label>
-            <textarea id="docDescription"></textarea>
-        </div>
-
-        <input
-            type="file"
-            id="docFile"
-            accept=".pdf,.doc,.docx"
-            required>
-         <button
-            type="submit"
-            class="btn btn-primary btn-block">
-            Upload Document
-        </button>
-
-    </form>
-
-</div>
+         </div>
                 </a>
             </li>
 
             <ul class="admin-menu">
 
-    <li>
+        <li>
         <a href="#"
            class="admin-menu-item active"
            onclick="switchAdminTab('overview')">
@@ -441,11 +253,11 @@
 
     <main class="admin-content">
 
-        <div id="overview" class="admin-tab active">
+       <div id="overview" class="admin-tab active">
 
-            <h2>Dashboard Overview</h2>
+          <h2>Dashboard Overview</h2>
 
-            <div class="stats-grid">
+           <div class="stats-grid">
 
                 <div class="stat-card">
                     <div class="stat-icon">

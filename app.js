@@ -1,324 +1,254 @@
-// ==================== FIREBASE STORAGE FUNCTIONS ====================
+// ==================== DATA STORAGE ====================
 let resources = [];
 let videos = [];
 let purchases = [];
 
-// Load all resources from Firestore
-async function loadAllResources() {
-    try {
-        if (!window.db) {
-            console.warn('Firebase not ready, using localStorage');
-            resources = JSON.parse(localStorage.getItem('nexalearn_resources')) || [];
-            return resources;
-        }
-        
-        const querySnapshot = await getDocs(collection(db, 'resources'));
-        resources = [];
-        querySnapshot.forEach((doc) => {
-            resources.push({ id: doc.id, ...doc.data() });
-        });
-        
-        // Backup to localStorage
+// Load data from localStorage or initialize with sample data
+function initializeData() {
+    // Load resources
+    const storedResources = localStorage.getItem('nexalearn_resources');
+    if (storedResources) {
+        resources = JSON.parse(storedResources);
+    } else {
+        // Sample resources
+        resources = [
+            { id: 1, title: "Complete Mathematics Guide - Grade 7", level: "junior", subject: "Mathematics", category: "textbook", price: 500, description: "Comprehensive mathematics guide covering algebra, geometry, and statistics for junior school students.", downloads: 125, date: "2024-01-15" },
+            { id: 2, title: "Biology Exam Papers - Form 3", level: "senior", subject: "Biology", category: "exam", price: 300, description: "Past exam papers with marking schemes. Includes 5 complete papers.", downloads: 89, date: "2024-02-10" },
+            { id: 3, title: "Financial Literacy for Beginners", level: "lifelong", subject: "Financial Literacy", category: "guide", price: 0, description: "Free guide to understanding personal finance, budgeting, and saving.", downloads: 450, date: "2024-01-20" },
+            { id: 4, title: "English Grammar Workbook", level: "junior", subject: "English", category: "textbook", price: 350, description: "Complete English grammar exercises and explanations.", downloads: 234, date: "2024-01-10" },
+            { id: 5, title: "Physics Practical Guide", level: "senior", subject: "Physics", category: "guide", price: 450, description: "Step-by-step physics practical guide with experiments.", downloads: 67, date: "2024-02-01" }
+        ];
         localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-        return resources;
-    } catch (error) {
-        console.error("Error loading resources:", error);
-        resources = JSON.parse(localStorage.getItem('nexalearn_resources')) || [];
-        return resources;
     }
-}
-
-// Load videos from Firestore
-async function loadAllVideos() {
-    try {
-        if (!window.db) {
-            videos = JSON.parse(localStorage.getItem('nexalearn_videos')) || [];
-            return videos;
-        }
-        
-        const querySnapshot = await getDocs(collection(db, 'videos'));
-        videos = [];
-        querySnapshot.forEach((doc) => {
-            videos.push({ id: doc.id, ...doc.data() });
-        });
-        
+    
+    // Load videos
+    const storedVideos = localStorage.getItem('nexalearn_videos');
+    if (storedVideos) {
+        videos = JSON.parse(storedVideos);
+    } else {
+        // Sample videos
+        videos = [
+            { id: 1, title: "Introduction to Algebra", subject: "Mathematics", level: "junior", url: "https://www.youtube.com/embed/3fh-jP0Y4Zs", date: "2024-01-10" },
+            { id: 2, title: "Financial Literacy Basics", subject: "Financial Literacy", level: "lifelong", url: "https://www.youtube.com/embed/3fh-jP0Y4Zs", date: "2024-01-15" },
+            { id: 3, title: "Biology Cell Structure", subject: "Biology", level: "senior", url: "https://www.youtube.com/embed/3fh-jP0Y4Zs", date: "2024-01-20" }
+        ];
         localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
-        return videos;
-    } catch (error) {
-        console.error("Error loading videos:", error);
-        videos = JSON.parse(localStorage.getItem('nexalearn_videos')) || [];
-        return videos;
+    }
+    
+    // Load purchases
+    const storedPurchases = localStorage.getItem('nexalearn_purchases');
+    if (storedPurchases) {
+        purchases = JSON.parse(storedPurchases);
+    } else {
+        purchases = [];
+        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
     }
 }
 
-// Upload document with file to Firebase Storage
-async function uploadDocumentToFirebase(file, resourceData) {
-    try {
-        if (!window.storage || !window.db) {
-            throw new Error('Firebase not initialized');
-        }
-        
-        // Show uploading indicator
-        showToast('📤 Uploading file to cloud...', 'info');
-        
-        // Generate unique filename
-        const timestamp = Date.now();
-        const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const filePath = `documents/${timestamp}_${safeFileName}`;
-        const storageRef = ref(storage, filePath);
-        
-        // Upload file to Firebase Storage
-        const uploadResult = await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-        
-        // Save resource data to Firestore
-        const docRef = await addDoc(collection(db, 'resources'), {
-            ...resourceData,
-            fileUrl: downloadURL,
-            filePath: filePath,
-            fileName: file.name,
-            fileSize: file.size,
-            fileType: file.type,
-            createdAt: new Date().toISOString(),
-            downloads: 0
-        });
-        
-        // Add to local array
-        const newResource = { id: docRef.id, ...resourceData, fileUrl: downloadURL };
-        resources.push(newResource);
-        
-        showToast(`✅ "${resourceData.title}" uploaded to cloud!`, 'success');
-        return newResource;
-    } catch (error) {
-        console.error("Upload error:", error);
-        showToast('❌ Upload failed: ' + error.message, 'error');
-        return null;
-    }
+// Save resources to localStorage
+function saveResources() {
+    localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
 }
 
-// Upload video to Firestore
-async function uploadVideoToFirebase(videoData) {
-    try {
-        if (!window.db) throw new Error('Firebase not initialized');
-        
-        const docRef = await addDoc(collection(db, 'videos'), {
-            ...videoData,
-            createdAt: new Date().toISOString(),
-            views: 0
-        });
-        
-        const newVideo = { id: docRef.id, ...videoData };
-        videos.push(newVideo);
-        
-        showToast(`✅ Video "${videoData.title}" added!`, 'success');
-        return newVideo;
-    } catch (error) {
-        console.error("Error adding video:", error);
-        showToast('❌ Failed to add video', 'error');
-        return null;
-    }
+// Save videos to localStorage
+function saveVideos() {
+    localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
 }
 
-// Download document from Firebase
-async function downloadFromFirebase(resourceId) {
-    const resource = resources.find(r => r.id === resourceId);
-    if (!resource) {
-        alert('Resource not found');
+// ==================== HELPER FUNCTIONS ====================
+function formatLevelName(level) {
+    const levels = {
+        'primary': 'Primary School',
+        'junior': 'Junior School',
+        'senior': 'Senior School',
+        'university': 'University',
+        'lifelong': 'Lifelong Learning'
+    };
+    return levels[level] || level;
+}
+
+function updateHeroStats() {
+    const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
+    document.getElementById('statResourcesCount').textContent = resources.length;
+    document.getElementById('statDownloadsCount').textContent = totalDownloads;
+    document.getElementById('statLearnersCount').textContent = Math.floor(Math.random() * 50000) + 50000;
+}
+
+// ==================== MARKETPLACE FUNCTIONS ====================
+function loadMarketplace() {
+    const grid = document.getElementById('marketplaceGrid');
+    if (!grid) return;
+    
+    if (resources.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><h3>No resources yet</h3><p>Check back soon for new resources</p></div>';
         return;
     }
+    
+    grid.innerHTML = resources.map(resource => `
+        <div class="resource-card">
+            <span class="resource-badge">${resource.category.toUpperCase()}</span>
+            <h3>${resource.title}</h3>
+            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+            <p><strong>Subject:</strong> ${resource.subject}</p>
+            <p class="resource-description">${resource.description.substring(0, 80)}${resource.description.length > 80 ? '...' : ''}</p>
+            <div class="price">${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</div>
+            <button onclick="viewResource(${resource.id})">
+                <i class="fas fa-eye"></i> View Resource
+            </button>
+        </div>
+    `).join('');
+}
+
+function filterMarketplace(category) {
+    let filtered = resources;
+    if (category !== 'all') {
+        filtered = resources.filter(r => r.category === category);
+    }
+    
+    const grid = document.getElementById('marketplaceGrid');
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No resources found</h3><p>Try a different category</p></div>';
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(resource => `
+        <div class="resource-card">
+            <span class="resource-badge">${resource.category.toUpperCase()}</span>
+            <h3>${resource.title}</h3>
+            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+            <p><strong>Subject:</strong> ${resource.subject}</p>
+            <div class="price">${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</div>
+            <button onclick="viewResource(${resource.id})">
+                <i class="fas fa-eye"></i> View Resource
+            </button>
+        </div>
+    `).join('');
+}
+
+// ==================== VIDEO FUNCTIONS ====================
+function loadVideos() {
+    const grid = document.getElementById('videoGrid');
+    if (!grid) return;
+    
+    if (videos.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-video"></i><h3>No videos yet</h3><p>Check back soon for video content</p></div>';
+        return;
+    }
+    
+    grid.innerHTML = videos.map(video => `
+        <div class="video-card">
+            <div class="video-thumbnail">
+                <i class="fas fa-play-circle"></i>
+            </div>
+            <div class="video-info">
+                <h4>${video.title}</h4>
+                <p>${video.subject} • ${formatLevelName(video.level)}</p>
+                <button onclick="viewVideo(${video.id})">
+                    <i class="fas fa-play"></i> Watch Now
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewVideo(videoId) {
+    const video = videos.find(v => v.id === videoId);
+    if (!video) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:3000; display:flex; align-items:center; justify-content:center;';
+    
+    modal.innerHTML = `
+        <div style="background:white; border-radius:12px; max-width:800px; width:90%; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>${video.title}</h3>
+                <span style="cursor:pointer; font-size:24px;" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div style="position:relative; padding-bottom:56.25%; height:0;">
+                <iframe src="${video.url}" style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div style="margin-top:10px;">
+                <p><strong>Subject:</strong> ${video.subject}</p>
+                <p><strong>Level:</strong> ${formatLevelName(video.level)}</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// ==================== RESOURCE FUNCTIONS ====================
+function viewResource(resourceId) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3000; display:flex; align-items:center; justify-content:center;';
+    
+    modal.innerHTML = `
+        <div style="background:white; border-radius:12px; max-width:500px; width:90%; padding:20px; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>${resource.title}</h3>
+                <span style="cursor:pointer; font-size:24px;" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div style="margin-bottom:10px;">
+                <p><strong>Subject:</strong> ${resource.subject}</p>
+                <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+                <p><strong>Category:</strong> ${resource.category}</p>
+                <p><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</p>
+            </div>
+            <div style="margin-bottom:15px;">
+                <strong>Description:</strong>
+                <p>${resource.description}</p>
+            </div>
+            <div style="background:#f3f4f6; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                <i class="fas fa-file-pdf" style="font-size:48px; color:#ef4444;"></i>
+                <p>Document ready for download</p>
+            </div>
+            <button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-download"></i> Download Resource
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function downloadResource(resourceId) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) return;
     
     // Check if purchased or free
     const hasPurchased = purchases.some(p => p.resourceId === resourceId);
-    if (resource.price > 0 && !hasPurchased) {
-        purchaseResource(resourceId);
-        return;
+    
+    if (resource.price === 0 || hasPurchased) {
+        // Generate document content
+        const content = generateDocumentContent(resource);
+        const blob = new Blob([content], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${resource.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        // Update download count
+        resource.downloads = (resource.downloads || 0) + 1;
+        saveResources();
+        
+        alert(`✅ "${resource.title}" downloaded successfully!`);
+        updateHeroStats();
+        
+        // Close modal
+        document.querySelectorAll('.modal').forEach(m => m.remove());
+    } else {
+        alert(`⚠️ Please purchase this resource for KES ${resource.price.toLocaleString()}`);
+        openPaymentModal(resourceId);
     }
-    
-    try {
-        if (resource.fileUrl) {
-            // Download from Firebase Storage URL
-            showToast('📥 Downloading from cloud...', 'info');
-            
-            const response = await fetch(resource.fileUrl);
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = resource.fileName || `${resource.title}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Update download count in Firestore
-            if (window.db) {
-                const resourceRef = doc(db, 'resources', resourceId);
-                await updateDoc(resourceRef, { 
-                    downloads: (resource.downloads || 0) + 1 
-                });
-            }
-            
-            resource.downloads = (resource.downloads || 0) + 1;
-            showToast(`✅ "${resource.title}" downloaded!`, 'success');
-        } else {
-            // Fallback to simulated download
-            simulateDownload(resource);
-        }
-    } catch (error) {
-        console.error("Download error:", error);
-        simulateDownload(resource);
-    }
-}
-
-// Delete resource from Firebase
-async function deleteResourceFromFirebase(resourceId) {
-    if (!confirm('⚠️ Delete this resource permanently? This action cannot be undone.')) return;
-    
-    try {
-        const resource = resources.find(r => r.id === resourceId);
-        
-        // Delete file from Storage if exists
-        if (resource && resource.filePath && window.storage) {
-            const fileRef = ref(storage, resource.filePath);
-            await deleteObject(fileRef);
-        }
-        
-        // Delete document from Firestore
-        if (window.db) {
-            await deleteDoc(doc(db, 'resources', resourceId));
-        }
-        
-        // Remove from local array
-        resources = resources.filter(r => r.id !== resourceId);
-        localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-        
-        showToast('✅ Resource deleted successfully!', 'success');
-        
-        // Refresh displays
-        loadMarketplace();
-        if (window.isAdminLoggedIn) {
-            updateAdminStats();
-            loadAdminDocuments();
-            loadAdminExams();
-        }
-    } catch (error) {
-        console.error("Delete error:", error);
-        alert('Delete failed: ' + error.message);
-    }
-}
-
-// Delete video from Firebase
-async function deleteVideoFromFirebase(videoId) {
-    if (!confirm('Delete this video?')) return;
-    
-    try {
-        if (window.db) {
-            await deleteDoc(doc(db, 'videos', videoId));
-        }
-        
-        videos = videos.filter(v => v.id !== videoId);
-        localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
-        
-        showToast('✅ Video deleted!', 'success');
-        loadVideos();
-        if (window.isAdminLoggedIn) loadAdminVideos();
-    } catch (error) {
-        console.error("Error deleting video:", error);
-        alert('Delete failed');
-    }
-}
-
-// Record purchase in Firestore
-async function recordPurchase(purchaseData) {
-    try {
-        if (window.db) {
-            await addDoc(collection(db, 'purchases'), {
-                ...purchaseData,
-                timestamp: new Date().toISOString()
-            });
-        }
-        
-        purchases.push(purchaseData);
-        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
-    } catch (error) {
-        console.error("Error recording purchase:", error);
-    }
-}
-
-// Toast notification helper
-function showToast(message, type = 'info') {
-    // Create toast element if it doesn't exist
-    let toast = document.getElementById('nexatoast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'nexatoast';
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-            max-width: 300px;
-        `;
-        document.body.appendChild(toast);
-        
-        // Add animation styles
-        if (!document.querySelector('#toast-styles')) {
-            const style = document.createElement('style');
-            style.id = 'toast-styles';
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes fadeOut {
-                    from { opacity: 1; }
-                    to { opacity: 0; visibility: hidden; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    }
-    
-    // Set color based on type
-    const colors = {
-        success: '#10b981',
-        error: '#ef4444',
-        info: '#3b82f6',
-        warning: '#f59e0b'
-    };
-    
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = message;
-    toast.style.display = 'block';
-    
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-        toast.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => {
-            toast.style.display = 'none';
-            toast.style.animation = '';
-        }, 300);
-    }, 3000);
-}
-
-// Simulated download (fallback)
-function simulateDownload(resource) {
-    const content = generateDocumentContent(resource);
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${resource.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    resource.downloads = (resource.downloads || 0) + 1;
-    localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-    showToast(`✅ "${resource.title}" downloaded!`, 'success');
 }
 
 function generateDocumentContent(resource) {
@@ -331,14 +261,23 @@ function generateDocumentContent(resource) {
 DOCUMENT: ${resource.title}
 ═══════════════════════════════════════════════════════════
 
-Level: ${resource.level?.toUpperCase() || 'N/A'}
-Subject: ${resource.subject || 'N/A'}
-Category: ${resource.category?.toUpperCase() || 'N/A'}
+Level: ${formatLevelName(resource.level)}
+Subject: ${resource.subject}
+Category: ${resource.category.toUpperCase()}
+Download Date: ${new Date().toLocaleDateString()}
 
 ───────────────────────────────────────────────────────────
 
 DESCRIPTION:
-${resource.description || 'Premium educational resource from NexaLearn International.'}
+${resource.description}
+
+───────────────────────────────────────────────────────────
+
+CONTENT SUMMARY:
+This educational resource is provided by NexaLearn International
+as part of our commitment to quality education.
+
+For more resources, visit: www.nexalearn.com
 
 ───────────────────────────────────────────────────────────
 
@@ -347,19 +286,348 @@ Knowledge for Global Excellence
     `;
 }
 
-// ==================== UPDATED ADMIN UPLOAD WITH FIREBASE ====================
+// ==================== SUBJECT & LEVEL FILTERING ====================
+function loadResourcesBySubject(level, subject) {
+    const filtered = resources.filter(r => r.level === level && r.subject === subject);
+    const grid = document.getElementById('resourcesGrid');
+    const display = document.getElementById('currentSubjectDisplay');
+    
+    if (!grid) return;
+    
+    display.textContent = `${subject} - ${formatLevelName(level)} Resources`;
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h3>No resources found</h3>
+            <p>Be the first to upload resources for ${subject}</p>
+            <button onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})" style="margin-top:1rem; padding:0.5rem 1rem; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-upload"></i> Upload Resource
+            </button>
+        </div>`;
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(r => `
+        <div class="resource-card">
+            <span class="resource-badge">${r.category.toUpperCase()}</span>
+            <h3>${r.title}</h3>
+            <p>${r.description.substring(0, 100)}${r.description.length > 100 ? '...' : ''}</p>
+            <div class="resource-meta">
+                <span><i class="fas fa-download"></i> ${r.downloads || 0} downloads</span>
+            </div>
+            <div class="price">${r.price === 0 ? 'FREE' : `KES ${r.price.toLocaleString()}`}</div>
+            <button onclick="viewResource(${r.id})">View Resource</button>
+        </div>
+    `).join('');
+    
+    // Scroll to results
+    document.getElementById('subject-resources').scrollIntoView({ behavior: 'smooth' });
+}
+
+function loadResourcesByLevel(level) {
+    const filtered = resources.filter(r => r.level === level);
+    const grid = document.getElementById('resourcesGrid');
+    const display = document.getElementById('currentSubjectDisplay');
+    
+    if (!grid) return;
+    
+    display.textContent = `${formatLevelName(level)} - All Resources`;
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h3>No resources available</h3>
+            <p>Check back later for new resources</p>
+        </div>`;
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(r => `
+        <div class="resource-card">
+            <span class="resource-badge">${r.category.toUpperCase()}</span>
+            <h3>${r.title}</h3>
+            <p><strong>Subject:</strong> ${r.subject}</p>
+            <p>${r.description.substring(0, 80)}${r.description.length > 80 ? '...' : ''}</p>
+            <div class="price">${r.price === 0 ? 'FREE' : `KES ${r.price.toLocaleString()}`}</div>
+            <button onclick="viewResource(${r.id})">View Resource</button>
+        </div>
+    `).join('');
+    
+    document.getElementById('subject-resources').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ==================== USER UPLOAD ====================
+function setupUploadForm() {
+    const form = document.getElementById('uploadForm');
+    if (!form) return;
+    
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('resourceTitle')?.value;
+        const level = document.getElementById('resourceLevel')?.value;
+        const subject = document.getElementById('resourceSubject')?.value;
+        const category = document.getElementById('resourceCategory')?.value;
+        const price = parseInt(document.getElementById('resourcePrice')?.value) || 0;
+        const description = document.getElementById('resourceDescription')?.value;
+        const fileInput = document.getElementById('resourceFile');
+        
+        if (!title || !level || !subject || !category) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        const newResource = {
+            id: Date.now(),
+            title: title,
+            level: level,
+            subject: subject,
+            category: category,
+            price: price,
+            description: description || `Uploaded document: ${title}`,
+            downloads: 0,
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        resources.push(newResource);
+        saveResources();
+        
+        alert(`✅ "${title}" uploaded successfully!`);
+        form.reset();
+        
+        // Refresh displays
+        loadMarketplace();
+        updateHeroStats();
+        
+        // If admin is logged in, refresh admin view
+        if (window.isAdminLoggedIn) {
+            updateAdminStats();
+            loadAdminDocuments();
+            loadAdminExams();
+        }
+    });
+}
+
+// ==================== SEARCH FUNCTION ====================
+function setupSearch() {
+    const searchInput = document.getElementById('globalSearch');
+    if (!searchInput) return;
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        if (query.length < 2) {
+            loadMarketplace();
+            return;
+        }
+        
+        const filtered = resources.filter(r => 
+            r.title.toLowerCase().includes(query) || 
+            r.subject.toLowerCase().includes(query) ||
+            r.description.toLowerCase().includes(query)
+        );
+        
+        const grid = document.getElementById('marketplaceGrid');
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No results found</h3><p>Try different keywords</p></div>';
+        } else {
+            grid.innerHTML = filtered.map(r => `
+                <div class="resource-card">
+                    <span class="resource-badge">${r.category.toUpperCase()}</span>
+                    <h3>${r.title}</h3>
+                    <p><strong>Subject:</strong> ${r.subject}</p>
+                    <div class="price">${r.price === 0 ? 'FREE' : `KES ${r.price.toLocaleString()}`}</div>
+                    <button onclick="viewResource(${r.id})">View Resource</button>
+                </div>
+            `).join('');
+        }
+    });
+}
+
+// ==================== ADMIN FUNCTIONS ====================
+let isAdminLoggedIn = false;
+
+function setupAdminAuth() {
+    const adminBtn = document.getElementById('adminBtn');
+    const adminModal = document.getElementById('adminModal');
+    const loginForm = document.getElementById('adminLoginForm');
+    
+    if (!adminBtn || !adminModal) return;
+    
+    adminBtn.addEventListener('click', () => {
+        adminModal.style.display = 'flex';
+    });
+    
+    document.querySelectorAll('.close-modal').forEach(close => {
+        close.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
+    });
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (email === 'admin@nexalearn.com' && password === 'admin123') {
+                isAdminLoggedIn = true;
+                window.isAdminLoggedIn = true;
+                adminModal.style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                updateAdminStats();
+                loadAdminDocuments();
+                loadAdminVideos();
+                loadAdminExams();
+            } else {
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 3000);
+            }
+        });
+    }
+    
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            isAdminLoggedIn = false;
+            window.isAdminLoggedIn = false;
+            document.getElementById('adminDashboard').style.display = 'none';
+            alert('Logged out of admin dashboard');
+        });
+    }
+}
+
+function updateAdminStats() {
+    const totalRevenue = purchases.reduce((sum, p) => sum + (p.price || 0), 0);
+    const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
+    
+    document.getElementById('statTotalResources').textContent = resources.length;
+    document.getElementById('statTotalVideos').textContent = videos.length;
+    document.getElementById('statTotalRevenue').textContent = totalRevenue.toLocaleString();
+    document.getElementById('statTotalDownloads').textContent = totalDownloads;
+    
+    const recent = [...purchases].reverse().slice(0, 10);
+    const activityDiv = document.getElementById('recentActivityList');
+    if (recent.length === 0) {
+        activityDiv.innerHTML = '<p class="no-data">No purchases yet</p>';
+    } else {
+        activityDiv.innerHTML = recent.map(p => `
+            <div class="admin-item">
+                <div><strong>${p.resourceTitle}</strong><br>${p.email || 'Anonymous'} | KES ${p.price}</div>
+                <small>${new Date(p.date).toLocaleDateString()}</small>
+            </div>
+        `).join('');
+    }
+}
+
+function loadAdminDocuments() {
+    const container = document.getElementById('adminDocumentsList');
+    if (!container) return;
+    
+    const docs = resources.filter(r => r.category !== 'exam');
+    if (docs.length === 0) {
+        container.innerHTML = '<p class="no-data">No documents yet</p>';
+        return;
+    }
+    
+    container.innerHTML = docs.map(doc => `
+        <div class="admin-item">
+            <div>
+                <strong>${doc.title}</strong><br>
+                <small>${formatLevelName(doc.level)} | ${doc.subject} | KES ${doc.price}</small>
+                <br><small>Downloads: ${doc.downloads || 0}</small>
+            </div>
+            <div class="admin-item-actions">
+                <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadAdminVideos() {
+    const container = document.getElementById('adminVideosList');
+    if (!container) return;
+    
+    if (videos.length === 0) {
+        container.innerHTML = '<p class="no-data">No videos yet</p>';
+        return;
+    }
+    
+    container.innerHTML = videos.map(v => `
+        <div class="admin-item">
+            <div>
+                <strong>${v.title}</strong><br>
+                <small>${v.subject} | ${formatLevelName(v.level)}</small>
+            </div>
+            <div class="admin-item-actions">
+                <button class="btn-delete" onclick="deleteVideo(${v.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadAdminExams() {
+    const container = document.getElementById('adminExamsList');
+    if (!container) return;
+    
+    const exams = resources.filter(r => r.category === 'exam');
+    if (exams.length === 0) {
+        container.innerHTML = '<p class="no-data">No exams yet</p>';
+        return;
+    }
+    
+    container.innerHTML = exams.map(exam => `
+        <div class="admin-item">
+            <div>
+                <strong>${exam.title}</strong><br>
+                <small>${formatLevelName(exam.level)} | ${exam.subject} | KES ${exam.price}</small>
+            </div>
+            <div class="admin-item-actions">
+                <button class="btn-delete" onclick="deleteResource(${exam.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Admin delete functions
+function deleteResource(id) {
+    if (confirm('Delete this resource permanently?')) {
+        resources = resources.filter(r => r.id !== id);
+        saveResources();
+        loadMarketplace();
+        updateAdminStats();
+        loadAdminDocuments();
+        loadAdminExams();
+        updateHeroStats();
+        alert('✅ Resource deleted');
+    }
+}
+
+function deleteVideo(id) {
+    if (confirm('Delete this video?')) {
+        videos = videos.filter(v => v.id !== id);
+        saveVideos();
+        loadVideos();
+        updateAdminStats();
+        loadAdminVideos();
+        alert('✅ Video deleted');
+    }
+}
+
+// Admin document upload
 let pendingDocFile = null;
 
-// Setup admin document upload
-document.getElementById('adminDocFile')?.addEventListener('change', async (e) => {
+document.getElementById('adminDocFile')?.addEventListener('change', (e) => {
     pendingDocFile = e.target.files[0];
     if (pendingDocFile) {
         document.getElementById('docUploadForm').style.display = 'block';
-        showToast(`File selected: ${pendingDocFile.name}`, 'info');
     }
 });
 
-document.getElementById('saveDocBtn')?.addEventListener('click', async () => {
+document.getElementById('saveDocBtn')?.addEventListener('click', () => {
     const title = document.getElementById('docTitle')?.value;
     const level = document.getElementById('docLevel')?.value;
     const subject = document.getElementById('docSubject')?.value;
@@ -367,41 +635,27 @@ document.getElementById('saveDocBtn')?.addEventListener('click', async () => {
     const price = parseInt(document.getElementById('docPrice')?.value) || 0;
     const description = document.getElementById('docDescription')?.value;
     
-    if (!title || !subject || !pendingDocFile) {
-        alert('Please fill all fields and select a file');
+    if (!title || !subject) {
+        alert('Please fill title and subject');
         return;
     }
     
-    const resourceData = {
+    const newResource = {
+        id: Date.now(),
         title: title,
         level: level,
         subject: subject,
         category: category,
         price: price,
-        description: description || `Uploaded document: ${title}`,
+        description: description || `Admin uploaded: ${title}`,
+        downloads: 0,
         date: new Date().toISOString().split('T')[0]
     };
     
-    // Upload to Firebase
-    if (window.storage && window.db) {
-        await uploadDocumentToFirebase(pendingDocFile, resourceData);
-    } else {
-        // Fallback to localStorage
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const newResource = {
-                id: Date.now(),
-                ...resourceData,
-                fileData: event.target.result,
-                fileName: pendingDocFile.name,
-                downloads: 0
-            };
-            resources.push(newResource);
-            localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-            showToast(`✅ "${title}" saved locally!`, 'success');
-        };
-        reader.readAsDataURL(pendingDocFile);
-    }
+    resources.push(newResource);
+    saveResources();
+    
+    alert(`✅ Document "${title}" uploaded!`);
     
     // Reset form
     document.getElementById('docTitle').value = '';
@@ -412,17 +666,14 @@ document.getElementById('saveDocBtn')?.addEventListener('click', async () => {
     pendingDocFile = null;
     
     // Refresh displays
-    setTimeout(() => {
-        loadMarketplace();
-        if (window.isAdminLoggedIn) {
-            updateAdminStats();
-            loadAdminDocuments();
-        }
-    }, 1000);
+    loadMarketplace();
+    updateAdminStats();
+    loadAdminDocuments();
+    updateHeroStats();
 });
 
-// Setup admin video upload
-document.getElementById('addVideoBtn')?.addEventListener('click', async () => {
+// Admin video upload
+document.getElementById('addVideoBtn')?.addEventListener('click', () => {
     const title = document.getElementById('videoTitle')?.value;
     const subject = document.getElementById('videoSubject')?.value;
     const level = document.getElementById('videoLevel')?.value;
@@ -433,7 +684,8 @@ document.getElementById('addVideoBtn')?.addEventListener('click', async () => {
         return;
     }
     
-    const videoData = {
+    const newVideo = {
+        id: Date.now(),
         title: title,
         subject: subject,
         level: level,
@@ -441,107 +693,269 @@ document.getElementById('addVideoBtn')?.addEventListener('click', async () => {
         date: new Date().toISOString().split('T')[0]
     };
     
-    if (window.db) {
-        await uploadVideoToFirebase(videoData);
-    } else {
-        const newVideo = { id: Date.now(), ...videoData };
-        videos.push(newVideo);
-        localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
-        showToast(`✅ Video "${title}" added locally!`, 'success');
-    }
+    videos.push(newVideo);
+    saveVideos();
     
-    // Reset form
+    alert(`✅ Video "${title}" added!`);
+    
     document.getElementById('videoTitle').value = '';
     document.getElementById('videoSubject').value = '';
     document.getElementById('videoUrl').value = '';
     
-    // Refresh displays
     loadVideos();
-    if (window.isAdminLoggedIn) loadAdminVideos();
+    updateAdminStats();
+    loadAdminVideos();
 });
 
-// ==================== INITIALIZATION WITH FIREBASE ====================
-// Override the original initialization to use Firebase
-(async function initFirebaseApp() {
-    // Wait for Firebase to be ready
-    await new Promise(resolve => setTimeout(resolve, 500));
+// Admin exam upload
+let pendingExamFile = null;
+
+document.getElementById('adminExamFile')?.addEventListener('change', (e) => {
+    pendingExamFile = e.target.files[0];
+    if (pendingExamFile) {
+        document.getElementById('examUploadForm').style.display = 'block';
+    }
+});
+
+document.getElementById('saveExamBtn')?.addEventListener('click', () => {
+    const title = document.getElementById('examTitle')?.value;
+    const level = document.getElementById('examLevel')?.value;
+    const subject = document.getElementById('examSubject')?.value;
+    const price = parseInt(document.getElementById('examPrice')?.value);
     
-    // Load data from Firebase
-    if (window.db) {
-        await loadAllResources();
-        await loadAllVideos();
-        console.log(`📚 Loaded ${resources.length} resources from Firebase`);
-        console.log(`🎬 Loaded ${videos.length} videos from Firebase`);
-    } else {
-        // Fallback to localStorage
-        resources = JSON.parse(localStorage.getItem('nexalearn_resources')) || [];
-        videos = JSON.parse(localStorage.getItem('nexalearn_videos')) || [];
-        purchases = JSON.parse(localStorage.getItem('nexalearn_purchases')) || [];
-        console.log('📚 Using localStorage fallback');
+    if (!title || !subject || !price) {
+        alert('Please fill all fields');
+        return;
     }
     
-    // Initialize UI
+    const newExam = {
+        id: Date.now(),
+        title: title,
+        level: level,
+        subject: subject,
+        category: 'exam',
+        price: price,
+        description: `Exam paper: ${title}`,
+        downloads: 0,
+        date: new Date().toISOString().split('T')[0]
+    };
+    
+    resources.push(newExam);
+    saveResources();
+    
+    alert(`✅ Exam "${title}" uploaded!`);
+    
+    document.getElementById('examTitle').value = '';
+    document.getElementById('examSubject').value = '';
+    document.getElementById('examPrice').value = '';
+    document.getElementById('examUploadForm').style.display = 'none';
+    pendingExamFile = null;
+    
+    loadMarketplace();
+    updateAdminStats();
+    loadAdminExams();
+    updateHeroStats();
+});
+
+// ==================== TAB SWITCHING ====================
+document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.admin-tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+    });
+});
+
+// ==================== SCROLL FUNCTIONS ====================
+window.scrollToLevels = function() {
+    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
+};
+
+window.scrollToMarketplace = function() {
+    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
+};
+
+// ==================== INITIALIZATION ====================
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize data
+    initializeData();
+    
+    // Load displays
     loadMarketplace();
     loadVideos();
     updateHeroStats();
     
-    // Sample data if empty
-    if (resources.length === 0) {
-        addSampleData();
-    }
-})();
-
-function addSampleData() {
-    const sampleResources = [
-        { title: "Complete Mathematics Guide", level: "junior", subject: "Mathematics", category: "textbook", price: 500, description: "Comprehensive math guide", downloads: 120, date: "2024-01-15" },
-        { title: "Biology Exam Papers", level: "senior", subject: "Biology", category: "exam", price: 300, description: "Past papers with answers", downloads: 89, date: "2024-02-10" },
-        { title: "Financial Literacy Basics", level: "lifelong", subject: "Financial Literacy", category: "guide", price: 0, description: "Free financial guide", downloads: 450, date: "2024-01-20" }
-    ];
+    // Setup event listeners
+    setupUploadForm();
+    setupSearch();
+    setupAdminAuth();
     
-    sampleResources.forEach(r => {
-        resources.push({ id: Date.now() + Math.random(), ...r });
+    // Level cards click
+    document.querySelectorAll('.level-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const level = card.dataset.level;
+            loadResourcesByLevel(level);
+        });
     });
-    localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-    loadMarketplace();
-}
-// Global helper functions
-function scrollToLevels() {
-    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
-}
-
-function scrollToMarketplace() {
-    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
-}
-
-// Admin login handler
-document.getElementById('adminLoginForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
     
-    if (email === 'admin@nexalearn.com' && password === 'admin123') {
-        document.getElementById('adminModal').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
-        loadAdminData();
-    } else {
-        document.getElementById('loginError').style.display = 'block';
+    // Subject chips click
+    document.querySelectorAll('.subject-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const level = chip.dataset.level;
+            const subject = chip.dataset.subject;
+            loadResourcesBySubject(level, subject);
+            
+            // Close mega menu
+            const levelsMenu = document.getElementById('levelsMenu');
+            if (levelsMenu) levelsMenu.classList.remove('active');
+        });
+    });
+    
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterMarketplace(btn.dataset.filter);
+        });
+    });
+    
+    // Mega menu toggle
+    const levelsNavLink = document.querySelector('a[href="#levels"]');
+    const levelsMenu = document.getElementById('levelsMenu');
+    
+    if (levelsNavLink) {
+        levelsNavLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            levelsMenu.classList.toggle('active');
+        });
     }
+    
+    // Close mega menu on outside click
+    document.addEventListener('click', (e) => {
+        if (levelsMenu && !levelsMenu.contains(e.target) && !levelsNavLink?.contains(e.target)) {
+            levelsMenu.classList.remove('active');
+        }
+    });
+    
+    // Animate stats
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const target = parseInt(stat.dataset.count);
+        if (target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    stat.textContent = target.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    stat.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 30);
+        }
+    });
+    
+    console.log('✅ NexaLearn initialized with', resources.length, 'resources and', videos.length, 'videos');
 });
 
-// Admin logout
-document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
-    document.getElementById('adminDashboard').style.display = 'none';
-});
+// Make functions global
+window.viewResource = viewResource;
+window.downloadResource = downloadResource;
+window.viewVideo = viewVideo;
+window.deleteResource = deleteResource;
+window.deleteVideo = deleteVideo;
+window.filterMarketplace = filterMarketplace;
+window.loadResourcesByLevel = loadResourcesByLevel;
+window.loadResourcesBySubject = loadResourcesBySubject;
+window.openPaymentModal = function(resourceId) {
+    const modal = document.getElementById('paymentModal');
+    const resource = resources.find(r => r.id === resourceId);
+    if (resource && modal) {
+        document.getElementById('paymentProductTitle').textContent = resource.title;
+        document.getElementById('paymentProductDesc').textContent = resource.description;
+        document.getElementById('paymentAmount').textContent = `KES ${resource.price.toLocaleString()}`;
+        document.getElementById('mpesaAmount').textContent = `KES ${resource.price.toLocaleString()}`;
+        document.getElementById('bankAmount').textContent = `KES ${resource.price.toLocaleString()}`;
+        modal.style.display = 'flex';
+        
+        // Store pending payment
+        window.pendingPayment = resource;
+    }
+};
 
-// Close modals
-document.querySelectorAll('.close-modal').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.closest('.modal').style.display = 'none';
+window.processMpesaPayment = function() {
+    const phone = document.getElementById('mpesaPhone')?.value;
+    if (!phone) {
+        alert('Please enter your M-Pesa phone number');
+        return;
+    }
+    alert(`M-Pesa payment initiated for KES ${window.pendingPayment?.price}\nCheck your phone for prompt`);
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        document.getElementById('receiptModal').style.display = 'flex';
+    }, 2000);
+};
+
+window.processCardPayment = function() {
+    alert('Card payment processing...');
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        document.getElementById('receiptModal').style.display = 'flex';
+    }, 1500);
+};
+
+window.processBankPayment = function() {
+    const reference = document.getElementById('bankReference')?.value;
+    if (!reference) {
+        alert('Please enter bank reference number');
+        return;
+    }
+    alert('Bank transfer confirmed. Processing...');
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        document.getElementById('receiptModal').style.display = 'flex';
+    }, 1500);
+};
+
+window.sendReceiptAndDownload = function() {
+    const email = document.getElementById('recipientEmail')?.value;
+    if (!email) {
+        alert('Please enter your email');
+        return;
+    }
+    
+    if (window.pendingPayment) {
+        purchases.push({
+            id: Date.now(),
+            resourceId: window.pendingPayment.id,
+            resourceTitle: window.pendingPayment.title,
+            price: window.pendingPayment.price,
+            email: email,
+            date: new Date().toISOString()
+        });
+        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
+        
+        alert(`✅ Receipt sent to ${email}\nDownloading ${window.pendingPayment.title}...`);
+        downloadResource(window.pendingPayment.id);
+        document.getElementById('receiptModal').style.display = 'none';
+        window.pendingPayment = null;
+        
+        if (window.isAdminLoggedIn) updateAdminStats();
+    }
+};
+
+window.showPaymentMethod = function(method) {
+    document.getElementById('mpesaForm').style.display = method === 'mpesa' ? 'block' : 'none';
+    document.getElementById('cardForm').style.display = method === 'card' ? 'block' : 'none';
+    document.getElementById('bankForm').style.display = method === 'bank' ? 'block' : 'none';
+};
+
+// Setup payment method radio buttons
+document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        window.showPaymentMethod(e.target.value);
     });
 });
-// Export global functions
-window.uploadDocumentToFirebase = uploadDocumentToFirebase;
-window.downloadFromFirebase = downloadFromFirebase;
-window.deleteResourceFromFirebase = deleteResourceFromFirebase;
-window.deleteVideoFromFirebase = deleteVideoFromFirebase;
-window.showToast = showToast;

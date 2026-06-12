@@ -444,82 +444,153 @@ function setupSearch() {
     });
 }
 
-// ==================== ADMIN FUNCTIONS ====================
+// ==================== ADMIN AUTHENTICATION - FIXED ====================
 let isAdminLoggedIn = false;
 
 function setupAdminAuth() {
     const adminBtn = document.getElementById('adminBtn');
     const adminModal = document.getElementById('adminModal');
+    const adminDashboard = document.getElementById('adminDashboard');
     const loginForm = document.getElementById('adminLoginForm');
+    const loginError = document.getElementById('loginError');
     
-    if (!adminBtn || !adminModal) return;
+    console.log('Setting up admin auth...', { adminBtn: !!adminBtn, adminModal: !!adminModal });
     
-    adminBtn.addEventListener('click', () => {
+    if (!adminBtn) {
+        console.error('Admin button not found!');
+        return;
+    }
+    
+    if (!adminModal) {
+        console.error('Admin modal not found!');
+        return;
+    }
+    
+    // OPEN MODAL when admin button is clicked
+    adminBtn.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Admin button clicked - opening modal');
         adminModal.style.display = 'flex';
-    });
+        // Clear any previous error
+        if (loginError) loginError.style.display = 'none';
+        // Clear input fields
+        document.getElementById('adminEmail').value = '';
+        document.getElementById('adminPassword').value = '';
+    };
     
-    document.querySelectorAll('.close-modal').forEach(close => {
-        close.addEventListener('click', function() {
-            this.closest('.modal').style.display = 'none';
-        });
-    });
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+    // CLOSE MODAL - using the close button
+    const closeButtons = document.querySelectorAll('.close-modal');
+    closeButtons.forEach(btn => {
+        btn.onclick = function(e) {
             e.preventDefault();
-            const email = document.getElementById('adminEmail').value;
-            const password = document.getElementById('adminPassword').value;
-            const errorDiv = document.getElementById('loginError');
+            e.stopPropagation();
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            if (adminDashboard) adminDashboard.style.display = 'none';
+        };
+    });
+    
+    // CLOSE MODAL when clicking outside
+    window.onclick = function(e) {
+        if (e.target === adminModal) {
+            adminModal.style.display = 'none';
+        }
+        if (e.target === adminDashboard) {
+            adminDashboard.style.display = 'none';
+        }
+    };
+    
+    // HANDLE LOGIN
+    if (loginForm) {
+        loginForm.onsubmit = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            
+            console.log('Login attempt:', email);
+            
+            // Admin credentials
             if (email === 'admin@nexalearn.com' && password === 'admin123') {
                 isAdminLoggedIn = true;
                 window.isAdminLoggedIn = true;
                 adminModal.style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                updateAdminStats();
-                loadAdminDocuments();
-                loadAdminVideos();
-                loadAdminExams();
+                
+                // Show admin dashboard
+                if (adminDashboard) {
+                    adminDashboard.style.display = 'block';
+                    console.log('Admin dashboard opened');
+                    
+                    // Load admin data
+                    updateAdminStats();
+                    loadAdminDocuments();
+                    loadAdminVideos();
+                    loadAdminExams();
+                } else {
+                    console.error('Admin dashboard element not found!');
+                }
             } else {
-                errorDiv.style.display = 'block';
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 3000);
+                if (loginError) {
+                    loginError.style.display = 'block';
+                    setTimeout(() => {
+                        loginError.style.display = 'none';
+                    }, 3000);
+                }
+                console.log('Invalid credentials');
             }
-        });
+        };
     }
     
+    // LOGOUT BUTTON
     const logoutBtn = document.getElementById('adminLogoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+        logoutBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             isAdminLoggedIn = false;
             window.isAdminLoggedIn = false;
-            document.getElementById('adminDashboard').style.display = 'none';
+            if (adminDashboard) adminDashboard.style.display = 'none';
+            console.log('Admin logged out');
             alert('Logged out of admin dashboard');
-        });
+        };
     }
 }
 
+// ==================== ADMIN DASHBOARD FUNCTIONS ====================
 function updateAdminStats() {
     const totalRevenue = purchases.reduce((sum, p) => sum + (p.price || 0), 0);
     const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
     
-    document.getElementById('statTotalResources').textContent = resources.length;
-    document.getElementById('statTotalVideos').textContent = videos.length;
-    document.getElementById('statTotalRevenue').textContent = totalRevenue.toLocaleString();
-    document.getElementById('statTotalDownloads').textContent = totalDownloads;
+    const statTotalResources = document.getElementById('statTotalResources');
+    const statTotalVideos = document.getElementById('statTotalVideos');
+    const statTotalRevenue = document.getElementById('statTotalRevenue');
+    const statTotalDownloads = document.getElementById('statTotalDownloads');
+    
+    if (statTotalResources) statTotalResources.textContent = resources.length;
+    if (statTotalVideos) statTotalVideos.textContent = videos.length;
+    if (statTotalRevenue) statTotalRevenue.textContent = totalRevenue.toLocaleString();
+    if (statTotalDownloads) statTotalDownloads.textContent = totalDownloads;
     
     const recent = [...purchases].reverse().slice(0, 10);
     const activityDiv = document.getElementById('recentActivityList');
-    if (recent.length === 0) {
-        activityDiv.innerHTML = '<p class="no-data">No purchases yet</p>';
-    } else {
-        activityDiv.innerHTML = recent.map(p => `
-            <div class="admin-item">
-                <div><strong>${p.resourceTitle}</strong><br>${p.email || 'Anonymous'} | KES ${p.price}</div>
-                <small>${new Date(p.date).toLocaleDateString()}</small>
-            </div>
-        `).join('');
+    if (activityDiv) {
+        if (recent.length === 0) {
+            activityDiv.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No purchases yet</p>';
+        } else {
+            activityDiv.innerHTML = recent.map(p => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${p.resourceTitle}</strong><br>
+                        <small>${p.email || 'Anonymous'} | KES ${p.price.toLocaleString()}</small>
+                    </div>
+                    <small>${new Date(p.date).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        }
     }
 }
 
@@ -529,7 +600,7 @@ function loadAdminDocuments() {
     
     const docs = resources.filter(r => r.category !== 'exam');
     if (docs.length === 0) {
-        container.innerHTML = '<p class="no-data">No documents yet</p>';
+        container.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No documents yet</p>';
         return;
     }
     
@@ -537,8 +608,8 @@ function loadAdminDocuments() {
         <div class="admin-item">
             <div>
                 <strong>${doc.title}</strong><br>
-                <small>${formatLevelName(doc.level)} | ${doc.subject} | KES ${doc.price}</small>
-                <br><small>Downloads: ${doc.downloads || 0}</small>
+                <small>${formatLevelName(doc.level)} | ${doc.subject} | KES ${doc.price.toLocaleString()}</small>
+                <br><small>Downloads: ${doc.downloads || 0} | Added: ${doc.date}</small>
             </div>
             <div class="admin-item-actions">
                 <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
@@ -552,7 +623,7 @@ function loadAdminVideos() {
     if (!container) return;
     
     if (videos.length === 0) {
-        container.innerHTML = '<p class="no-data">No videos yet</p>';
+        container.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No videos yet</p>';
         return;
     }
     
@@ -561,6 +632,7 @@ function loadAdminVideos() {
             <div>
                 <strong>${v.title}</strong><br>
                 <small>${v.subject} | ${formatLevelName(v.level)}</small>
+                <br><small>Added: ${v.date}</small>
             </div>
             <div class="admin-item-actions">
                 <button class="btn-delete" onclick="deleteVideo(${v.id})">Delete</button>
@@ -575,7 +647,7 @@ function loadAdminExams() {
     
     const exams = resources.filter(r => r.category === 'exam');
     if (exams.length === 0) {
-        container.innerHTML = '<p class="no-data">No exams yet</p>';
+        container.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No exams yet</p>';
         return;
     }
     
@@ -583,7 +655,8 @@ function loadAdminExams() {
         <div class="admin-item">
             <div>
                 <strong>${exam.title}</strong><br>
-                <small>${formatLevelName(exam.level)} | ${exam.subject} | KES ${exam.price}</small>
+                <small>${formatLevelName(exam.level)} | ${exam.subject} | KES ${exam.price.toLocaleString()}</small>
+                <br><small>Downloads: ${exam.downloads || 0}</small>
             </div>
             <div class="admin-item-actions">
                 <button class="btn-delete" onclick="deleteResource(${exam.id})">Delete</button>
@@ -594,188 +667,208 @@ function loadAdminExams() {
 
 // Admin delete functions
 function deleteResource(id) {
-    if (confirm('Delete this resource permanently?')) {
+    if (confirm('⚠️ Delete this resource permanently? This cannot be undone.')) {
         resources = resources.filter(r => r.id !== id);
         saveResources();
+        
+        // Refresh all displays
         loadMarketplace();
         updateAdminStats();
         loadAdminDocuments();
         loadAdminExams();
         updateHeroStats();
-        alert('✅ Resource deleted');
+        
+        alert('✅ Resource deleted successfully');
     }
 }
 
 function deleteVideo(id) {
-    if (confirm('Delete this video?')) {
+    if (confirm('⚠️ Delete this video permanently?')) {
         videos = videos.filter(v => v.id !== id);
         saveVideos();
+        
         loadVideos();
         updateAdminStats();
         loadAdminVideos();
-        alert('✅ Video deleted');
+        
+        alert('✅ Video deleted successfully');
     }
 }
 
 // Admin document upload
 let pendingDocFile = null;
 
-document.getElementById('adminDocFile')?.addEventListener('change', (e) => {
-    pendingDocFile = e.target.files[0];
-    if (pendingDocFile) {
-        document.getElementById('docUploadForm').style.display = 'block';
-    }
-});
-
-document.getElementById('saveDocBtn')?.addEventListener('click', () => {
-    const title = document.getElementById('docTitle')?.value;
-    const level = document.getElementById('docLevel')?.value;
-    const subject = document.getElementById('docSubject')?.value;
-    const category = document.getElementById('docCategory')?.value;
-    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
-    const description = document.getElementById('docDescription')?.value;
-    
-    if (!title || !subject) {
-        alert('Please fill title and subject');
-        return;
+function setupAdminUploads() {
+    const adminDocFile = document.getElementById('adminDocFile');
+    if (adminDocFile) {
+        adminDocFile.addEventListener('change', (e) => {
+            pendingDocFile = e.target.files[0];
+            const uploadForm = document.getElementById('docUploadForm');
+            if (uploadForm && pendingDocFile) {
+                uploadForm.style.display = 'block';
+            }
+        });
     }
     
-    const newResource = {
-        id: Date.now(),
-        title: title,
-        level: level,
-        subject: subject,
-        category: category,
-        price: price,
-        description: description || `Admin uploaded: ${title}`,
-        downloads: 0,
-        date: new Date().toISOString().split('T')[0]
-    };
-    
-    resources.push(newResource);
-    saveResources();
-    
-    alert(`✅ Document "${title}" uploaded!`);
-    
-    // Reset form
-    document.getElementById('docTitle').value = '';
-    document.getElementById('docSubject').value = '';
-    document.getElementById('docDescription').value = '';
-    document.getElementById('docPrice').value = '0';
-    document.getElementById('docUploadForm').style.display = 'none';
-    pendingDocFile = null;
-    
-    // Refresh displays
-    loadMarketplace();
-    updateAdminStats();
-    loadAdminDocuments();
-    updateHeroStats();
-});
-
-// Admin video upload
-document.getElementById('addVideoBtn')?.addEventListener('click', () => {
-    const title = document.getElementById('videoTitle')?.value;
-    const subject = document.getElementById('videoSubject')?.value;
-    const level = document.getElementById('videoLevel')?.value;
-    const url = document.getElementById('videoUrl')?.value;
-    
-    if (!title || !subject || !url) {
-        alert('Please fill all fields');
-        return;
+    const saveDocBtn = document.getElementById('saveDocBtn');
+    if (saveDocBtn) {
+        saveDocBtn.addEventListener('click', () => {
+            const title = document.getElementById('docTitle')?.value;
+            const level = document.getElementById('docLevel')?.value;
+            const subject = document.getElementById('docSubject')?.value;
+            const category = document.getElementById('docCategory')?.value;
+            const price = parseInt(document.getElementById('docPrice')?.value) || 0;
+            const description = document.getElementById('docDescription')?.value;
+            
+            if (!title || !subject) {
+                alert('Please fill in title and subject');
+                return;
+            }
+            
+            const newResource = {
+                id: Date.now(),
+                title: title,
+                level: level,
+                subject: subject,
+                category: category,
+                price: price,
+                description: description || `Admin uploaded: ${title}`,
+                downloads: 0,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            resources.push(newResource);
+            saveResources();
+            
+            alert(`✅ Document "${title}" uploaded successfully!`);
+            
+            // Reset form
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docSubject').value = '';
+            document.getElementById('docDescription').value = '';
+            document.getElementById('docPrice').value = '0';
+            const uploadForm = document.getElementById('docUploadForm');
+            if (uploadForm) uploadForm.style.display = 'none';
+            pendingDocFile = null;
+            
+            // Refresh displays
+            loadMarketplace();
+            updateAdminStats();
+            loadAdminDocuments();
+            updateHeroStats();
+        });
     }
     
-    const newVideo = {
-        id: Date.now(),
-        title: title,
-        subject: subject,
-        level: level,
-        url: url,
-        date: new Date().toISOString().split('T')[0]
-    };
+    // Video upload
+    const addVideoBtn = document.getElementById('addVideoBtn');
+    if (addVideoBtn) {
+        addVideoBtn.addEventListener('click', () => {
+            const title = document.getElementById('videoTitle')?.value;
+            const subject = document.getElementById('videoSubject')?.value;
+            const level = document.getElementById('videoLevel')?.value;
+            const url = document.getElementById('videoUrl')?.value;
+            
+            if (!title || !subject || !url) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const newVideo = {
+                id: Date.now(),
+                title: title,
+                subject: subject,
+                level: level,
+                url: url,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            videos.push(newVideo);
+            saveVideos();
+            
+            alert(`✅ Video "${title}" added successfully!`);
+            
+            document.getElementById('videoTitle').value = '';
+            document.getElementById('videoSubject').value = '';
+            document.getElementById('videoUrl').value = '';
+            
+            loadVideos();
+            updateAdminStats();
+            loadAdminVideos();
+        });
+    }
     
-    videos.push(newVideo);
-    saveVideos();
+    // Exam upload
+    const adminExamFile = document.getElementById('adminExamFile');
+    if (adminExamFile) {
+        adminExamFile.addEventListener('change', (e) => {
+            pendingExamFile = e.target.files[0];
+            const examForm = document.getElementById('examUploadForm');
+            if (examForm && pendingExamFile) {
+                examForm.style.display = 'block';
+            }
+        });
+    }
     
-    alert(`✅ Video "${title}" added!`);
-    
-    document.getElementById('videoTitle').value = '';
-    document.getElementById('videoSubject').value = '';
-    document.getElementById('videoUrl').value = '';
-    
-    loadVideos();
-    updateAdminStats();
-    loadAdminVideos();
-});
+    const saveExamBtn = document.getElementById('saveExamBtn');
+    if (saveExamBtn) {
+        saveExamBtn.addEventListener('click', () => {
+            const title = document.getElementById('examTitle')?.value;
+            const level = document.getElementById('examLevel')?.value;
+            const subject = document.getElementById('examSubject')?.value;
+            const price = parseInt(document.getElementById('examPrice')?.value);
+            
+            if (!title || !subject || !price) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const newExam = {
+                id: Date.now(),
+                title: title,
+                level: level,
+                subject: subject,
+                category: 'exam',
+                price: price,
+                description: `Exam paper: ${title}`,
+                downloads: 0,
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            resources.push(newExam);
+            saveResources();
+            
+            alert(`✅ Exam "${title}" uploaded successfully!`);
+            
+            document.getElementById('examTitle').value = '';
+            document.getElementById('examSubject').value = '';
+            document.getElementById('examPrice').value = '';
+            const examForm = document.getElementById('examUploadForm');
+            if (examForm) examForm.style.display = 'none';
+            pendingExamFile = null;
+            
+            loadMarketplace();
+            updateAdminStats();
+            loadAdminExams();
+            updateHeroStats();
+        });
+    }
+}
 
-// Admin exam upload
 let pendingExamFile = null;
 
-document.getElementById('adminExamFile')?.addEventListener('change', (e) => {
-    pendingExamFile = e.target.files[0];
-    if (pendingExamFile) {
-        document.getElementById('examUploadForm').style.display = 'block';
-    }
-});
-
-document.getElementById('saveExamBtn')?.addEventListener('click', () => {
-    const title = document.getElementById('examTitle')?.value;
-    const level = document.getElementById('examLevel')?.value;
-    const subject = document.getElementById('examSubject')?.value;
-    const price = parseInt(document.getElementById('examPrice')?.value);
-    
-    if (!title || !subject || !price) {
-        alert('Please fill all fields');
-        return;
-    }
-    
-    const newExam = {
-        id: Date.now(),
-        title: title,
-        level: level,
-        subject: subject,
-        category: 'exam',
-        price: price,
-        description: `Exam paper: ${title}`,
-        downloads: 0,
-        date: new Date().toISOString().split('T')[0]
-    };
-    
-    resources.push(newExam);
-    saveResources();
-    
-    alert(`✅ Exam "${title}" uploaded!`);
-    
-    document.getElementById('examTitle').value = '';
-    document.getElementById('examSubject').value = '';
-    document.getElementById('examPrice').value = '';
-    document.getElementById('examUploadForm').style.display = 'none';
-    pendingExamFile = null;
-    
-    loadMarketplace();
-    updateAdminStats();
-    loadAdminExams();
-    updateHeroStats();
-});
-
 // ==================== TAB SWITCHING ====================
-document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.admin-tab-pane').forEach(pane => pane.classList.remove('active'));
-        document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+function setupAdminTabs() {
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.admin-tab-pane').forEach(pane => pane.classList.remove('active'));
+            const tabId = btn.dataset.tab + 'Tab';
+            const activePane = document.getElementById(tabId);
+            if (activePane) activePane.classList.add('active');
+        });
     });
-});
-
-// ==================== SCROLL FUNCTIONS ====================
-window.scrollToLevels = function() {
-    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
-};
-
-window.scrollToMarketplace = function() {
-    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
-};
-
+}
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize data

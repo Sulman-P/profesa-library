@@ -871,6 +871,8 @@ function setupAdminTabs() {
 }
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded - initializing NexaLearn');
+    
     // Initialize data
     initializeData();
     
@@ -879,16 +881,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loadVideos();
     updateHeroStats();
     
-    // Setup event listeners
+    // Setup all functionality
     setupUploadForm();
     setupSearch();
     setupAdminAuth();
+    setupAdminUploads();
+    setupAdminTabs();
     
     // Level cards click
     document.querySelectorAll('.level-card').forEach(card => {
         card.addEventListener('click', () => {
             const level = card.dataset.level;
-            loadResourcesByLevel(level);
+            if (level) loadResourcesByLevel(level);
         });
     });
     
@@ -897,7 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chip.addEventListener('click', () => {
             const level = chip.dataset.level;
             const subject = chip.dataset.subject;
-            loadResourcesBySubject(level, subject);
+            if (level && subject) loadResourcesBySubject(level, subject);
             
             // Close mega menu
             const levelsMenu = document.getElementById('levelsMenu');
@@ -910,7 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            filterMarketplace(btn.dataset.filter);
+            const filter = btn.dataset.filter;
+            if (filter) filterMarketplace(filter);
         });
     });
     
@@ -921,13 +926,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (levelsNavLink) {
         levelsNavLink.addEventListener('click', (e) => {
             e.preventDefault();
-            levelsMenu.classList.toggle('active');
+            if (levelsMenu) levelsMenu.classList.toggle('active');
         });
     }
     
     // Close mega menu on outside click
     document.addEventListener('click', (e) => {
-        if (levelsMenu && !levelsMenu.contains(e.target) && !levelsNavLink?.contains(e.target)) {
+        if (levelsMenu && levelsNavLink && 
+            !levelsMenu.contains(e.target) && 
+            !levelsNavLink.contains(e.target)) {
             levelsMenu.classList.remove('active');
         }
     });
@@ -951,7 +958,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    console.log('✅ NexaLearn initialized with', resources.length, 'resources and', videos.length, 'videos');
+    console.log('✅ NexaLearn fully initialized with', resources.length, 'resources and', videos.length, 'videos');
+    console.log('Admin login: admin@nexalearn.com / admin123');
 });
 
 // Make functions global

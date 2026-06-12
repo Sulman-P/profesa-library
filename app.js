@@ -504,7 +504,41 @@ function addSampleData() {
     localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
     loadMarketplace();
 }
+// Global helper functions
+function scrollToLevels() {
+    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
+}
 
+function scrollToMarketplace() {
+    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Admin login handler
+document.getElementById('adminLoginForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
+    
+    if (email === 'admin@nexalearn.com' && password === 'admin123') {
+        document.getElementById('adminModal').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        loadAdminData();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
+});
+
+// Admin logout
+document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
+    document.getElementById('adminDashboard').style.display = 'none';
+});
+
+// Close modals
+document.querySelectorAll('.close-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.modal').style.display = 'none';
+    });
+});
 // Export global functions
 window.uploadDocumentToFirebase = uploadDocumentToFirebase;
 window.downloadFromFirebase = downloadFromFirebase;

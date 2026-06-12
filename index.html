@@ -3,47 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta
-        name="description"
-        content="NexaLearn International - Academic resources, digital marketplace, online learning, exams and educational resource platform."
-    >
-
+    <meta name="description" content="NexaLearn International - Academic resources, digital marketplace, online learning, exams and educational resource platform.">
     <title>NexaLearn International</title>
-
     <link rel="icon" type="image/png" href="favicon.png">
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-
-    <style>
-        /* Sets a clean, professional admin block background image behind the admin dashboard section */
-        .admin-dashboard {
-            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
-                        url('admin-block.jpg') no-repeat center center/cover;
-        }
-        /* Style additions for new professional blocks */
-        .navbar-brand-wrapper { display: flex; flex-direction: column; }
-        .navbar-motto { font-size: 0.75rem; font-style: italic; color: #666; margin-top: 2px; }
-        .core-values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .value-card { padding: 1.5rem; background: #f9f9f9; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .value-card i { font-size: 2rem; color: #0056b3; margin-bottom: 0.5rem; }
-        .about-statement-block { margin-bottom: 3rem; line-height: 1.8; font-size: 1.1rem; }
-        .mission-vision-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem; }
-        @media (max-width: 768px) { .mission-vision-container { grid-template-columns: 1fr; } }
-    </style>
 </head>
-
 <body>
 
 <nav class="navbar">
-
     <div class="navbar-container">
-
         <div class="navbar-brand-wrapper">
             <div class="navbar-brand">
                 <i class="fas fa-book-open"></i>
@@ -53,781 +22,323 @@
         </div>
 
         <div class="navbar-search">
-
-            <input
-                type="text"
-                id="search-input"
-                class="search-input"
-                placeholder="Search books, notes, exams..."
-            >
-
-            <button
-                type="button"
-                class="search-btn"
-                id="search-btn"
-            >
+            <input type="text" id="search-input" class="search-input" placeholder="Search books, notes, exams...">
+            <button type="button" class="search-btn" id="search-btn">
                 <i class="fas fa-search"></i>
             </button>
-
         </div>
 
         <ul class="navbar-menu">
-
-            <li>
-                <a href="#home" class="nav-link">Home</a>
-            </li>
-
-            <li>
-                <a href="#explore" class="nav-link">Explore</a>
-            </li>
-
-            <li>
-                <a href="#marketplace" class="nav-link">Marketplace</a>
-            </li>
-
-            <li>
-                <a href="#upload" class="nav-link">Upload</a>
-            </li>
-
-            <li>
-                <a href="#about" class="nav-link">About</a>
-            </li>
-            
-            <li>
-                 <a href="#videos">Videos</a>
-           </li>
-
-           <li>
-                 <a href="#examGallery">Exam Store</a>
-          </li>
-
+            <li><a href="#home" class="nav-link">Home</a></li>
+            <li><a href="#academic-levels" class="nav-link">Academic Levels</a></li>
+            <li><a href="#marketplace" class="nav-link">Marketplace</a></li>
+            <li><a href="#upload" class="nav-link">Upload</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
         </ul>
 
         <div class="navbar-actions">
-
-            <button
-                type="button"
-                class="user-profile-btn"
-                id="userProfileBtn"
-            >
+            <button type="button" class="user-profile-btn" id="userProfileBtn">
                 <i class="fas fa-user-circle"></i>
                 <span id="userName">Guest</span>
             </button>
-
-            <button
-                type="button"
-                class="admin-btn"
-                id="adminBtn"
-            >
+            <button type="button" class="admin-btn" id="adminBtn">
                 <i class="fas fa-lock"></i>
                 Admin
             </button>
-
         </div>
 
-        <div
-            class="menu-toggle"
-            id="menuToggle"
-        >
+        <div class="menu-toggle" id="menuToggle">
             <span></span>
             <span></span>
             <span></span>
         </div>
-
     </div>
-
 </nav>
 
-<div id="adminModal" class="modal">
-
-    <div class="modal-content">
-
-        <span class="close admin-close">&times;</span>
-
-        <div class="modal-header">
-            <h2>
-                <i class="fas fa-shield-alt"></i>
-                Admin Portal
-            </h2>
+<!-- Academic Levels Mega Menu / Sub Nav -->
+<div class="levels-subnav" id="levelsSubnav">
+    <div class="levels-container">
+        <div class="level-item">
+            <button class="level-btn" data-level="primary">📚 Level 1: Primary School</button>
+            <div class="level-dropdown" id="primary-dropdown">
+                <div class="level-grades">
+                    <span>PP1</span> <span>PP2</span> <span>Grade 1</span> <span>Grade 2</span>
+                    <span>Grade 3</span> <span>Grade 4</span> <span>Grade 5</span> <span>Grade 6</span>
+                </div>
+                <div class="level-subjects">
+                    <h4>Subjects:</h4>
+                    <div class="subject-buttons">
+                        <button class="subject-btn" data-subject="Mathematics" data-level="primary">Mathematics</button>
+                        <button class="subject-btn" data-subject="English" data-level="primary">English</button>
+                        <button class="subject-btn" data-subject="Kiswahili" data-level="primary">Kiswahili</button>
+                        <button class="subject-btn" data-subject="Science" data-level="primary">Science</button>
+                        <button class="subject-btn" data-subject="Social Studies" data-level="primary">Social Studies</button>
+                        <button class="subject-btn" data-subject="CRE/IRE/HRE" data-level="primary">Religious Education</button>
+                        <button class="subject-btn" data-subject="Creative Arts" data-level="primary">Creative Arts</button>
+                    </div>
+                </div>
+                <div class="level-upload">
+                    <button class="upload-resource-btn" data-level="primary">+ Upload Resource</button>
+                </div>
+            </div>
         </div>
 
-        <form id="adminForm">
-
-            <div class="form-group">
-
-                <label for="adminEmail">Email</label>
-
-                <input
-                    type="email"
-                    id="adminEmail"
-                    placeholder="admin@nexalearn.com"
-                    required
-                >
-
+        <div class="level-item">
+            <button class="level-btn" data-level="junior">🎓 Level 2: Junior School</button>
+            <div class="level-dropdown" id="junior-dropdown">
+                <div class="level-grades">
+                    <span>Grade 7</span> <span>Grade 8</span> <span>Grade 9</span>
+                </div>
+                <div class="level-subjects">
+                    <h4>Learning Areas:</h4>
+                    <div class="subject-buttons">
+                        <button class="subject-btn" data-subject="Mathematics" data-level="junior">Mathematics</button>
+                        <button class="subject-btn" data-subject="English" data-level="junior">English</button>
+                        <button class="subject-btn" data-subject="Kiswahili" data-level="junior">Kiswahili</button>
+                        <button class="subject-btn" data-subject="Integrated Science" data-level="junior">Integrated Science</button>
+                        <button class="subject-btn" data-subject="Religious Education" data-level="junior">Religious Education (IRE/CRE/HRE)</button>
+                        <button class="subject-btn" data-subject="Social Studies" data-level="junior">Social Studies</button>
+                        <button class="subject-btn" data-subject="Pre Technical Studies" data-level="junior">Pre Technical Studies</button>
+                        <button class="subject-btn" data-subject="Agriculture" data-level="junior">Agriculture</button>
+                        <button class="subject-btn" data-subject="Creative Arts" data-level="junior">Creative Arts</button>
+                        <button class="subject-btn" data-subject="Kenya Sign Language" data-level="junior">Kenya Sign Language</button>
+                    </div>
+                </div>
+                <div class="level-upload">
+                    <button class="upload-resource-btn" data-level="junior">+ Upload Resource</button>
+                </div>
             </div>
+        </div>
 
-            <div class="form-group">
-
-                <label for="adminPassword">Password</label>
-
-                <input
-                    type="password"
-                    id="adminPassword"
-                    placeholder="Enter password"
-                    required
-                >
-
+        <div class="level-item">
+            <button class="level-btn" data-level="senior">🏫 Level 3: Senior School</button>
+            <div class="level-dropdown" id="senior-dropdown">
+                <div class="level-grades">
+                    <span>Grade 10</span> <span>Grade 11</span> <span>Grade 12</span>
+                </div>
+                <div class="level-subjects">
+                    <h4>Learning Areas:</h4>
+                    <div class="subject-buttons">
+                        <button class="subject-btn" data-subject="Core Mathematics" data-level="senior">Core Mathematics</button>
+                        <button class="subject-btn" data-subject="Chemistry" data-level="senior">Chemistry</button>
+                        <button class="subject-btn" data-subject="Physics" data-level="senior">Physics</button>
+                        <button class="subject-btn" data-subject="Biology" data-level="senior">Biology</button>
+                        <button class="subject-btn" data-subject="English Literature" data-level="senior">English Literature</button>
+                        <button class="subject-btn" data-subject="Kiswahili" data-level="senior">Kiswahili</button>
+                        <button class="subject-btn" data-subject="Geography" data-level="senior">Geography</button>
+                        <button class="subject-btn" data-subject="History and Citizenship" data-level="senior">History and Citizenship</button>
+                        <button class="subject-btn" data-subject="Sports and Recreation" data-level="senior">Sports and Recreation</button>
+                        <button class="subject-btn" data-subject="Music and Fine Arts" data-level="senior">Music and Fine Arts</button>
+                        <button class="subject-btn" data-subject="Business Studies" data-level="senior">Business Studies</button>
+                        <button class="subject-btn" data-subject="Computer Studies" data-level="senior">Computer Studies</button>
+                    </div>
+                </div>
+                <div class="level-upload">
+                    <button class="upload-resource-btn" data-level="senior">+ Upload Resource</button>
+                </div>
             </div>
-        <div>
-            <button
-                type="submit"
-                class="btn btn-primary btn-block"
-            >
-                <i class="fas fa-sign-in-alt"></i>
-                Login
-            </button>
+        </div>
 
-        </form>
+        <div class="level-item">
+            <button class="level-btn" data-level="university">🎓 Level 4: University</button>
+            <div class="level-dropdown" id="university-dropdown">
+                <div class="level-grades">
+                    <span>Bachelor's</span> <span>Master's</span> <span>Doctorate</span>
+                </div>
+                <div class="level-subjects">
+                    <h4>Global Top Courses:</h4>
+                    <div class="subject-buttons">
+                        <button class="subject-btn" data-subject="Computer Science & AI" data-level="university">Computer Science & AI</button>
+                        <button class="subject-btn" data-subject="Data Science" data-level="university">Data Science</button>
+                        <button class="subject-btn" data-subject="Business Administration (MBA)" data-level="university">Business Administration (MBA)</button>
+                        <button class="subject-btn" data-subject="Medicine & Surgery" data-level="university">Medicine & Surgery</button>
+                        <button class="subject-btn" data-subject="Engineering" data-level="university">Engineering</button>
+                        <button class="subject-btn" data-subject="Economics & Finance" data-level="university">Economics & Finance</button>
+                        <button class="subject-btn" data-subject="Law" data-level="university">Law</button>
+                        <button class="subject-btn" data-subject="Psychology" data-level="university">Psychology</button>
+                        <button class="subject-btn" data-subject="International Relations" data-level="university">International Relations</button>
+                        <button class="subject-btn" data-subject="Pharmacy" data-level="university">Pharmacy</button>
+                        <button class="subject-btn" data-subject="Architecture" data-level="university">Architecture</button>
+                        <button class="subject-btn" data-subject="Biotechnology" data-level="university">Biotechnology</button>
+                    </div>
+                </div>
+                <div class="level-upload">
+                    <button class="upload-resource-btn" data-level="university">+ Upload Resource</button>
+                </div>
+            </div>
+        </div>
 
+        <div class="level-item">
+            <button class="level-btn" data-level="lifelong">📖 Level 5: Lifelong Learning</button>
+            <div class="level-dropdown" id="lifelong-dropdown">
+                <div class="level-subjects">
+                    <h4>Special Topics:</h4>
+                    <div class="subject-buttons">
+                        <button class="subject-btn" data-subject="Financial Literacy" data-level="lifelong">Financial Literacy</button>
+                        <button class="subject-btn" data-subject="Personal Development" data-level="lifelong">Personal Development</button>
+                        <button class="subject-btn" data-subject="Entrepreneurship" data-level="lifelong">Entrepreneurship</button>
+                        <button class="subject-btn" data-subject="Digital Marketing" data-level="lifelong">Digital Marketing</button>
+                        <button class="subject-btn" data-subject="Leadership Skills" data-level="lifelong">Leadership Skills</button>
+                        <button class="subject-btn" data-subject="Investing Basics" data-level="lifelong">Investing Basics</button>
+                    </div>
+                </div>
+                <div class="level-upload">
+                    <button class="upload-resource-btn" data-level="lifelong">+ Upload Resource</button>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
 
+<!-- Admin Login Modal -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <span class="close admin-close">&times;</span>
+        <div class="modal-header">
+            <h2><i class="fas fa-shield-alt"></i> Admin Portal</h2>
+        </div>
+        <form id="adminForm">
+            <div class="form-group">
+                <label for="adminEmail">Email</label>
+                <input type="email" id="adminEmail" placeholder="admin@nexalearn.com" required>
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Admin Dashboard -->
 <div id="adminDashboard" class="admin-dashboard hidden">
-
     <aside class="admin-sidebar">
-         </div>
-                </a>
-            </li>
-
-            <ul class="admin-menu">
-
-        <li>
-        <a href="#"
-           class="admin-menu-item active"
-           onclick="switchAdminTab('overview')">
-            <i class="fas fa-chart-line"></i>
-            Dashboard
-        </a>
-    </li>
-
-    <li>
-        <a href="#"
-           class="admin-menu-item"
-           onclick="switchAdminTab('adminUpload')">
-            <i class="fas fa-upload"></i>
-            Documents
-        </a>
-    </li>
-
-    <li>
-        <a href="#"
-           class="admin-menu-item"
-           onclick="switchAdminTab('videoUpload')">
-            <i class="fas fa-video"></i>
-            Videos
-        </a>
-    </li>
-
-    <li>
-        <a href="#"
-           class="admin-menu-item"
-           onclick="switchAdminTab('examUpload')">
-            <i class="fas fa-file-alt"></i>
-            Exams
-        </a>
-    </li>
-
-    <li>
-        <a href="#"
-           class="admin-menu-item"
-           onclick="logoutAdmin()">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-        </a>
-    </li>
-
-</ul>
-
+        <ul class="admin-menu">
+            <li><a href="#" class="admin-menu-item active" onclick="switchAdminTab('overview')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#" class="admin-menu-item" onclick="switchAdminTab('adminUpload')"><i class="fas fa-upload"></i> Documents</a></li>
+            <li><a href="#" class="admin-menu-item" onclick="switchAdminTab('videoUpload')"><i class="fas fa-video"></i> Videos</a></li>
+            <li><a href="#" class="admin-menu-item" onclick="switchAdminTab('examUpload')"><i class="fas fa-file-alt"></i> Exams</a></li>
+            <li><a href="#" class="admin-menu-item" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
     </aside>
 
     <main class="admin-content">
-
-       <div id="overview" class="admin-tab active">
-
-          <h2>Dashboard Overview</h2>
-
-           <div class="stats-grid">
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-
-                    <div class="stat-info">
-                        <h4>Total Documents</h4>
-                        <p id="statDocs">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-
-                    <div class="stat-info">
-                        <h4>Users</h4>
-                        <p id="statUsers">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-
-                    <div class="stat-info">
-                        <h4>Revenue</h4>
-                        <p id="statRevenue">KES 0</p>
-                    </div>
-                </div>
-
+        <div id="overview" class="admin-tab active">
+            <h2>Dashboard Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h4>Total Documents</h4><p id="statDocs">0</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h4>Users</h4><p id="statUsers">0</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h4>Revenue</h4><p id="statRevenue">KES 0</p></div></div>
             </div>
-
         </div>
-
         <div id="adminUpload" class="admin-tab file-upload">
-
-            <input
-                type="file"
-                id="docFile"
-                accept=".pdf,.doc,.docx"
-                hidden
-            >
-
-            <div
-                class="file-upload-area"
-                id="fileUploadArea"
-            >
-                <i class="fas fa-cloud-upload-alt"></i>
-
-                <p>Click to upload or drag & drop</p>
-
-                <span>
-                    PDF, DOC, DOCX (Max 10MB)
-                </span>
-
-                <div id="selectedFileName" class="selected-file"></div>
-            </div>
-
+            <input type="file" id="docFile" accept=".pdf,.doc,.docx" hidden>
+            <div class="file-upload-area" id="fileUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload or drag & drop</p><span>PDF, DOC, DOCX (Max 10MB)</span><div id="selectedFileName"></div></div>
         </div>
-        <!-- VIDEO UPLOAD TAB -->
-
-<div id="videoUpload" class="admin-tab">
-
-    <h2>Upload Learning Video</h2>
-
-    <form id="videoUploadForm">
-
-        <input type="text"
-               id="videoTitle"
-               placeholder="Video Title"
-               required>
-
-        <input type="text"
-               id="videoSubject"
-               placeholder="Subject"
-               required>
-
-        <input type="url"
-               id="videoUrl"
-               placeholder="YouTube Link"
-               required>
-
-        <button type="submit"
-                class="btn btn-primary">
-            Upload Video
-        </button>
-
-    </form>
-
-</div>
-
-
-<!-- EXAM UPLOAD TAB -->
-
-<div id="examUpload" class="admin-tab">
-
-    <h2>Upload Exam Paper</h2>
-
-    <form id="examUploadForm">
-
-        <input type="text"
-               id="examTitle"
-               placeholder="Exam Title"
-               required>
-
-        <input type="number"
-               id="examPrice"
-               placeholder="Price (KES)"
-               required>
-
-        <input type="file"
-               id="examImage"
-               accept="image/*"
-               required>
-
-        <input type="file"
-               id="examDocument"
-               accept=".pdf,.doc,.docx"
-               required>
-
-        <button type="submit"
-                class="btn btn-primary">
-            Upload Exam
-        </button>
-
-    </form>
-
-   </div>
+        <div id="videoUpload" class="admin-tab"><h2>Upload Learning Video</h2><form id="videoUploadForm"><input type="text" id="videoTitle" placeholder="Video Title" required><input type="text" id="videoSubject" placeholder="Subject" required><input type="url" id="videoUrl" placeholder="YouTube Link" required><button type="submit" class="btn btn-primary">Upload Video</button></form></div>
+        <div id="examUpload" class="admin-tab"><h2>Upload Exam Paper</h2><form id="examUploadForm"><input type="text" id="examTitle" placeholder="Exam Title" required><input type="number" id="examPrice" placeholder="Price (KES)" required><input type="file" id="examImage" accept="image/*" required><input type="file" id="examDocument" accept=".pdf,.doc,.docx" required><button type="submit" class="btn btn-primary">Upload Exam</button></form></div>
     </main>
-
 </div>
 
 <main>
-
+    <!-- Hero Section -->
     <section id="home" class="hero">
-
         <div class="hero-content">
-
             <h1>Welcome to NexaLearn International</h1>
-
-            <p>
-                Your complete digital learning and academic resource platform for modern education, collaboration, and success.
-            </p>
-
+            <p>Your complete digital learning and academic resource platform for modern education, collaboration, and success.</p>
             <div class="hero-buttons">
-
-                <button
-                    class="btn btn-primary"
-                    onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})"
-                >
-                    <i class="fas fa-search"></i>
-                    Explore Resources
-                </button>
-
-                <button
-                    class="btn btn-primary"
-                    onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})"
-                >
-                    <i class="fas fa-graduation-cap"></i>
-                    Start Learning
-                </button>
-
-                <button
-                    class="btn btn-secondary"
-                    onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})"
-                >
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    Upload Content
-                </button>
-
-                <button
-                    class="btn btn-secondary"
-                    onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})"
-                >
-                    <i class="fas fa-user-plus"></i>
-                    Join NexaLearn
-                </button>
-
+                <button class="btn btn-primary" onclick="document.getElementById('academic-levels').scrollIntoView({behavior:'smooth'})"><i class="fas fa-graduation-cap"></i> Browse Levels</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('marketplace').scrollIntoView({behavior:'smooth'})"><i class="fas fa-search"></i> Marketplace</button>
             </div>
-
         </div>
-
     </section>
 
-    <section id="explore" class="explore">
-
+    <!-- Academic Levels Showcase Section -->
+    <section id="academic-levels" class="academic-levels-showcase">
         <div class="container">
-
-            <h2>Explore Categories</h2>
-
-            <div class="categories-grid">
-
-                <div class="category-card" data-category="textbook">
-                 <i class="fas fa-book"></i>
-                    <h3>Textbooks</h3>
-                </div>
-
-        <div class="category-card" data-category="exam">
-           <i class="fas fa-file-alt"></i>
-           <h3>Exam Papers</h3>
+            <h2>Explore Academic Levels</h2>
+            <p class="section-subtitle">Choose your level and access curated educational resources</p>
+            <div class="levels-showcase-grid">
+                <div class="level-card" data-level="primary"><i class="fas fa-chalkboard-user"></i><h3>Primary School</h3><p>PP1 - Grade 6</p><button class="view-level-btn">View Resources →</button></div>
+                <div class="level-card" data-level="junior"><i class="fas fa-school"></i><h3>Junior School</h3><p>Grade 7 - Grade 9</p><button class="view-level-btn">View Resources →</button></div>
+                <div class="level-card" data-level="senior"><i class="fas fa-building"></i><h3>Senior School</h3><p>Grade 10 - Grade 12</p><button class="view-level-btn">View Resources →</button></div>
+                <div class="level-card" data-level="university"><i class="fas fa-university"></i><h3>University</h3><p>Bachelor's - Doctorate</p><button class="view-level-btn">View Resources →</button></div>
+                <div class="level-card" data-level="lifelong"><i class="fas fa-book-reader"></i><h3>Lifelong Learning</h3><p>Financial Literacy & More</p><button class="view-level-btn">View Resources →</button></div>
+            </div>
         </div>
-
-     <div class="category-card" data-category="notes">
-        <i class="fas fa-graduation-cap"></i>
-        <h3>Lecture Notes</h3>
-     </div>
-
-    <div class="category-card" data-category="research">
-         <i class="fas fa-flask"></i>
-         <h3>Research</h3>
-    </div>
-        <div class="youtube-video">
-    <iframe
-        width="100%"
-        height="450"
-        src="https://www.youtube.com/embed/3fh-jP0Y4Zs"
-        title="NexaLearn Video"
-        frameborder="0"
-        allowfullscreen>
-    </iframe>
-   </div>
-
-    </div>
-
     </section>
-    
+
+    <!-- Subject Resources Display Area -->
+    <section id="subject-resources" class="subject-resources-section">
+        <div class="container">
+            <div id="subjectHeader" class="subject-header">
+                <h2 id="currentSubject">Select a Subject</h2>
+                <p id="currentLevelInfo">Click on any subject button to explore resources</p>
+            </div>
+            <div id="subjectResourcesGrid" class="products-grid"></div>
+        </div>
+    </section>
+
+    <!-- Marketplace Section -->
     <section id="marketplace" class="marketplace">
-
         <div class="container">
-
             <h2>Marketplace Resources</h2>
-
             <div class="categories-grid">
-
-                <button class="category-btn active" data-category="all">
-                    All
-                </button>
-
-                <button class="category-btn" data-category="textbook">
-                    Textbooks
-                </button>
-
-                <button class="category-btn" data-category="exam">
-                    Exams
-                </button>
-
-                <button class="category-btn" data-category="notes">
-                    Notes
-                </button>
-
-                <button class="category-btn" data-category="guide">
-                    Guides
-                </button>
-
-                <button class="category-btn" data-category="research">
-                    Research
-                </button>
-
+                <button class="category-btn active" data-category="all">All</button>
+                <button class="category-btn" data-category="textbook">Textbooks</button>
+                <button class="category-btn" data-category="exam">Exams</button>
+                <button class="category-btn" data-category="notes">Notes</button>
+                <button class="category-btn" data-category="guide">Guides</button>
             </div>
-
             <div id="marketplaceGrid" class="products-grid"></div>
-
         </div>
-
     </section>
-    <section id="examGallery">
 
-    <div class="container">
-
-        <h2>Exam Papers Store</h2>
-
-        <div id="examGrid" class="exam-grid">
-
-        </div>
-
-    </div>
-
-</section>
-    <section id="videos" class="videos-section">
-
-    <div class="container">
-
-        <h2>Video Learning Center</h2>
-
-        <div id="videoGrid" class="video-grid">
-
-        </div>
-
-    </div>
-
-</section>
+    <!-- Upload Section -->
     <section id="upload" class="upload">
-
         <div class="container">
-
             <h2>Upload Resources</h2>
-
-            <p class="section-subtitle">
-                Share educational materials with learners
-            </p>
-
+            <p class="section-subtitle">Share educational materials with learners</p>
             <form id="uploadForm" class="upload-form">
-
-                <div class="form-group">
-
-                    <label>Resource Title</label>
-
-                    <input
-                        type="text"
-                        id="resource-title"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Category</label>
-
-                    <select
-                        id="resource-category"
-                        required
-                    >
-                        <option value="">Select Category</option>
-                        <option value="Notes">Notes</option>
-                        <option value="Exam">Exam</option>
-                        <option value="Book">Book</option>
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Subject</label>
-
-                    <input
-                        type="text"
-                        id="resource-subject"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Price (KES)</label>
-
-                    <input
-                        type="number"
-                        id="resource-price"
-                        min="0"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Description</label>
-
-                    <textarea
-                        id="resource-description"
-                        rows="4"
-                    ></textarea>
-
-                </div>
-
-                <label
-      class="file-upload-area"
-      id="fileInputWrapper"
-     for="resource-file">
-                    <\label>
-  
-                <div id="fileName"></div>
-
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-block"
-                >
-            <section id="resources">
-    <div class="container">
-
-        <h2>Uploaded Resources</h2>
-
-        <div id="resourcesGrid"
-             class="products-grid">
+                <div class="form-group"><label>Resource Title</label><input type="text" id="resource-title" required></div>
+                <div class="form-group"><label>Academic Level</label><select id="resource-level" required><option value="">Select Level</option><option value="primary">Primary School</option><option value="junior">Junior School</option><option value="senior">Senior School</option><option value="university">University</option><option value="lifelong">Lifelong Learning</option></select></div>
+                <div class="form-group"><label>Subject</label><input type="text" id="resource-subject" required></div>
+                <div class="form-group"><label>Category</label><select id="resource-category" required><option value="">Select Category</option><option value="Notes">Notes</option><option value="Exam">Exam</option><option value="Book">Book</option><option value="Guide">Guide</option></select></div>
+                <div class="form-group"><label>Price (KES)</label><input type="number" id="resource-price" min="0"></div>
+                <div class="form-group"><label>Description</label><textarea id="resource-description" rows="4"></textarea></div>
+                <div class="form-group"><label>Upload File (PDF/DOC/DOCX)</label><input type="file" id="resource-file" accept=".pdf,.doc,.docx" required></div>
+                <button type="submit" class="btn btn-primary btn-block">Upload Resource</button>
+            </form>
         </div>
-
-       </div>
-      </section>
-        </div>
-
     </section>
-        <section id="videos" class="video-library">
 
-    <div class="container">
-
-        <h2>Video Learning Center</h2>
-
-        <div id="videoGrid" class="video-grid">
-
-        </div>
-
-    </div>
-
-</section>
-
+    <!-- About Section -->
     <section id="about" class="about">
-
         <div class="container">
-
             <h2>About NexaLearn</h2>
-            
-            <div class="about-statement-block">
-                <p>
-                    NexaLearn International is a digital learning and academic resource platform designed to connect learners, teachers, and institutions through technology-driven education solutions. The platform provides access to educational materials, online classes, assessments, academic collaboration, and digital resource sharing to support modern learning across the world.
-                </p>
-            </div>
-
-            <div class="mission-vision-container">
-                <div class="value-card">
-                    <i class="fas fa-eye"></i>
-                    <h3>Vision Statement</h3>
-                    <p>To shape the future of education through innovation, accessibility, and lifelong learning.</p>
-                </div>
-                <div class="value-card">
-                    <i class="fas fa-bullseye"></i>
-                    <h3>Mission Statement</h3>
-                    <p>NexaLearn International is committed to providing a modern, interactive, and inclusive learning environment where learners and educators can access academic resources, collaborate, share knowledge, conduct online learning, and achieve educational excellence through technology.</p>
-                </div>
-            </div>
-
+            <div class="about-statement-block"><p>NexaLearn International is a digital learning and academic resource platform designed to connect learners, teachers, and institutions through technology-driven education solutions.</p></div>
+            <div class="mission-vision-container"><div class="value-card"><i class="fas fa-eye"></i><h3>Vision</h3><p>To shape the future of education through innovation, accessibility, and lifelong learning.</p></div><div class="value-card"><i class="fas fa-bullseye"></i><h3>Mission</h3><p>Committed to providing a modern, interactive, and inclusive learning environment.</p></div></div>
             <h2>Our Core Values</h2>
-            <div class="core-values-grid">
-
-                <div class="value-card">
-                    <i class="fas fa-star"></i>
-                    <h3>Excellence</h3>
-                </div>
-
-                <div class="value-card">
-                    <i class="fas fa-lightbulb"></i>
-                    <h3>Innovation</h3>
-                </div>
-
-                <div class="value-card">
-                    <i class="fas fa-shield-alt"></i>
-                    <h3>Integrity</h3>
-                </div>
-
-                <div class="value-card">
-                    <i class="fas fa-universal-access"></i>
-                    <h3>Accessibility</h3>
-                </div>
-
-                <div class="value-card">
-                    <i class="fas fa-hands-helping"></i>
-                    <h3>Collaboration</h3>
-                </div>
-
-                <div class="value-card">
-                    <i class="fas fa-infinity"></i>
-                    <h3>Lifelong Learning</h3>
-                </div>
-
-            </div>
-
+            <div class="core-values-grid"><div class="value-card"><i class="fas fa-star"></i><h3>Excellence</h3></div><div class="value-card"><i class="fas fa-lightbulb"></i><h3>Innovation</h3></div><div class="value-card"><i class="fas fa-shield-alt"></i><h3>Integrity</h3></div><div class="value-card"><i class="fas fa-universal-access"></i><h3>Accessibility</h3></div><div class="value-card"><i class="fas fa-hands-helping"></i><h3>Collaboration</h3></div></div>
         </div>
-
     </section>
-  <div class="footer-grid">
-
-    <div>
-        <h4>NexaLearn International</h4>
-        <p>Knowledge for Global Excellence.</p>
-    </div>
-
-    <div>
-        <h4>Contact</h4>
-        <p>Email: admin@nexalearn.com</p>
-    </div>
-
-  </div>
 </main>
 
 <footer class="footer">
-
-    <div class="container">
-
-        <div class="footer-bottom">
-
-            <p>
-                &copy; 2026 NexaLearn International.
-                All rights reserved.
-            </p>
-
-        </div>
-
-    </div>
-
+    <div class="container"><div class="footer-bottom"><p>&copy; 2026 NexaLearn International. All rights reserved. | Email: admin@nexalearn.com</p></div></div>
 </footer>
 
-<div id="paymentModal" class="modal">
-
-    <div class="modal-content modal-payment">
-
-        <span class="close payment-close">&times;</span>
-
-        <div class="modal-header">
-
-            <h2>
-                <i class="fas fa-credit-card"></i>
-                Complete Payment
-            </h2>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div id="receiptModal" class="modal">
-
-    <div class="modal-content modal-small">
-
-        <span class="close receipt-close">&times;</span>
-
-        <div class="modal-header">
-
-            <h2>
-                <i class="fas fa-envelope"></i>
-                Enter Your Email
-            </h2>
-
-        </div>
-
-        <form id="receiptForm">
-
-            <div class="form-group">
-
-                <label>Email Address</label>
-
-                <input
-                    type="email"
-                    id="recipientEmail"
-                    required
-                >
-
-            </div>
-
-            <button
-                type="submit"
-                class="btn btn-primary btn-block"
-            >
-                Send Document
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
+<!-- Payment & Receipt Modals -->
+<div id="paymentModal" class="modal"><div class="modal-content modal-payment"><span class="close payment-close">&times;</span><div class="modal-header"><h2><i class="fas fa-credit-card"></i> Complete Payment</h2></div></div></div>
+<div id="receiptModal" class="modal"><div class="modal-content modal-small"><span class="close receipt-close">&times;</span><div class="modal-header"><h2><i class="fas fa-envelope"></i> Enter Your Email</h2></div><form id="receiptForm"><div class="form-group"><label>Email Address</label><input type="email" id="recipientEmail" required></div><button type="submit" class="btn btn-primary btn-block">Send Document</button></form></div></div>
 
 <script src="main.js"></script>
 <script src="marketplace.js"></script>
 <script src="upload-manager.js"></script>
 <script src="payment.js"></script>
-
+<script src="academic-levels.js"></script>
 </body>
 </html>

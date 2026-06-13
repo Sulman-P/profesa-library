@@ -1191,3 +1191,112 @@ function trackReferral(referralCode, newUserEmail) {
     updateSellerBalance(referredBy, 200);
     localStorage.setItem('nexalearn_referrals', JSON.stringify(referrals));
 }
+// ==================== SUBSCRIPTION FUNCTIONS ====================
+let activeSubscriptions = JSON.parse(localStorage.getItem('nexalearn_subscriptions')) || [];
+
+function subscribeToPlan(planType, amount) {
+    // Check if user is logged in
+    let currentUser = localStorage.getItem('currentUserEmail');
+    
+    if (!currentUser) {
+        const userEmail = prompt('Enter your email to subscribe:', 'student@example.com');
+        if (!userEmail || !userEmail.includes('@')) {
+            alert('Valid email is required to subscribe.');
+            return;
+        }
+        currentUser = userEmail;
+        localStorage.setItem('currentUserEmail', currentUser);
+    }
+    
+    // Open payment modal for subscription
+    pendingSubscription = {
+        planType: planType,
+        planName: planType === 'monthly' ? 'Monthly Plan' : 'Annual Plan',
+        amount: amount,
+        userEmail: currentUser,
+        duration: planType === 'monthly' ? 30 : 365
+    };
+    
+    // Update payment modal for subscription
+    const paymentModal = document.getElementById('paymentModal');
+    const paymentTitle = document.getElementById('paymentProductTitle');
+    const paymentDesc = document.getElementById('paymentProductDesc');
+    const paymentAmount = document.getElementById('paymentAmount');
+    const mpesaAmount = document.getElementById('mpesaAmount');
+    const bankAmount = document.getElementById('bankAmount');
+    
+    if (paymentTitle) paymentTitle.textContent = `Subscription: ${pendingSubscription.planName}`;
+    if (paymentDesc) paymentDesc.textContent = `Get unlimited access to all premium resources for ${pendingSubscription.duration} days.`;
+    if (paymentAmount) paymentAmount.textContent = `KES ${amount.toLocaleString()}`;
+    if (mpesaAmount) mpesaAmount.textContent = `KES ${amount.toLocaleString()}`;
+    if (bankAmount) bankAmount.textContent = `KES ${amount.toLocaleString()}`;
+    
+    // Show payment modal
+    if (paymentModal) paymentModal.style.display = 'flex';
+}
+
+function completeSubscriptionPayment(transactionCode, email) {
+    if (!pendingSubscription) return;
+    
+    const subscription = {
+        id: Date.now(),
+        planType: pendingSubscription.planType,
+        planName: pendingSubscription.planName,
+        amount: pendingSubscription.amount,
+        userEmail: email,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + (pendingSubscription.duration * 24 * 60 * 60 * 1000)).toISOString(),
+        transactionCode: transactionCode,
+        status: 'active'
+    };
+    
+    activeSubscriptions.push(subscription);
+    localStorage.setItem('nexalearn_subscriptions', JSON.stringify(activeSubscriptions));
+    
+    // Also store user subscription status
+    localStorage.setItem(`subscription_${email}`, JSON.stringify(subscription));
+    
+    alert(`✅ Successfully subscribed to ${subscription.planName}!\n\nYour subscription is active until ${new Date(subscription.endDate).toLocaleDateString()}`);
+    
+    pendingSubscription = null;
+    
+    // Close modals
+    document.getElementById('paymentModal').style.display = 'none';
+    document.getElementById('receiptModal').style.display = 'none';
+}
+
+function checkUserSubscription(userEmail) {
+    const subscription = JSON.parse(localStorage.getItem(`subscription_${userEmail}`));
+    if (!subscription) return false;
+    
+    // Check if subscription is still valid
+    if (new Date(subscription.endDate) > new Date()) {
+        return subscription;
+    } else {
+        // Subscription expired
+        localStorage.removeItem(`subscription_${userEmail}`);
+        return false;
+    }
+}
+
+// Override resource access check for subscribers
+function canAccessResource(resourceId, userEmail) {
+    const resource = resources.find(r => r.id === resourceId);
+    
+    // Free resources are always accessible
+    if (resource.price === 0) return true;
+    
+    // Check if user has purchased the resource
+    const hasPurchased = purchases.some(p => p.resourceId === resourceId && p.email === userEmail);
+    if (hasPurchased) return true;
+    
+    // Check if user has active subscription
+    const subscription = checkUserSubscription(userEmail);
+    if (subscription) return true;
+    
+    return false;
+}
+
+function contactSales() {
+    window.location.href = 'mailto:admin@nexalearn.com?subject=School%20Subscription%20Inquiry&body=I%20am%20interested%20in%20the%20School%20Plan.%20Please%20contact%20me.';
+}

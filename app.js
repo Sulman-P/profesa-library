@@ -1154,7 +1154,24 @@ function promoteResource(resourceId, promotionDays, paymentAmount) {
         alert(`✅ "${resource.title}" is now FEATURED for ${promotionDays} days!`);
     }
 }
+function updateUserDisplay() {
+    const userEmail = localStorage.getItem('currentUserEmail');
+    const userDisplay = document.getElementById('userDisplayName');
+    const subscription = checkUserSubscription(userEmail);
+    
+    if (userDisplay) {
+        if (subscription) {
+            userDisplay.innerHTML = `<i class="fas fa-crown" style="color: #f59e0b;"></i> Premium`;
+        } else if (userEmail) {
+            userDisplay.textContent = userEmail.split('@')[0];
+        } else {
+            userDisplay.textContent = 'Account';
+        }
+    }
+}
 
+// Call this after login/load
+updateUserDisplay();
 // Display featured resources at top
 function loadFeaturedResources() {
     const featured = resources.filter(r => r.featured && r.featuredUntil > Date.now());
@@ -1278,7 +1295,41 @@ function checkUserSubscription(userEmail) {
         return false;
     }
 }
-
+function verifyPayment(resourceId) {
+    const transCode = document.getElementById('transCode')?.value;
+    const email = document.getElementById('buyerEmail')?.value;
+    
+    if (!transCode || !email) {
+        alert('Please enter transaction code and email');
+        return;
+    }
+    
+    // Check if this is a subscription or resource purchase
+    if (pendingSubscription) {
+        completeSubscriptionPayment(transCode, email);
+    } else {
+        // Regular resource purchase
+        const resource = resources.find(r => r.id === resourceId);
+        if (resource) {
+            const purchase = {
+                id: Date.now(),
+                resourceId: resource.id,
+                resourceTitle: resource.title,
+                price: resource.price,
+                email: email,
+                transactionCode: transCode,
+                date: new Date().toISOString()
+            };
+            
+            purchases.push(purchase);
+            localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
+            
+            alert(`Payment verified! Downloading ${resource.title}...`);
+            document.querySelectorAll('.modal').forEach(m => m.remove());
+            downloadResource(resourceId);
+        }
+    }
+}
 // Override resource access check for subscribers
 function canAccessResource(resourceId, userEmail) {
     const resource = resources.find(r => r.id === resourceId);

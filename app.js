@@ -1060,3 +1060,134 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
         window.showPaymentMethod(e.target.value);
     });
 });
+// Add to your app.js - Enhanced payment processing
+const COMMISSION_RATE = 0.30; // 30% platform commission
+const SELLER_PAYOUT_RATE = 0.70; // 70% to seller
+
+async function processSale(resourceId, buyerEmail, amount) {
+    const resource = resources.find(r => r.id === resourceId);
+    
+    const transaction = {
+        id: Date.now(),
+        resourceId: resourceId,
+        resourceTitle: resource.title,
+        sellerEmail: resource.sellerEmail || 'admin@nexalearn.com',
+        buyerEmail: buyerEmail,
+        amount: amount,
+        commission: amount * COMMISSION_RATE,
+        sellerEarnings: amount * SELLER_PAYOUT_RATE,
+        date: new Date().toISOString(),
+        status: 'completed'
+    };
+    
+    // Store transaction
+    let transactions = JSON.parse(localStorage.getItem('nexalearn_transactions')) || [];
+    transactions.push(transaction);
+    localStorage.setItem('nexalearn_transactions', JSON.stringify(transactions));
+    
+    // Update seller balance
+    updateSellerBalance(resource.sellerEmail, transaction.sellerEarnings);
+    
+    return transaction;
+}
+// Seller/Affiliate System
+let sellers = JSON.parse(localStorage.getItem('nexalearn_sellers')) || [];
+
+function registerAsSeller(email, paypalEmail, phoneNumber) {
+    const seller = {
+        id: Date.now(),
+        email: email,
+        paypalEmail: paypalEmail,
+        phone: phoneNumber,
+        balance: 0,
+        totalSales: 0,
+        totalEarned: 0,
+        joinDate: new Date().toISOString(),
+        status: 'active'
+    };
+    
+    sellers.push(seller);
+    localStorage.setItem('nexalearn_sellers', JSON.stringify(sellers));
+    
+    alert('✅ You are now a NexaLearn seller! Upload resources and earn 70% commission.');
+}
+
+function updateSellerBalance(sellerEmail, amount) {
+    const seller = sellers.find(s => s.email === sellerEmail);
+    if (seller) {
+        seller.balance += amount;
+        seller.totalEarned += amount;
+        localStorage.setItem('nexalearn_sellers', JSON.stringify(sellers));
+    }
+}
+
+function requestPayout(sellerEmail) {
+    const seller = sellers.find(s => s.email === sellerEmail);
+    if (seller && seller.balance >= 1000) {
+        alert(`💰 Payout request submitted!\nAmount: KES ${seller.balance}\nWill be sent to: ${seller.paypalEmail}`);
+        seller.balance = 0;
+        localStorage.setItem('nexalearn_sellers', JSON.stringify(sellers));
+    } else {
+        alert(`Minimum payout is KES 1,000. Your balance: KES ${seller.balance || 0}`);
+    }
+}
+// Ad rotation system
+const ads = [
+    { image: "ad1.jpg", link: "https://sponsor1.com", text: "Premium Stationery - 20% off" },
+    { image: "ad2.jpg", link: "https://sponsor2.com", text: "Online Tutoring Services" },
+];
+
+let currentAd = 0;
+setInterval(() => {
+    currentAd = (currentAd + 1) % ads.length;
+    updateAdDisplay(ads[currentAd]);
+}, 10000);
+// Admin feature to highlight paid resources
+function promoteResource(resourceId, promotionDays, paymentAmount) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (resource) {
+        resource.featured = true;
+        resource.featuredUntil = Date.now() + (promotionDays * 86400000);
+        resource.promotionPaid = paymentAmount;
+        saveResources();
+        
+        alert(`✅ "${resource.title}" is now FEATURED for ${promotionDays} days!`);
+    }
+}
+
+// Display featured resources at top
+function loadFeaturedResources() {
+    const featured = resources.filter(r => r.featured && r.featuredUntil > Date.now());
+    if (featured.length > 0) {
+        const featuredSection = document.getElementById('featuredGrid');
+        featuredSection.innerHTML = featured.map(r => `
+            <div class="featured-card">
+                <span class="featured-badge">⭐ FEATURED</span>
+                <h3>${r.title}</h3>
+                <div class="price">KES ${r.price}</div>
+                <button onclick="viewResource(${r.id})">View Resource</button>
+            </div>
+        `).join('');
+    }
+}
+// Referral system
+function generateReferralLink(userEmail) {
+    const referralCode = btoa(userEmail).substring(0, 10);
+    return `https://nexalearn.com/?ref=${referralCode}`;
+}
+
+function trackReferral(referralCode, newUserEmail) {
+    const referredBy = atob(referralCode);
+    let referrals = JSON.parse(localStorage.getItem('nexalearn_referrals')) || [];
+    
+    referrals.push({
+        referrer: referredBy,
+        newUser: newUserEmail,
+        date: new Date().toISOString(),
+        commission: 200 // KES 200 per referral
+    });
+    
+    // Credit referrer
+    updateSellerBalance(referredBy, 200);
+    localStorage.setItem('nexalearn_referrals', JSON.stringify(referrals));
+}

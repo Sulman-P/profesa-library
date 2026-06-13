@@ -2,754 +2,245 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="NexaLearn International - Academic resources, digital marketplace, online learning, exams and educational resource platform.">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>NexaLearn International | Premier Academic Resource Platform</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #1f2937;
-            background: #f5f7fa;
-        }
-        
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            padding: 0.75rem 0;
-        }
-        
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-        
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .nav-brand i {
-            font-size: 2rem;
-            color: #4F46E5;
-        }
-        
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .brand-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-        
-        .brand-tagline {
-            font-size: 0.7rem;
-            color: #6b7280;
-        }
-        
-        .nav-search {
-            flex: 1;
-            max-width: 400px;
-            display: flex;
-            align-items: center;
-            background: #f3f4f6;
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
-            gap: 0.5rem;
-        }
-        
-        .nav-search input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 0.9rem;
-        }
-        
-        .nav-menu {
-            display: flex;
-            gap: 1.5rem;
-            list-style: none;
-        }
-        
-        .nav-menu a {
-            text-decoration: none;
-            color: #1f2937;
-            font-weight: 500;
-            transition: color 0.3s;
-            cursor: pointer;
-        }
-        
-        .nav-menu a:hover {
-            color: #4F46E5;
-        }
-        
-        .nav-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-        
-        .icon-btn, .admin-trigger {
-            background: #f3f4f6;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .icon-btn:hover, .admin-trigger:hover {
-            background: #4F46E5;
-            color: white;
-        }
-        
-        .mobile-toggle {
-            display: none;
-            flex-direction: column;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        
-        /* Hero Section */
-        .hero {
-            position: relative;
-            min-height: 85vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin-top: 70px;
-        }
-        
-        .hero-content {
-            text-align: center;
-            color: white;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 4rem 0;
-        }
-        
-        .hero-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .hero-content h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #fff, #e0e7ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin: 2rem 0;
-        }
-        
-        .hero-stats .stat {
-            text-align: center;
-        }
-        
-        .hero-stats .stat span {
-            display: block;
-            font-size: 1.75rem;
-            font-weight: 700;
-        }
-        
-        .btn-primary, .btn-secondary {
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-        
-        .btn-primary {
-            background: white;
-            color: #4F46E5;
-        }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid white;
-        }
-        
-        /* Sections */
-        .levels-showcase, .marketplace, .upload-section, .about-section, .videos-section, .subject-resources {
-            padding: 4rem 0;
-        }
-        
-        .section-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .section-header h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Levels Grid */
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .level-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
+        /* Additional styles for admin dashboard */
+        .admin-upload-area {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        
-        .level-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(79,70,229,0.15);
+        .admin-upload-area:hover {
+            border-color: #4F46E5;
+            background: #f8f9ff;
         }
-        
-        .card-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
+        .admin-form {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
         }
-        
-        .card-icon i {
-            font-size: 2rem;
-            color: white;
-        }
-        
-        .primary-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .junior-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .senior-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .uni-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .lifelong-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
-        
-        /* Resource Cards */
-        .resources-grid, .marketplace-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .resource-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-        
-        .resource-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        
-        .resource-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #e5e7eb;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-        
-        .price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #10b981;
-            margin: 0.75rem 0;
-        }
-        
-        .resource-card button {
-            width: 100%;
-            padding: 0.6rem;
-            background: #4F46E5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        
-        /* Marketplace Filters */
-        .marketplace-filters {
-            display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        
-        .filter-btn {
-            padding: 0.5rem 1.25rem;
-            background: #f3f4f6;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-        }
-        
-        .filter-btn.active, .filter-btn:hover {
-            background: #4F46E5;
-            color: white;
-        }
-        
-        /* Upload Form */
-        .upload-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .form-row {
+        .admin-form .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 15px;
+            margin-bottom: 15px;
         }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-family: inherit;
-        }
-        
-        .full-width {
-            grid-column: span 2;
-        }
-        
-        .btn-submit {
-            width: 100%;
-            padding: 0.875rem;
-            background: #4F46E5;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        /* Video Grid */
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .video-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .video-thumbnail {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            height: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .video-thumbnail i {
-            font-size: 3rem;
-            color: white;
-        }
-        
-        .video-info {
-            padding: 1rem;
-        }
-        
-        .video-info button {
-            width: 100%;
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background: #4F46E5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        /* Footer */
-        .footer {
-            background: #1f2937;
-            color: white;
-            padding: 3rem 0 1rem;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid #374151;
-            color: #9ca3af;
-        }
-        
-        .footer a {
-            color: #9ca3af;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
+        .admin-items-list {
+            max-height: 500px;
             overflow-y: auto;
         }
-        
-        .modal-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+        .admin-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        
-        .close-modal {
+        .admin-item:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .admin-item-actions button {
+            margin-left: 10px;
+            padding: 5px 12px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1.5rem;
+            font-size: 12px;
         }
-        
-        /* Mega Menu */
-        .levels-mega-menu {
-            position: fixed;
-            top: 70px;
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 999;
-            transform: translateY(-100%);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .levels-mega-menu.active {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .mega-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-        
-        .mega-level {
-            background: #f9fafb;
-            border-radius: 12px;
-            padding: 1rem;
-        }
-        
-        .level-header {
-            padding: 0.75rem;
-            border-radius: 8px;
-            color: white;
-            margin-bottom: 1rem;
-        }
-        
-        .primary-bg { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .junior-bg { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .senior-bg { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .uni-bg { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .lifelong-bg { background: linear-gradient(135deg, #fa709a, #fee140); }
-        
-        .level-grades {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .level-grades span {
-            background: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-        }
-        
-        .level-subjects {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-        
-        .subject-chip {
-            background: white;
-            border: 1px solid #e5e7eb;
-            padding: 0.4rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .subject-chip:hover {
-            background: #4F46E5;
-            color: white;
-        }
-        
-        .payment-methods {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .payment-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: #f3f4f6;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        .payment-form {
-            display: none;
-        }
-        
-        .payment-form.active {
-            display: block;
-        }
-        
-        /* Admin Dashboard */
-        .admin-dashboard {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #f3f4f6;
-            z-index: 3000;
-            overflow: auto;
-            padding: 2rem;
-        }
-        
-        .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .btn-logout {
+        .btn-delete {
             background: #ef4444;
             color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
         }
-        
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-card i {
+            font-size: 2rem;
+            color: #4F46E5;
+            margin-bottom: 10px;
+        }
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
         .admin-tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
         .admin-tab-btn {
-            padding: 0.75rem 1.5rem;
-            background: white;
+            padding: 10px 20px;
+            background: #f3f4f6;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s;
         }
-        
         .admin-tab-btn.active {
             background: #4F46E5;
             color: white;
         }
-        
         .admin-tab-pane {
             display: none;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
         }
-        
         .admin-tab-pane.active {
             display: block;
         }
-        
-        .stats-grid {
+        .video-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
-        
-        .admin-item {
-            background: #f9fafb;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
+        .video-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .video-thumbnail {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 180px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
         }
-        
-        .form-input {
+        .video-thumbnail i {
+            font-size: 4rem;
+            color: white;
+        }
+        .video-info {
+            padding: 15px;
+        }
+        .video-info h4 {
+            margin-bottom: 5px;
+        }
+        .video-info button {
             width: 100%;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            margin-top: 10px;
+            padding: 8px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
-            }
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            .full-width {
-                grid-column: span 1;
-            }
-            .hero-content h1 {
-                font-size: 2rem;
-            }
-            .mega-container {
-                grid-template-columns: 1fr;
-                max-height: 80vh;
-                overflow-y: auto;
-            }
+        .resource-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .resource-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .resource-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #10b981;
+            margin: 10px 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .level-card {
+            cursor: pointer;
+        }
+        .subject-chip {
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+  
+  // Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCd92I8dZEN_PJRPgLSZ-Tz2qu2Bf_ELmw",
+    authDomain: "nexalearn-2026p.firebaseapp.com",
+    projectId: "nexalearn-2026p",
+    storageBucket: "nexalearn-2026p.firebasestorage.app",
+    messagingSenderId: "918959017140",
+    appId: "1:918959017140:web:bdec1e8f264bd59df55be1",
+    measurementId: "G-3XJJG5FJ3Z"
+  };
 
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+  const auth = getAuth(app);
+  
+  // Make available globally
+  window.db = db;
+  window.storage = storage;
+  window.auth = auth;
+  window.firebaseCollections = {
+    resources: 'nexalearn_resources',
+    users: 'nexalearn_users',
+    purchases: 'nexalearn_purchases',
+    videos: 'nexalearn_videos'
+  };
+  
+  console.log('✅ Firebase initialized successfully!');
+</script>
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
@@ -763,7 +254,7 @@
         
         <div class="nav-search">
             <i class="fas fa-search"></i>
-            <input type="text" id="globalSearch" placeholder="Search resources...">
+            <input type="text" id="globalSearch" placeholder="Search resources, subjects, exams...">
         </div>
         
         <div class="nav-menu">
@@ -790,47 +281,108 @@
     </div>
 </nav>
 
-<!-- Mega Menu -->
+<!-- Academic Levels Mega Menu -->
 <div class="levels-mega-menu" id="levelsMenu">
     <div class="mega-container">
         <div class="mega-level">
-            <div class="level-header primary-bg"><h3>Primary School</h3></div>
+            <div class="level-header primary-bg">
+                <i class="fas fa-chalkboard-user"></i>
+                <h3>Primary School</h3>
+                <p>PP1 - Grade 6</p>
+            </div>
+            <div class="level-grades">
+                <span>PP1</span> <span>PP2</span> <span>Grade 1-6</span>
+            </div>
             <div class="level-subjects">
                 <button class="subject-chip" data-level="primary" data-subject="Mathematics">📐 Mathematics</button>
                 <button class="subject-chip" data-level="primary" data-subject="English">📖 English</button>
                 <button class="subject-chip" data-level="primary" data-subject="Kiswahili">🗣️ Kiswahili</button>
                 <button class="subject-chip" data-level="primary" data-subject="Science">🔬 Science</button>
+                <button class="subject-chip" data-level="primary" data-subject="Social Studies">🌍 Social Studies</button>
+                <button class="subject-chip" data-level="primary" data-subject="CRE/IRE/HRE">⛪ Religious Ed</button>
+                <button class="subject-chip" data-level="primary" data-subject="Creative Arts">🎨 Creative Arts</button>
             </div>
         </div>
+        
         <div class="mega-level">
-            <div class="level-header junior-bg"><h3>Junior School</h3></div>
+            <div class="level-header junior-bg">
+                <i class="fas fa-school"></i>
+                <h3>Junior School</h3>
+                <p>Grade 7 - Grade 9</p>
+            </div>
+            <div class="level-grades">
+                <span>Grade 7</span> <span>Grade 8</span> <span>Grade 9</span>
+            </div>
             <div class="level-subjects">
                 <button class="subject-chip" data-level="junior" data-subject="Mathematics">📐 Mathematics</button>
                 <button class="subject-chip" data-level="junior" data-subject="English">📖 English</button>
-                <button class="subject-chip" data-level="junior" data-subject="Integrated Science">🔬 Science</button>
+                <button class="subject-chip" data-level="junior" data-subject="Kiswahili">🗣️ Kiswahili</button>
+                <button class="subject-chip" data-level="junior" data-subject="Integrated Science">🔬 Integrated Science</button>
+                <button class="subject-chip" data-level="junior" data-subject="Religious Education">⛪ Religious Ed</button>
+                <button class="subject-chip" data-level="junior" data-subject="Social Studies">🌍 Social Studies</button>
+                <button class="subject-chip" data-level="junior" data-subject="Pre Technical Studies">⚙️ Pre Technical</button>
+                <button class="subject-chip" data-level="junior" data-subject="Agriculture">🌱 Agriculture</button>
+                <button class="subject-chip" data-level="junior" data-subject="Creative Arts">🎨 Creative Arts</button>
+                <button class="subject-chip" data-level="junior" data-subject="Kenya Sign Language">🤟 Sign Language</button>
             </div>
         </div>
+        
         <div class="mega-level">
-            <div class="level-header senior-bg"><h3>Senior School</h3></div>
+            <div class="level-header senior-bg">
+                <i class="fas fa-building"></i>
+                <h3>Senior School</h3>
+                <p>Grade 10 - Grade 12</p>
+            </div>
+            <div class="level-grades">
+                <span>Grade 10</span> <span>Grade 11</span> <span>Grade 12</span>
+            </div>
             <div class="level-subjects">
-                <button class="subject-chip" data-level="senior" data-subject="Mathematics">📐 Mathematics</button>
-                <button class="subject-chip" data-level="senior" data-subject="Physics">⚡ Physics</button>
+                <button class="subject-chip" data-level="senior" data-subject="Core Mathematics">📐 Core Mathematics</button>
                 <button class="subject-chip" data-level="senior" data-subject="Chemistry">🧪 Chemistry</button>
+                <button class="subject-chip" data-level="senior" data-subject="Physics">⚡ Physics</button>
                 <button class="subject-chip" data-level="senior" data-subject="Biology">🧬 Biology</button>
+                <button class="subject-chip" data-level="senior" data-subject="English Literature">📚 English Literature</button>
+                <button class="subject-chip" data-level="senior" data-subject="Kiswahili">🗣️ Kiswahili</button>
+                <button class="subject-chip" data-level="senior" data-subject="Geography">🌏 Geography</button>
+                <button class="subject-chip" data-level="senior" data-subject="History & Citizenship">📜 History</button>
+                <button class="subject-chip" data-level="senior" data-subject="Business Studies">💼 Business Studies</button>
+                <button class="subject-chip" data-level="senior" data-subject="Computer Studies">💻 Computer Studies</button>
             </div>
         </div>
+        
         <div class="mega-level">
-            <div class="level-header uni-bg"><h3>University</h3></div>
+            <div class="level-header uni-bg">
+                <i class="fas fa-university"></i>
+                <h3>University</h3>
+                <p>Bachelor's - Doctorate</p>
+            </div>
+            <div class="level-grades">
+                <span>Bachelor's</span> <span>Master's</span> <span>PhD</span>
+            </div>
             <div class="level-subjects">
-                <button class="subject-chip" data-level="university" data-subject="Computer Science">💻 CS</button>
-                <button class="subject-chip" data-level="university" data-subject="Business">💼 Business</button>
+                <button class="subject-chip" data-level="university" data-subject="Computer Science & AI">🤖 CS & AI</button>
+                <button class="subject-chip" data-level="university" data-subject="Data Science">📊 Data Science</button>
+                <button class="subject-chip" data-level="university" data-subject="Business Administration">💼 MBA</button>
+                <button class="subject-chip" data-level="university" data-subject="Medicine & Surgery">🩺 Medicine</button>
                 <button class="subject-chip" data-level="university" data-subject="Engineering">🔧 Engineering</button>
+                <button class="subject-chip" data-level="university" data-subject="Economics & Finance">💰 Economics</button>
+                <button class="subject-chip" data-level="university" data-subject="Law">⚖️ Law</button>
             </div>
         </div>
+        
         <div class="mega-level">
-            <div class="level-header lifelong-bg"><h3>Lifelong Learning</h3></div>
+            <div class="level-header lifelong-bg">
+                <i class="fas fa-book-reader"></i>
+                <h3>Lifelong Learning</h3>
+                <p>Continuous Growth</p>
+            </div>
             <div class="level-subjects">
                 <button class="subject-chip" data-level="lifelong" data-subject="Financial Literacy">💰 Financial Literacy</button>
+                <button class="subject-chip" data-level="lifelong" data-subject="Personal Development">🌱 Personal Development</button>
+                <button class="subject-chip" data-level="lifelong" data-subject="Entrepreneurship">🚀 Entrepreneurship</button>
+                <button class="subject-chip" data-level="lifelong" data-subject="Digital Marketing">📱 Digital Marketing</button>
+                <button class="subject-chip" data-level="lifelong" data-subject="Leadership Skills">👔 Leadership Skills</button>
+                <button class="subject-chip" data-level="lifelong" data-subject="Investing Basics">📈 Investing Basics</button>
             </div>
         </div>
     </div>
@@ -838,108 +390,216 @@
 
 <!-- Hero Section -->
 <section id="home" class="hero">
+    <div class="hero-bg-pattern"></div>
     <div class="container">
         <div class="hero-content">
             <div class="hero-badge">Premier Academic Platform</div>
             <h1>Welcome to <span class="gradient-text">NexaLearn</span> International</h1>
-            <p>Your complete digital learning ecosystem for modern education.</p>
+            <p>Your complete digital learning ecosystem for modern education, collaboration, and academic excellence across all levels.</p>
             <div class="hero-stats">
                 <div class="stat"><span id="statResourcesCount">0</span><label>Resources</label></div>
-                <div class="stat"><span id="statDownloadsCount">0</span><label>Downloads</label></div>
                 <div class="stat"><span id="statLearnersCount">0</span><label>Learners</label></div>
+                <div class="stat"><span id="statDownloadsCount">0</span><label>Downloads</label></div>
             </div>
             <div class="hero-buttons">
-                <button class="btn-primary" onclick="scrollToLevels()">Explore Levels</button>
-                <button class="btn-secondary" onclick="scrollToMarketplace()">Marketplace</button>
+                <button class="btn-primary" onclick="scrollToLevels()">
+                    <i class="fas fa-graduation-cap"></i> Explore Levels
+                </button>
+                <button class="btn-secondary" onclick="scrollToMarketplace()">
+                    <i class="fas fa-store"></i> Marketplace
+                </button>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Levels -->
+<!-- Academic Levels Showcase -->
 <section id="levels" class="levels-showcase">
     <div class="container">
         <div class="section-header">
             <h2>Academic <span class="gradient-text">Levels</span></h2>
-            <p>Choose your educational level</p>
+            <p>Choose your educational level and access curated resources from expert educators</p>
         </div>
         <div class="levels-grid">
-            <div class="level-card" data-level="primary"><div class="card-icon primary-icon"><i class="fas fa-chalkboard-user"></i></div><h3>Primary School</h3><p>PP1 - Grade 6</p></div>
-            <div class="level-card" data-level="junior"><div class="card-icon junior-icon"><i class="fas fa-school"></i></div><h3>Junior School</h3><p>Grade 7 - 9</p></div>
-            <div class="level-card" data-level="senior"><div class="card-icon senior-icon"><i class="fas fa-building"></i></div><h3>Senior School</h3><p>Grade 10 - 12</p></div>
-            <div class="level-card" data-level="university"><div class="card-icon uni-icon"><i class="fas fa-university"></i></div><h3>University</h3><p>Bachelor's - PhD</p></div>
-            <div class="level-card" data-level="lifelong"><div class="card-icon lifelong-icon"><i class="fas fa-book-reader"></i></div><h3>Lifelong Learning</h3><p>Continuous Growth</p></div>
+            <div class="level-card" data-level="primary">
+                <div class="card-icon primary-icon"><i class="fas fa-chalkboard-user"></i></div>
+                <h3>Primary School</h3>
+                <p>PP1 - Grade 6</p>
+            </div>
+            <div class="level-card" data-level="junior">
+                <div class="card-icon junior-icon"><i class="fas fa-school"></i></div>
+                <h3>Junior School</h3>
+                <p>Grade 7 - Grade 9</p>
+            </div>
+            <div class="level-card" data-level="senior">
+                <div class="card-icon senior-icon"><i class="fas fa-building"></i></div>
+                <h3>Senior School</h3>
+                <p>Grade 10 - Grade 12</p>
+            </div>
+            <div class="level-card" data-level="university">
+                <div class="card-icon uni-icon"><i class="fas fa-university"></i></div>
+                <h3>University</h3>
+                <p>Bachelor's - Doctorate</p>
+            </div>
+            <div class="level-card" data-level="lifelong">
+                <div class="card-icon lifelong-icon"><i class="fas fa-book-reader"></i></div>
+                <h3>Lifelong Learning</h3>
+                <p>Continuous Growth</p>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Resources Display -->
+<!-- Subject Resources Section -->
 <section id="subject-resources" class="subject-resources">
     <div class="container">
         <div class="section-header">
             <h2>Browse <span class="gradient-text">Resources</span></h2>
-            <p id="currentSubjectDisplay">Select a subject to view resources</p>
+            <p id="currentSubjectDisplay">Select a subject from above to view resources</p>
         </div>
-        <div id="resourcesGrid" class="resources-grid"></div>
+        <div id="resourcesGrid" class="resources-grid">
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <h3>No resources selected</h3>
+                <p>Click on any subject button to explore educational materials</p>
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- Videos -->
+<!-- Videos Section -->
 <section id="videos" class="videos-section">
     <div class="container">
         <div class="section-header">
             <h2>Video <span class="gradient-text">Learning</span> Center</h2>
+            <p>Watch educational videos from expert teachers</p>
         </div>
         <div id="videoGrid" class="video-grid"></div>
     </div>
 </section>
 
-<!-- Marketplace -->
+<!-- Marketplace Section -->
 <section id="marketplace" class="marketplace">
     <div class="container">
         <div class="section-header">
             <h2>Digital <span class="gradient-text">Marketplace</span></h2>
+            <p>Buy and sell premium educational resources</p>
         </div>
         <div class="marketplace-filters">
-            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn active" data-filter="all">All Resources</button>
             <button class="filter-btn" data-filter="textbook">Textbooks</button>
             <button class="filter-btn" data-filter="exam">Exam Papers</button>
-            <button class="filter-btn" data-filter="notes">Notes</button>
+            <button class="filter-btn" data-filter="notes">Lecture Notes</button>
+            <button class="filter-btn" data-filter="guide">Study Guides</button>
         </div>
-        <div id="marketplaceGrid" class="marketplace-grid"></div>
+        <div id="marketplaceGrid" class="marketplace-grid">
+            <div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Loading resources...</div>
+        </div>
     </div>
 </section>
 
-<!-- Upload -->
+<!-- Upload Section -->
 <section id="upload" class="upload-section">
     <div class="container">
-        <div class="section-header"><h2>Share Your <span class="gradient-text">Knowledge</span></h2></div>
+        <div class="section-header">
+            <h2>Share Your <span class="gradient-text">Knowledge</span></h2>
+            <p>Upload educational resources and earn from your expertise</p>
+        </div>
         <div class="upload-container">
-            <form id="uploadForm">
+            <form id="uploadForm" class="upload-form">
                 <div class="form-row">
-                    <div class="form-group"><label>Title</label><input type="text" id="resourceTitle" required></div>
-                    <div class="form-group"><label>Level</label><select id="resourceLevel"><option value="primary">Primary</option><option value="junior">Junior</option><option value="senior">Senior</option><option value="university">University</option></select></div>
+                    <div class="form-group">
+                        <label>Resource Title</label>
+                        <input type="text" id="resourceTitle" placeholder="e.g., Complete Mathematics Guide" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Academic Level</label>
+                        <select id="resourceLevel" required>
+                            <option value="">Select Level</option>
+                            <option value="primary">Primary School</option>
+                            <option value="junior">Junior School</option>
+                            <option value="senior">Senior School</option>
+                            <option value="university">University</option>
+                            <option value="lifelong">Lifelong Learning</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Subject</label><input type="text" id="resourceSubject" required></div>
-                    <div class="form-group"><label>Category</label><select id="resourceCategory"><option value="textbook">Textbook</option><option value="exam">Exam</option><option value="notes">Notes</option></select></div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="resourceSubject" placeholder="e.g., Mathematics" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="resourceCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="textbook">Textbook</option>
+                            <option value="exam">Exam Paper</option>
+                            <option value="notes">Lecture Notes</option>
+                            <option value="guide">Study Guide</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Price (KES)</label><input type="number" id="resourcePrice" value="0"></div>
-                    <div class="form-group"><label>File</label><input type="file" id="resourceFile"></div>
+                    <div class="form-group">
+                        <label>Price (KES)</label>
+                        <input type="number" id="resourcePrice" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload File</label>
+                        <input type="file" id="resourceFile" accept=".pdf,.doc,.docx">
+                    </div>
                 </div>
-                <div class="form-group full-width"><label>Description</label><textarea id="resourceDescription" rows="3"></textarea></div>
-                <button type="submit" class="btn-submit">Upload</button>
+                <div class="form-group full-width">
+                    <label>Description</label>
+                    <textarea id="resourceDescription" rows="4" placeholder="Describe your resource..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Upload Resource</button>
             </form>
         </div>
     </div>
 </section>
 
-<!-- About -->
+<!-- About Section -->
 <section id="about" class="about-section">
     <div class="container">
-        <div class="section-header"><h2>About <span class="gradient-text">NexaLearn</span></h2></div>
-        <p style="text-align:center; max-width:800px; margin:0 auto;">NexaLearn International connects learners and educators worldwide with quality educational resources.</p>
+        <div class="about-grid">
+            <div class="about-content">
+                <div class="section-header left-align">
+                    <h2>About <span class="gradient-text">NexaLearn</span></h2>
+                </div>
+                <p>NexaLearn International is a revolutionary digital learning platform connecting learners, educators, and institutions worldwide. We provide access to quality educational materials, interactive learning tools, and a vibrant academic marketplace.</p>
+                <div class="mission-vision">
+                    <div class="mv-card">
+                        <i class="fas fa-eye"></i>
+                        <h4>Our Vision</h4>
+                        <p>To democratize education globally through innovative technology and accessible learning resources.</p>
+                    </div>
+                    <div class="mv-card">
+                        <i class="fas fa-bullseye"></i>
+                        <h4>Our Mission</h4>
+                        <p>Empowering learners at every stage with high-quality, affordable educational content and collaborative tools.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-stats">
+                <div class="stat-card">
+                    <i class="fas fa-download"></i>
+                    <div class="stat-number" data-count="50000">0</div>
+                    <p>Resources Downloaded</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number" data-count="100000">0</div>
+                    <p>Active Learners</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chalkboard"></i>
+                    <div class="stat-number" data-count="2500">0</div>
+                    <p>Expert Educators</p>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -947,38 +607,306 @@
 <footer class="footer">
     <div class="container">
         <div class="footer-content">
-            <div><h3>NexaLearn</h3><p>Knowledge for Global Excellence</p></div>
-            <div><h4>Quick Links</h4><a href="#home">Home</a><a href="#levels">Levels</a><a href="#marketplace">Marketplace</a></div>
-            <div><h4>Contact</h4><p>admin@nexalearn.com</p><p>+254 700 123 456</p></div>
+            <div class="footer-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>NexaLearn International</h3>
+                <p>Knowledge for Global Excellence</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="#home">Home</a>
+                <a href="#levels">Academic Levels</a>
+                <a href="#marketplace">Marketplace</a>
+                <a href="#upload">Upload</a>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Become an Educator</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <p><i class="fas fa-envelope"></i> admin@nexalearn.com</p>
+                <p><i class="fas fa-phone"></i> +254 700 123 456</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
         </div>
-        <div class="footer-bottom"><p>&copy; 2026 NexaLearn International. All rights reserved.</p></div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NexaLearn International. All rights reserved.</p>
+        </div>
     </div>
 </footer>
 
-<!-- Admin Modal -->
+<!-- Admin Login Modal -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Admin Login</h3><span class="close-modal" onclick="document.getElementById('adminModal').style.display='none'">&times;</span></div>
-        <div style="padding:1.5rem">
-            <input type="email" id="adminEmail" placeholder="admin@nexalearn.com" style="width:100%; padding:0.75rem; margin-bottom:1rem; border:1px solid #ddd; border-radius:8px;">
-            <input type="password" id="adminPassword" placeholder="Password" style="width:100%; padding:0.75rem; margin-bottom:1rem; border:1px solid #ddd; border-radius:8px;">
-            <button onclick="adminLogin()" class="btn-submit">Login</button>
+        <div class="modal-header">
+            <i class="fas fa-shield-alt"></i>
+            <h2>Admin Portal Login</h2>
+            <span class="close-modal">&times;</span>
         </div>
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="adminEmail" placeholder="admin@nexalearn.com" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter password" required>
+            </div>
+            <div id="loginError" class="error-message" style="display: none; color: red; margin-bottom: 10px;">
+                Invalid credentials. Use admin@nexalearn.com / admin123
+            </div>
+            <button type="submit" class="btn-submit">Login to Dashboard</button>
+        </form>
     </div>
 </div>
 
 <!-- Admin Dashboard -->
-<div id="adminDashboard" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#f3f4f6; z-index:3000; overflow:auto; padding:2rem;">
-    <div style="max-width:1200px; margin:0 auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <h2>Admin Dashboard</h2>
-            <button onclick="adminLogout()" style="background:#ef4444; color:white; border:none; padding:0.5rem 1rem; border-radius:8px;">Logout</button>
+<div id="adminDashboard" class="admin-dashboard" style="display: none;">
+    <div class="admin-container">
+        <div class="admin-header">
+            <h2><i class="fas fa-shield-alt"></i> Admin Dashboard</h2>
+            <button id="adminLogoutBtn" class="btn-logout">Logout</button>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem;">
-            <div style="background:white; padding:1rem; border-radius:12px;"><h3>Resources</h3><p id="adminStatResources">0</p></div>
-            <div style="background:white; padding:1rem; border-radius:12px;"><h3>Revenue</h3><p id="adminStatRevenue">KES 0</p></div>
-            <div style="background:white; padding:1rem; border-radius:12px;"><h3>Downloads</h3><p id="adminStatDownloads">0</p></div>
+        
+        <div class="admin-tabs">
+            <button class="admin-tab-btn active" data-tab="overview">Overview</button>
+            <button class="admin-tab-btn" data-tab="documents">Documents</button>
+            <button class="admin-tab-btn" data-tab="videos">Videos</button>
+            <button class="admin-tab-btn" data-tab="exams">Exams</button>
         </div>
-        <div style="background:white; padding:1.5rem; border-radius:12px;">
-            <h3>Upload Document</h3>
-            <input type="text" id="adminDocTitle" placeholder="Title" style="width:100%; padding:0.5rem; margin:0.5rem 0; border:1px solid
+        
+        <!-- Overview Tab -->
+        <div id="overviewTab" class="admin-tab-pane active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Total Resources</h3>
+                    <p id="statTotalResources">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-video"></i>
+                    <h3>Total Videos</h3>
+                    <p id="statTotalVideos">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h3>Total Revenue (KES)</h3>
+                    <p id="statTotalRevenue">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-download"></i>
+                    <h3>Total Downloads</h3>
+                    <p id="statTotalDownloads">0</p>
+                </div>
+            </div>
+            <div class="recent-activity">
+                <h3>Recent Purchases</h3>
+                <div id="recentActivityList"></div>
+            </div>
+        </div>
+        
+        <!-- Documents Tab -->
+        <div id="documentsTab" class="admin-tab-pane">
+            <h3>Upload New Document</h3>
+            <div class="admin-upload-area" onclick="document.getElementById('adminDocFile').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 48px;"></i>
+                <p>Click to upload document (PDF, DOC, DOCX)</p>
+                <input type="file" id="adminDocFile" accept=".pdf,.doc,.docx" style="display: none;">
+            </div>
+            
+            <div id="docUploadForm" style="margin-top: 20px; display: none;">
+                <input type="text" id="docTitle" placeholder="Document Title" class="form-input">
+                <select id="docLevel" class="form-input">
+                    <option value="primary">Primary School</option>
+                    <option value="junior">Junior School</option>
+                    <option value="senior">Senior School</option>
+                    <option value="university">University</option>
+                    <option value="lifelong">Lifelong Learning</option>
+                </select>
+                <input type="text" id="docSubject" placeholder="Subject" class="form-input">
+                <select id="docCategory" class="form-input">
+                    <option value="textbook">Textbook</option>
+                    <option value="notes">Lecture Notes</option>
+                    <option value="guide">Study Guide</option>
+                </select>
+                <input type="number" id="docPrice" placeholder="Price (KES)" class="form-input" value="0">
+                <textarea id="docDescription" placeholder="Description" class="form-input" rows="3"></textarea>
+                <button id="saveDocBtn" class="btn-submit">Save Document</button>
+            </div>
+            
+            <h3 style="margin-top: 30px;">Existing Documents</h3>
+            <div id="adminDocumentsList"></div>
+        </div>
+        
+        <!-- Videos Tab -->
+        <div id="videosTab" class="admin-tab-pane">
+            <h3>Add New Video</h3>
+            <div class="admin-form">
+                <input type="text" id="videoTitle" placeholder="Video Title" class="form-input">
+                <input type="text" id="videoSubject" placeholder="Subject" class="form-input">
+                <select id="videoLevel" class="form-input">
+                    <option value="primary">Primary School</option>
+                    <option value="junior">Junior School</option>
+                    <option value="senior">Senior School</option>
+                    <option value="university">University</option>
+                    <option value="lifelong">Lifelong Learning</option>
+                </select>
+                <input type="url" id="videoUrl" placeholder="YouTube URL" class="form-input">
+                <button id="addVideoBtn" class="btn-submit">Add Video</button>
+            </div>
+            
+            <h3>Existing Videos</h3>
+            <div id="adminVideosList"></div>
+        </div>
+        
+        <!-- Exams Tab -->
+        <div id="examsTab" class="admin-tab-pane">
+            <h3>Upload New Exam</h3>
+            <div class="admin-upload-area" onclick="document.getElementById('adminExamFile').click()">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 48px;"></i>
+                <p>Click to upload exam (PDF)</p>
+                <input type="file" id="adminExamFile" accept=".pdf" style="display: none;">
+            </div>
+            
+            <div id="examUploadForm" style="margin-top: 20px; display: none;">
+                <input type="text" id="examTitle" placeholder="Exam Title" class="form-input">
+                <select id="examLevel" class="form-input">
+                    <option value="primary">Primary School</option>
+                    <option value="junior">Junior School</option>
+                    <option value="senior">Senior School</option>
+                    <option value="university">University</option>
+                </select>
+                <input type="text" id="examSubject" placeholder="Subject" class="form-input">
+                <input type="number" id="examPrice" placeholder="Price (KES)" class="form-input">
+                <button id="saveExamBtn" class="btn-submit">Save Exam</button>
+            </div>
+            
+            <h3 style="margin-top: 30px;">Existing Exams</h3>
+            <div id="adminExamsList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 550px;">
+        <div class="modal-header">
+            <i class="fas fa-credit-card"></i>
+            <h2>Complete Payment</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        
+        <div style="padding: 20px;">
+            <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 id="paymentProductTitle">Product Title</h3>
+                <p id="paymentProductDesc" style="color: #6b7280; font-size: 14px;">Product description</p>
+                <p style="font-size: 24px; font-weight: bold; color: #10b981; margin-top: 10px;" id="paymentAmount">KES 0</p>
+            </div>
+            
+            <div class="payment-methods">
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="mpesa" checked>
+                    <i class="fas fa-mobile-alt"></i> M-Pesa
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="card">
+                    <i class="fas fa-credit-card"></i> Card
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="bank">
+                    <i class="fas fa-university"></i> Bank Transfer
+                </label>
+            </div>
+            
+            <!-- M-Pesa Form -->
+            <div id="mpesaForm" class="payment-form">
+                <div class="form-group">
+                    <label>M-Pesa Phone Number</label>
+                    <input type="tel" id="mpesaPhone" placeholder="07XXXXXXXX or 2547XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>M-Pesa PIN</label>
+                    <input type="password" id="mpesaPin" placeholder="Enter your M-Pesa PIN" maxlength="4">
+                </div>
+                <div style="background: #fef3c7; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px;">
+                    <strong>Paybill:</strong> 522522<br>
+                    <strong>Account:</strong> 1197966080<br>
+                    <strong>Amount:</strong> <span id="mpesaAmount">KES 0</span>
+                </div>
+                <button class="btn-submit" onclick="processMpesaPayment()">Pay with M-Pesa</button>
+            </div>
+            
+            <!-- Card Form -->
+            <div id="cardForm" class="payment-form" style="display: none;">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label>Expiry (MM/YY)</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/YY">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="password" id="cardCvv" placeholder="123" maxlength="4">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cardholder Name</label>
+                    <input type="text" id="cardName" placeholder="Name on card">
+                </div>
+                <button class="btn-submit" onclick="processCardPayment()">Pay with Card</button>
+            </div>
+            
+            <!-- Bank Form -->
+            <div id="bankForm" class="payment-form" style="display: none;">
+                <div style="background: #e0f2fe; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong>Bank Details:</strong><br>
+                    Bank: Kenya Commercial Bank (KCB)<br>
+                    Account Name: NexaLearn International<br>
+                    Account Number: 1197966080<br>
+                    Amount: <span id="bankAmount">KES 0</span>
+                </div>
+                <div class="form-group">
+                    <label>Transaction Reference Number</label>
+                    <input type="text" id="bankReference" placeholder="Enter bank reference number">
+                </div>
+                <button class="btn-submit" onclick="processBankPayment()">Confirm Bank Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div id="receiptModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <i class="fas fa-receipt"></i>
+            <h2>Payment Receipt</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div style="padding: 20px;">
+            <div id="receiptDetails"></div>
+            <div class="form-group">
+                <label>Email for Receipt</label>
+                <input type="email" id="recipientEmail" placeholder="your@email.com">
+            </div>
+            <button class="btn-submit" onclick="sendReceiptAndDownload()">
+                <i class="fas fa-download"></i> Send Receipt & Download
+            </button>
+        </div>
+    </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

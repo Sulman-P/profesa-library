@@ -1351,3 +1351,102 @@ function canAccessResource(resourceId, userEmail) {
 function contactSales() {
     window.location.href = 'mailto:admin@nexalearn.com?subject=School%20Subscription%20Inquiry&body=I%20am%20interested%20in%20the%20School%20Plan.%20Please%20contact%20me.';
 }
+// mpesa-worker.js - CORRECTED VERSION
+export default {
+    async fetch(request, env) {
+        const url = new URL(request.url);
+        
+        // Handle STK Push
+        if (url.pathname === '/api/mpesa/stkpush' && request.method === 'POST') {
+            try {
+                const { phoneNumber, amount, resourceId, resourceTitle } = await request.json();
+                
+                // STEP 1: GET ACCESS TOKEN
+                console.log('Getting access token...');
+                const auth = btoa(`${env.DywCXKtVBQjbADFszMe5yImI9pWVo7o7bN7GaJNNGSdIxMel}:${env.vmPL1lRAmnrTcXBFgpawoOFvErPvcJv3qcbrn737HDxOttbI3JqEn7A6IMOgXcLR}`);
+                
+                const tokenRes = await fetch('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${auth}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const tokenData = await tokenRes.json();
+                console.log('Token response:', tokenData);
+                
+                if (!tokenData.access_token) {
+                    console.error('Token error:', tokenData);
+                    return new Response(JSON.stringify({ 
+                        error: 'Failed to get access token',
+                        details: tokenData 
+                    }), { status: 400 });
+                }
+                
+                const accessToken = tokenData.access_token;
+                console.log('✅ Access token obtained:', accessToken.substring(0, 20) + '...');
+                
+                // STEP 2: PREPARE STK PUSH
+                const formattedPhone = phoneNumber.replace(/^0/, '254').replace(/^\+/, '');
+                const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14);
+                
+                // IMPORTANT: Use sandbox credentials
+                const shortcode = '174379';  // Sandbox shortcode
+                const passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
+                const password = btoa(`${shortcode}${passkey}${timestamp}`);
+                
+                console.log('Initiating STK Push...');
+                
+                const stkRes = await fetch('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        BusinessShortCode: shortcode,
+                        Password: password,
+                        Timestamp: timestamp,
+                        TransactionType: 'CustomerPayBillOnline',
+                        Amount: amount,
+                        PartyA: formattedPhone,
+                        PartyB: shortcode,
+                        PhoneNumber: formattedPhone,
+                        CallBackURL: `${env.CALLBACK_URL}/api/mpesa/callback`,
+                        AccountReference: `NEXA-${resourceId}`,
+                        TransactionDesc: resourceTitle.substring(0, 36) // Max 36 chars
+                    })
+                });
+                
+                const result = await stkRes.json();
+                console.log('STK Push result:', result);
+                
+                return new Response(JSON.stringify(result), {
+                    headers: { 'Content-Type': 'application/json' },
+                    status: stkRes.status
+                });
+                
+            } catch (error) {
+                console.error('STK Push error:', error);
+                return new Response(JSON.stringify({ 
+                    error: 'Internal server error', 
+                    details: error.message 
+                }), { status: 500 });
+            }
+        }
+        
+        // Handle Callback
+        if (url.pathname === '/api/mpesa/callback' && request.method === 'POST') {
+            const callback = await request.json();
+            console.log('Callback received:', JSON.stringify(callback, null, 2));
+            
+            // Process callback...
+            return new Response(JSON.stringify({ ResultCode: 0 }), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+        
+        return new Response('Not found', { status: 404 });
+    }
+};

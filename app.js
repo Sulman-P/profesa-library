@@ -399,27 +399,76 @@ function sendReceiptAndDownload() {
 
 // ==================== ADMIN FUNCTIONS ====================
 function adminLogin() {
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
+    console.log('Admin login function called');
+    
+    const emailInput = document.getElementById('adminEmail');
+    const passwordInput = document.getElementById('adminPassword');
+    const loginError = document.getElementById('loginError');
+    
+    if (!emailInput || !passwordInput) {
+        console.error('Email or password input not found');
+        alert('Form inputs not found');
+        return;
+    }
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    console.log('Login attempt with:', email);
     
     if (email === 'admin@nexalearn.com' && password === 'admin123') {
-        document.getElementById('adminModal').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
-        loadAdminData();
+        console.log('Login successful!');
+        isAdminLoggedIn = true;
+        window.isAdminLoggedIn = true;
+        
+        // Close modal
+        const adminModal = document.getElementById('adminModal');
+        if (adminModal) adminModal.style.display = 'none';
+        
+        // Show dashboard
+        const adminDashboard = document.getElementById('adminDashboard');
+        if (adminDashboard) {
+            adminDashboard.style.display = 'block';
+            console.log('Admin dashboard opened');
+            
+            // Load admin data
+            loadAdminData();
+        } else {
+            console.error('Admin dashboard element not found!');
+        }
+        
+        // Clear error if exists
+        if (loginError) loginError.style.display = 'none';
     } else {
-        alert('Invalid credentials. Use admin@nexalearn.com / admin123');
+        console.log('Login failed - invalid credentials');
+        if (loginError) {
+            loginError.style.display = 'block';
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 3000);
+        } else {
+            alert('Invalid credentials. Use admin@nexalearn.com / admin123');
+        }
     }
 }
 
 function adminLogout() {
-    document.getElementById('adminDashboard').style.display = 'none';
+    console.log('Admin logout called');
+    const adminDashboard = document.getElementById('adminDashboard');
+    if (adminDashboard) adminDashboard.style.display = 'none';
     isAdminLoggedIn = false;
+    window.isAdminLoggedIn = false;
+    alert('Logged out of admin dashboard');
 }
 
 function loadAdminData() {
+    console.log('Loading admin data...');
+    
+    // Calculate stats
     const totalRevenue = purchases.reduce((sum, p) => sum + (p.price || 0), 0);
     const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
     
+    // Update stats in dashboard
     const statResources = document.getElementById('statTotalResources');
     const statRevenue = document.getElementById('statTotalRevenue');
     const statDownloads = document.getElementById('statTotalDownloads');
@@ -430,74 +479,103 @@ function loadAdminData() {
     if (statDownloads) statDownloads.textContent = totalDownloads;
     if (statVideos) statVideos.textContent = videos.length;
     
+    // Load documents list
     const docsList = document.getElementById('adminDocumentsList');
     if (docsList) {
-        docsList.innerHTML = resources.filter(r => r.category !== 'exam').map(doc => `
-            <div class="admin-item">
-                <div><strong>${doc.title}</strong><br><small>${doc.subject} | KES ${doc.price}</small></div>
-                <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
-            </div>
-        `).join('') || '<p>No documents</p>';
+        const documents = resources.filter(r => r.category !== 'exam');
+        if (documents.length === 0) {
+            docsList.innerHTML = '<p class="no-data">No documents yet</p>';
+        } else {
+            docsList.innerHTML = documents.map(doc => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${doc.title}</strong><br>
+                        <small>${doc.subject} | KES ${doc.price.toLocaleString()}</small>
+                        <br><small>Downloads: ${doc.downloads || 0}</small>
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
     }
     
+    // Load exams list
     const examsList = document.getElementById('adminExamsList');
     if (examsList) {
-        examsList.innerHTML = resources.filter(r => r.category === 'exam').map(exam => `
-            <div class="admin-item">
-                <div><strong>${exam.title}</strong><br><small>${exam.subject} | KES ${exam.price}</small></div>
-                <button class="btn-delete" onclick="deleteResource(${exam.id})">Delete</button>
-            </div>
-        `).join('') || '<p>No exams</p>';
-    }
-}
-
-function deleteResource(id) {
-    if (confirm('Delete this resource?')) {
-        resources = resources.filter(r => r.id !== id);
-        saveResources();
-        loadMarketplace();
-        if (document.getElementById('adminDashboard').style.display === 'block') loadAdminData();
-        updateHeroStats();
-        alert('Deleted');
-    }
-}
-
-function adminUploadDocument() {
-    const title = document.getElementById('docTitle')?.value;
-    const subject = document.getElementById('docSubject')?.value;
-    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
-    
-    if (!title || !subject) {
-        alert('Please enter title and subject');
-        return;
+        const exams = resources.filter(r => r.category === 'exam');
+        if (exams.length === 0) {
+            examsList.innerHTML = '<p class="no-data">No exams yet</p>';
+        } else {
+            examsList.innerHTML = exams.map(exam => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${exam.title}</strong><br>
+                        <small>${exam.subject} | KES ${exam.price.toLocaleString()}</small>
+                        <br><small>Downloads: ${exam.downloads || 0}</small>
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteResource(${exam.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
     }
     
-    const newResource = {
-        id: Date.now(),
-        title: title,
-        level: document.getElementById('docLevel')?.value || 'university',
-        subject: subject,
-        category: document.getElementById('docCategory')?.value || 'textbook',
-        price: price,
-        description: document.getElementById('docDescription')?.value || `Admin uploaded: ${title}`,
-        downloads: 0,
-        date: new Date().toISOString().split('T')[0]
-    };
+    // Load videos list
+    const videosList = document.getElementById('adminVideosList');
+    if (videosList) {
+        if (videos.length === 0) {
+            videosList.innerHTML = '<p class="no-data">No videos yet</p>';
+        } else {
+            videosList.innerHTML = videos.map(v => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${v.title}</strong><br>
+                        <small>${v.subject} | ${formatLevelName(v.level)}</small>
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteVideo(${v.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
     
-    resources.push(newResource);
-    saveResources();
-    alert(`✅ "${title}" uploaded!`);
+    // Load recent purchases
+    const activityList = document.getElementById('recentActivityList');
+    if (activityList) {
+        const recent = [...purchases].reverse().slice(0, 10);
+        if (recent.length === 0) {
+            activityList.innerHTML = '<p class="no-data">No purchases yet</p>';
+        } else {
+            activityList.innerHTML = recent.map(p => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${p.resourceTitle}</strong><br>
+                        <small>${p.email || 'Anonymous'} | KES ${p.price.toLocaleString()}</small>
+                    </div>
+                    <small>${new Date(p.date).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        }
+    }
     
-    document.getElementById('docTitle').value = '';
-    document.getElementById('docSubject').value = '';
-    document.getElementById('docPrice').value = '';
-    document.getElementById('docDescription').value = '';
-    
-    loadMarketplace();
-    if (document.getElementById('adminDashboard').style.display === 'block') loadAdminData();
-    updateHeroStats();
+    console.log('Admin data loaded - Resources:', resources.length);
 }
 
+function deleteVideo(id) {
+    if (confirm('Delete this video permanently?')) {
+        videos = videos.filter(v => v.id !== id);
+        saveVideos();
+        loadVideos();
+        if (document.getElementById('adminDashboard').style.display === 'block') {
+            loadAdminData();
+        }
+        alert('✅ Video deleted');
+    }
+}
 // ==================== USER UPLOAD ====================
 function setupUploadForm() {
     const form = document.getElementById('uploadForm');

@@ -1,12 +1,10 @@
 // ==================== NEXALEARN MAIN APPLICATION ====================
-// This file contains ALL functionality - no need for separate payment.js, marketplace.js, upload-manager.js
 
 // ==================== DATA STORAGE ====================
 let resources = [];
 let videos = [];
 let purchases = [];
 let isAdminLoggedIn = false;
-let pendingPayment = null;
 
 // ==================== INITIALIZATION ====================
 function initializeData() {
@@ -255,7 +253,7 @@ function downloadResource(resourceId) {
     const hasPurchased = purchases.some(p => p.resourceId === resourceId);
     
     if (resource.price === 0 || hasPurchased) {
-        const content = generateDocumentContent(resource);
+        const content = `NEXALEARN INTERNATIONAL\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nLevel: ${formatLevelName(resource.level)}\n\n${resource.description}\n\n© NexaLearn International`;
         const blob = new Blob([content], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -276,21 +274,6 @@ function downloadResource(resourceId) {
     }
 }
 
-function generateDocumentContent(resource) {
-    return `NEXALEARN INTERNATIONAL
-
-Title: ${resource.title}
-Subject: ${resource.subject}
-Level: ${formatLevelName(resource.level)}
-Download Date: ${new Date().toLocaleDateString()}
-
-Description:
-${resource.description}
-
-© ${new Date().getFullYear()} NexaLearn International
-Knowledge for Global Excellence`;
-}
-
 // ==================== PAYMENT FUNCTIONS ====================
 function openPaymentModal(resourceId) {
     const resource = resources.find(r => r.id === resourceId);
@@ -299,7 +282,7 @@ function openPaymentModal(resourceId) {
         return;
     }
     
-    pendingPayment = resource;
+    window.pendingPayment = resource;
     
     const paymentTitle = document.getElementById('paymentProductTitle');
     const paymentDesc = document.getElementById('paymentProductDesc');
@@ -317,7 +300,7 @@ function openPaymentModal(resourceId) {
 }
 
 function processMpesaPayment() {
-    if (!pendingPayment) {
+    if (!window.pendingPayment) {
         alert('No pending payment');
         return;
     }
@@ -328,16 +311,16 @@ function processMpesaPayment() {
         return;
     }
     
-    alert(`💰 M-Pesa payment initiated!\nAmount: KES ${pendingPayment.price}\nCheck your phone for the M-Pesa prompt.`);
+    alert(`💰 M-Pesa payment initiated!\nAmount: KES ${window.pendingPayment.price}\nCheck your phone for the M-Pesa prompt.`);
     
     setTimeout(() => {
         document.getElementById('paymentModal').style.display = 'none';
         
         const purchase = {
             id: Date.now(),
-            resourceId: pendingPayment.id,
-            resourceTitle: pendingPayment.title,
-            price: pendingPayment.price,
+            resourceId: window.pendingPayment.id,
+            resourceTitle: window.pendingPayment.title,
+            price: window.pendingPayment.price,
             phone: phone,
             date: new Date().toISOString()
         };
@@ -345,24 +328,24 @@ function processMpesaPayment() {
         localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
         
         alert('✅ Payment successful! Downloading...');
-        downloadResource(pendingPayment.id);
-        pendingPayment = null;
+        downloadResource(window.pendingPayment.id);
+        window.pendingPayment = null;
     }, 2000);
 }
 
 function processCardPayment() {
-    if (!pendingPayment) return;
+    if (!window.pendingPayment) return;
     alert('💳 Card payment processing...');
     setTimeout(() => {
         document.getElementById('paymentModal').style.display = 'none';
         alert('✅ Payment successful! Downloading...');
-        downloadResource(pendingPayment.id);
-        pendingPayment = null;
+        downloadResource(window.pendingPayment.id);
+        window.pendingPayment = null;
     }, 1500);
 }
 
 function processBankPayment() {
-    if (!pendingPayment) return;
+    if (!window.pendingPayment) return;
     const reference = document.getElementById('bankReference')?.value;
     if (!reference) {
         alert('Please enter bank reference number');
@@ -372,8 +355,8 @@ function processBankPayment() {
     setTimeout(() => {
         document.getElementById('paymentModal').style.display = 'none';
         alert('✅ Payment successful! Downloading...');
-        downloadResource(pendingPayment.id);
-        pendingPayment = null;
+        downloadResource(window.pendingPayment.id);
+        window.pendingPayment = null;
     }, 1500);
 }
 
@@ -399,48 +382,57 @@ function sendReceiptAndDownload() {
 
 // ==================== ADMIN FUNCTIONS ====================
 function adminLogin() {
-    console.log('Admin login function called');
+    console.log('=== ADMIN LOGIN FUNCTION CALLED ===');
     
     const emailInput = document.getElementById('adminEmail');
     const passwordInput = document.getElementById('adminPassword');
-    const loginError = document.getElementById('loginError');
     
     if (!emailInput || !passwordInput) {
-        console.error('Email or password input not found');
-        alert('Form inputs not found');
+        console.error('Email or password input not found!');
+        alert('Form inputs not found. Please refresh the page.');
         return;
     }
     
     const email = emailInput.value.trim();
     const password = passwordInput.value.trim();
     
-    console.log('Login attempt with:', email);
+    console.log('Email entered:', email);
+    console.log('Password length:', password.length);
     
     if (email === 'admin@nexalearn.com' && password === 'admin123') {
-        console.log('Login successful!');
+        console.log('✅ ADMIN LOGIN SUCCESSFUL!');
         isAdminLoggedIn = true;
         window.isAdminLoggedIn = true;
         
-        // Close modal
+        // Close the modal
         const adminModal = document.getElementById('adminModal');
-        if (adminModal) adminModal.style.display = 'none';
+        if (adminModal) {
+            adminModal.style.display = 'none';
+            console.log('Admin modal closed');
+        } else {
+            console.error('Admin modal not found');
+        }
         
-        // Show dashboard
+        // Show the dashboard
         const adminDashboard = document.getElementById('adminDashboard');
         if (adminDashboard) {
             adminDashboard.style.display = 'block';
-            console.log('Admin dashboard opened');
+            console.log('✅ Admin dashboard opened!');
             
             // Load admin data
             loadAdminData();
         } else {
             console.error('Admin dashboard element not found!');
+            alert('Dashboard element not found. Check if ID "adminDashboard" exists.');
         }
         
         // Clear error if exists
+        const loginError = document.getElementById('loginError');
         if (loginError) loginError.style.display = 'none';
+        
     } else {
-        console.log('Login failed - invalid credentials');
+        console.log('❌ ADMIN LOGIN FAILED - Invalid credentials');
+        const loginError = document.getElementById('loginError');
         if (loginError) {
             loginError.style.display = 'block';
             setTimeout(() => {
@@ -478,6 +470,8 @@ function loadAdminData() {
     if (statRevenue) statRevenue.textContent = totalRevenue.toLocaleString();
     if (statDownloads) statDownloads.textContent = totalDownloads;
     if (statVideos) statVideos.textContent = videos.length;
+    
+    console.log('Stats updated - Resources:', resources.length, 'Revenue:', totalRevenue);
     
     // Load documents list
     const docsList = document.getElementById('adminDocumentsList');
@@ -562,11 +556,24 @@ function loadAdminData() {
         }
     }
     
-    console.log('Admin data loaded - Resources:', resources.length);
+    console.log('Admin data loaded successfully');
+}
+
+function deleteResource(id) {
+    if (confirm('Delete this resource?')) {
+        resources = resources.filter(r => r.id !== id);
+        saveResources();
+        loadMarketplace();
+        if (document.getElementById('adminDashboard').style.display === 'block') {
+            loadAdminData();
+        }
+        updateHeroStats();
+        alert('✅ Resource deleted');
+    }
 }
 
 function deleteVideo(id) {
-    if (confirm('Delete this video permanently?')) {
+    if (confirm('Delete this video?')) {
         videos = videos.filter(v => v.id !== id);
         saveVideos();
         loadVideos();
@@ -576,6 +583,45 @@ function deleteVideo(id) {
         alert('✅ Video deleted');
     }
 }
+
+function adminUploadDocument() {
+    const title = document.getElementById('docTitle')?.value;
+    const subject = document.getElementById('docSubject')?.value;
+    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
+    
+    if (!title || !subject) {
+        alert('Please enter title and subject');
+        return;
+    }
+    
+    const newResource = {
+        id: Date.now(),
+        title: title,
+        level: document.getElementById('docLevel')?.value || 'university',
+        subject: subject,
+        category: document.getElementById('docCategory')?.value || 'textbook',
+        price: price,
+        description: document.getElementById('docDescription')?.value || `Admin uploaded: ${title}`,
+        downloads: 0,
+        date: new Date().toISOString().split('T')[0]
+    };
+    
+    resources.push(newResource);
+    saveResources();
+    alert(`✅ "${title}" uploaded!`);
+    
+    document.getElementById('docTitle').value = '';
+    document.getElementById('docSubject').value = '';
+    document.getElementById('docPrice').value = '';
+    document.getElementById('docDescription').value = '';
+    
+    loadMarketplace();
+    if (document.getElementById('adminDashboard').style.display === 'block') {
+        loadAdminData();
+    }
+    updateHeroStats();
+}
+
 // ==================== USER UPLOAD ====================
 function setupUploadForm() {
     const form = document.getElementById('uploadForm');
@@ -643,6 +689,35 @@ function setupSearch() {
     });
 }
 
+// ==================== ADMIN BUTTON SETUP ====================
+function setupAdminButton() {
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) {
+        console.log('Admin button found - setting up click handler');
+        adminBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Admin button clicked!');
+            const adminModal = document.getElementById('adminModal');
+            if (adminModal) {
+                adminModal.style.display = 'flex';
+                // Clear previous values
+                const emailInput = document.getElementById('adminEmail');
+                const passwordInput = document.getElementById('adminPassword');
+                const loginError = document.getElementById('loginError');
+                if (emailInput) emailInput.value = '';
+                if (passwordInput) passwordInput.value = '';
+                if (loginError) loginError.style.display = 'none';
+                console.log('Admin modal opened');
+            } else {
+                console.error('Admin modal not found!');
+            }
+        };
+    } else {
+        console.error('Admin button not found!');
+    }
+}
+
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Level cards
@@ -671,14 +746,6 @@ function setupEventListeners() {
             filterMarketplace(btn.dataset.filter);
         });
     });
-    
-    // Admin button
-    const adminBtn = document.getElementById('adminBtn');
-    if (adminBtn) {
-        adminBtn.addEventListener('click', () => {
-            document.getElementById('adminModal').style.display = 'flex';
-        });
-    }
     
     // Mega menu toggle
     const levelsNavLink = document.querySelector('a[href="#levels"]');
@@ -716,15 +783,18 @@ function scrollToMarketplace() {
 
 // ==================== INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('NexaLearn initializing...');
+    console.log('=== NEXALEARN INITIALIZING ===');
     initializeData();
     loadMarketplace();
     loadVideos();
     setupUploadForm();
     setupSearch();
     setupEventListeners();
+    setupAdminButton();  // This is critical!
     updateHeroStats();
     console.log(`✅ Loaded ${resources.length} resources, ${videos.length} videos`);
+    console.log('Admin login: admin@nexalearn.com / admin123');
+    console.log('Click the shield icon to open admin login');
 });
 
 // Make functions global for HTML onclick

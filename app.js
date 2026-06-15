@@ -383,25 +383,119 @@ ${resource.description}
 Knowledge for Global Excellence`;
 }
 
-// ==================== ADMIN FUNCTIONS WITH R2 ====================
+// ==================== ADMIN FUNCTIONS ====================
 function adminLogin() {
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
+    console.log('Admin login function called');
     
+    // Get the input values
+    const emailInput = document.getElementById('adminEmail');
+    const passwordInput = document.getElementById('adminPassword');
+    const loginError = document.getElementById('loginError');
+    
+    // Check if elements exist
+    if (!emailInput || !passwordInput) {
+        console.error('Email or password input not found');
+        alert('Form inputs not found. Please refresh the page.');
+        return;
+    }
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    console.log('Email entered:', email);
+    console.log('Password length:', password.length);
+    
+    // Check credentials
     if (email === 'admin@nexalearn.com' && password === 'admin123') {
-        document.getElementById('adminModal').style.display = 'none';
-        document.getElementById('adminDashboard').style.display = 'block';
-        loadAdminData();
-        alert('✅ Admin login successful!');
+        console.log('✅ Login successful!');
+        
+        // Hide the error if visible
+        if (loginError) loginError.style.display = 'none';
+        
+        // Close the admin modal
+        const adminModal = document.getElementById('adminModal');
+        if (adminModal) {
+            adminModal.style.display = 'none';
+            console.log('Admin modal closed');
+        }
+        
+        // Show the admin dashboard
+        const adminDashboard = document.getElementById('adminDashboard');
+        if (adminDashboard) {
+            adminDashboard.style.display = 'block';
+            console.log('Admin dashboard opened');
+            
+            // Load all admin data
+            loadAdminData();
+        } else {
+            console.error('Admin dashboard element not found!');
+            alert('Dashboard not found. Please check the page structure.');
+        }
+        
+        // Set login flag
+        isAdminLoggedIn = true;
+        window.isAdminLoggedIn = true;
+        
     } else {
-        alert('Invalid credentials. Use admin@nexalearn.com / admin123');
+        console.log('❌ Login failed - invalid credentials');
+        if (loginError) {
+            loginError.style.display = 'block';
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 3000);
+        } else {
+            alert('Invalid credentials. Use admin@nexalearn.com / admin123');
+        }
     }
 }
 
 function adminLogout() {
-    document.getElementById('adminDashboard').style.display = 'none';
+    console.log('Admin logout called');
+    const adminDashboard = document.getElementById('adminDashboard');
+    if (adminDashboard) {
+        adminDashboard.style.display = 'none';
+    }
     isAdminLoggedIn = false;
+    window.isAdminLoggedIn = false;
     alert('Logged out of admin dashboard');
+}
+// ==================== ADMIN BUTTON SETUP ====================
+function setupAdminButton() {
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) {
+        console.log('Admin button found - setting up click handler');
+        
+        // Remove any existing event listeners
+        adminBtn.removeEventListener('click', adminBtnClickHandler);
+        adminBtn.addEventListener('click', adminBtnClickHandler);
+    } else {
+        console.error('Admin button not found!');
+    }
+}
+
+function adminBtnClickHandler(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Admin button clicked - opening modal');
+    
+    const adminModal = document.getElementById('adminModal');
+    if (adminModal) {
+        adminModal.style.display = 'flex';
+        
+        // Clear previous values
+        const emailInput = document.getElementById('adminEmail');
+        const passwordInput = document.getElementById('adminPassword');
+        const loginError = document.getElementById('loginError');
+        
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (loginError) loginError.style.display = 'none';
+        
+        console.log('Admin modal opened');
+    } else {
+        console.error('Admin modal not found!');
+        alert('Admin modal not found. Please check the page structure.');
+    }
 }
 
 function loadAdminData() {
@@ -819,16 +913,6 @@ function setupEventListeners() {
         });
     }
 }
-
-// ==================== SCROLL FUNCTIONS ====================
-function scrollToLevels() {
-    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
-}
-
-function scrollToMarketplace() {
-    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
-}
-
 // ==================== INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('=== NEXALEARN INITIALIZING ===');
@@ -840,12 +924,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setupUploadForm();
     setupSearch();
     setupEventListeners();
+    setupAdminButton();  // MAKE SURE THIS LINE IS HERE!
     updateHeroStats();
     
     console.log(`✅ Loaded ${resources.length} resources, ${videos.length} videos`);
     console.log('Admin login: admin@nexalearn.com / admin123');
-    console.log('R2 Cloud Storage is ready!');
+    console.log('Click the shield icon to open admin login');
 });
+// ==================== SCROLL FUNCTIONS ====================
+function scrollToLevels() {
+    document.getElementById('levels').scrollIntoView({ behavior: 'smooth' });
+}
+
+function scrollToMarketplace() {
+    document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
+}
 
 // Make functions global
 window.viewResource = viewResource;

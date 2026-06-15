@@ -1,4 +1,8 @@
-// ==================== NEXALEARN MAIN APPLICATION ====================
+// ==================== NEXALEARN WITH R2 STORAGE ====================
+
+// ==================== R2 CONFIGURATION ====================
+const R2_PUBLIC_URL = 'https://pub-3133156f64f840d78860a966ba458b7b.r2.dev';
+const R2_BUCKET_NAME = 'nexalearn';
 
 // ==================== DATA STORAGE ====================
 let resources = [];
@@ -6,19 +10,80 @@ let videos = [];
 let purchases = [];
 let isAdminLoggedIn = false;
 
-// ==================== INITIALIZATION ====================
+// Initialize data
 function initializeData() {
-    // Load resources
+    // Load resources from localStorage
     const storedResources = localStorage.getItem('nexalearn_resources');
     if (storedResources && JSON.parse(storedResources).length > 0) {
         resources = JSON.parse(storedResources);
     } else {
+        // Sample resources with R2 URLs (you'll replace these with actual R2 URLs)
         resources = [
-            { id: 1, title: "Complete Mathematics Guide - Grade 7", level: "junior", subject: "Mathematics", category: "textbook", price: 500, description: "Comprehensive mathematics guide covering algebra, geometry, and statistics.", downloads: 125, date: "2024-01-15" },
-            { id: 2, title: "Biology Exam Papers - Form 3", level: "senior", subject: "Biology", category: "exam", price: 300, description: "Past exam papers with marking schemes.", downloads: 89, date: "2024-02-10" },
-            { id: 3, title: "Financial Literacy for Beginners", level: "lifelong", subject: "Financial Literacy", category: "guide", price: 0, description: "Free guide to personal finance.", downloads: 450, date: "2024-01-20" },
-            { id: 4, title: "English Grammar Workbook", level: "junior", subject: "English", category: "textbook", price: 350, description: "Complete English grammar exercises.", downloads: 234, date: "2024-01-10" },
-            { id: 5, title: "Physics Practical Guide", level: "senior", subject: "Physics", category: "guide", price: 450, description: "Physics practical guide.", downloads: 67, date: "2024-02-01" }
+            { 
+                id: 1, 
+                title: "Complete Mathematics Guide - Grade 7", 
+                level: "junior", 
+                subject: "Mathematics", 
+                category: "textbook", 
+                price: 500, 
+                description: "Comprehensive mathematics guide covering algebra, geometry, and statistics.", 
+                downloads: 125, 
+                date: "2024-01-15",
+                r2Url: null,
+                fileName: null
+            },
+            { 
+                id: 2, 
+                title: "Biology Exam Papers - Form 3", 
+                level: "senior", 
+                subject: "Biology", 
+                category: "exam", 
+                price: 300, 
+                description: "Past exam papers with marking schemes.", 
+                downloads: 89, 
+                date: "2024-02-10",
+                r2Url: null,
+                fileName: null
+            },
+            { 
+                id: 3, 
+                title: "Financial Literacy for Beginners", 
+                level: "lifelong", 
+                subject: "Financial Literacy", 
+                category: "guide", 
+                price: 0, 
+                description: "Free guide to personal finance.", 
+                downloads: 450, 
+                date: "2024-01-20",
+                r2Url: null,
+                fileName: null
+            },
+            { 
+                id: 4, 
+                title: "English Grammar Workbook", 
+                level: "junior", 
+                subject: "English", 
+                category: "textbook", 
+                price: 350, 
+                description: "Complete English grammar exercises.", 
+                downloads: 234, 
+                date: "2024-01-10",
+                r2Url: null,
+                fileName: null
+            },
+            { 
+                id: 5, 
+                title: "Physics Practical Guide", 
+                level: "senior", 
+                subject: "Physics", 
+                category: "guide", 
+                price: 450, 
+                description: "Physics practical guide.", 
+                downloads: 67, 
+                date: "2024-02-01",
+                r2Url: null,
+                fileName: null
+            }
         ];
         localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
     }
@@ -42,10 +107,6 @@ function initializeData() {
 
 function saveResources() {
     localStorage.setItem('nexalearn_resources', JSON.stringify(resources));
-}
-
-function saveVideos() {
-    localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
 }
 
 function formatLevelName(level) {
@@ -223,23 +284,44 @@ function viewResource(resourceId) {
     const resource = resources.find(r => r.id === resourceId);
     if (!resource) return;
     
+    // Generate download button based on whether R2 URL exists
+    let downloadButton = '';
+    if (resource.r2Url) {
+        downloadButton = `<a href="${resource.r2Url}" target="_blank" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer; text-align:center; display:inline-block; text-decoration:none;">
+            <i class="fas fa-cloud-download-alt"></i> Download from Cloud
+        </a>`;
+    } else {
+        downloadButton = `<button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+            <i class="fas fa-download"></i> Download
+        </button>`;
+    }
+    
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:center;';
     
     modal.innerHTML = `
-        <div style="background:white; border-radius:16px; max-width:450px; width:90%; padding:20px;">
+        <div style="background:white; border-radius:16px; max-width:500px; width:90%; padding:20px; max-height:80vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
                 <h3>${resource.title}</h3>
                 <span style="cursor:pointer; font-size:24px;" onclick="this.closest('.modal').remove()">&times;</span>
             </div>
-            <p><strong>Subject:</strong> ${resource.subject}</p>
-            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
-            <p><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</p>
-            <p style="margin:15px 0;">${resource.description}</p>
-            <button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
-                <i class="fas fa-download"></i> Download
-            </button>
+            <div style="margin-bottom:10px;">
+                <p><strong>Subject:</strong> ${resource.subject}</p>
+                <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+                <p><strong>Category:</strong> ${resource.category}</p>
+                <p><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</p>
+            </div>
+            <div style="margin-bottom:15px;">
+                <strong>Description:</strong>
+                <p>${resource.description}</p>
+            </div>
+            <div style="background:#f3f4f6; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                <i class="fas fa-file-pdf" style="font-size:48px; color:#ef4444;"></i>
+                <p>Document ready for download</p>
+                ${resource.r2Url ? `<p style="font-size:12px; margin-top:5px;">Stored in Cloudflare R2</p>` : ''}
+            </div>
+            ${downloadButton}
         </div>
     `;
     
@@ -253,7 +335,19 @@ function downloadResource(resourceId) {
     const hasPurchased = purchases.some(p => p.resourceId === resourceId);
     
     if (resource.price === 0 || hasPurchased) {
-        const content = `NEXALEARN INTERNATIONAL\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nLevel: ${formatLevelName(resource.level)}\n\n${resource.description}\n\n© NexaLearn International`;
+        // If R2 URL exists, open it in new tab
+        if (resource.r2Url) {
+            window.open(resource.r2Url, '_blank');
+            resource.downloads = (resource.downloads || 0) + 1;
+            saveResources();
+            updateHeroStats();
+            alert(`✅ "${resource.title}" opened from cloud storage!`);
+            document.querySelectorAll('.modal').forEach(m => m.remove());
+            return;
+        }
+        
+        // Fallback to generated content
+        const content = generateDocumentContent(resource);
         const blob = new Blob([content], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -274,242 +368,46 @@ function downloadResource(resourceId) {
     }
 }
 
-// ==================== PAYMENT FUNCTIONS ====================
-function openPaymentModal(resourceId) {
-    const resource = resources.find(r => r.id === resourceId);
-    if (!resource) {
-        alert('Resource not found');
-        return;
-    }
-    
-    window.pendingPayment = resource;
-    
-    const paymentTitle = document.getElementById('paymentProductTitle');
-    const paymentDesc = document.getElementById('paymentProductDesc');
-    const paymentAmount = document.getElementById('paymentAmount');
-    const mpesaAmount = document.getElementById('mpesaAmount');
-    const bankAmount = document.getElementById('bankAmount');
-    
-    if (paymentTitle) paymentTitle.textContent = resource.title;
-    if (paymentDesc) paymentDesc.textContent = resource.description;
-    if (paymentAmount) paymentAmount.textContent = `KES ${resource.price.toLocaleString()}`;
-    if (mpesaAmount) mpesaAmount.textContent = `KES ${resource.price.toLocaleString()}`;
-    if (bankAmount) bankAmount.textContent = `KES ${resource.price.toLocaleString()}`;
-    
-    document.getElementById('paymentModal').style.display = 'flex';
+function generateDocumentContent(resource) {
+    return `NEXALEARN INTERNATIONAL
+
+Title: ${resource.title}
+Subject: ${resource.subject}
+Level: ${formatLevelName(resource.level)}
+Download Date: ${new Date().toLocaleDateString()}
+
+Description:
+${resource.description}
+
+© ${new Date().getFullYear()} NexaLearn International
+Knowledge for Global Excellence`;
 }
 
-function processMpesaPayment() {
-    if (!window.pendingPayment) {
-        alert('No pending payment');
-        return;
-    }
-    
-    const phone = document.getElementById('mpesaPhone')?.value;
-    if (!phone) {
-        alert('Please enter your M-Pesa phone number');
-        return;
-    }
-    
-    alert(`💰 M-Pesa payment initiated!\nAmount: KES ${window.pendingPayment.price}\nCheck your phone for the M-Pesa prompt.`);
-    
-    setTimeout(() => {
-        document.getElementById('paymentModal').style.display = 'none';
-        
-        const purchase = {
-            id: Date.now(),
-            resourceId: window.pendingPayment.id,
-            resourceTitle: window.pendingPayment.title,
-            price: window.pendingPayment.price,
-            phone: phone,
-            date: new Date().toISOString()
-        };
-        purchases.push(purchase);
-        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
-        
-        alert('✅ Payment successful! Downloading...');
-        downloadResource(window.pendingPayment.id);
-        window.pendingPayment = null;
-    }, 2000);
-}
-
-function processCardPayment() {
-    if (!window.pendingPayment) return;
-    alert('💳 Card payment processing...');
-    setTimeout(() => {
-        document.getElementById('paymentModal').style.display = 'none';
-        alert('✅ Payment successful! Downloading...');
-        downloadResource(window.pendingPayment.id);
-        window.pendingPayment = null;
-    }, 1500);
-}
-
-function processBankPayment() {
-    if (!window.pendingPayment) return;
-    const reference = document.getElementById('bankReference')?.value;
-    if (!reference) {
-        alert('Please enter bank reference number');
-        return;
-    }
-    alert('🏦 Bank transfer confirmed. Processing...');
-    setTimeout(() => {
-        document.getElementById('paymentModal').style.display = 'none';
-        alert('✅ Payment successful! Downloading...');
-        downloadResource(window.pendingPayment.id);
-        window.pendingPayment = null;
-    }, 1500);
-}
-
-function showPaymentMethod(method) {
-    const mpesaForm = document.getElementById('mpesaForm');
-    const cardForm = document.getElementById('cardForm');
-    const bankForm = document.getElementById('bankForm');
-    
-    if (mpesaForm) mpesaForm.style.display = method === 'mpesa' ? 'block' : 'none';
-    if (cardForm) cardForm.style.display = method === 'card' ? 'block' : 'none';
-    if (bankForm) bankForm.style.display = method === 'bank' ? 'block' : 'none';
-}
-
-function sendReceiptAndDownload() {
-    const email = document.getElementById('recipientEmail')?.value;
-    if (!email) {
-        alert('Please enter your email');
-        return;
-    }
-    alert(`✅ Receipt sent to ${email}`);
-    document.getElementById('receiptModal').style.display = 'none';
-    
-    // ==================== CLOUDFLARE R2 DIRECT UPLOAD ====================
-const R2_PUBLIC_URL = 'https://pub-3133156f64f840d78860a966ba458b7b.r2.dev'; // YOUR public URL from above
-
-// Upload file directly to R2 using presigned URL
-async function uploadToR2Directly(file, resourceId) {
-    try {
-        // We'll use Cloudflare's direct upload via API
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Note: For direct upload, you need to generate a presigned URL
-        // Since you don't have a Worker, we'll use localStorage for now
-        // and upgrade later
-        
-        console.log('File ready for upload:', file.name);
-        return simulateCloudUpload(file, resourceId);
-        
-    } catch (error) {
-        console.error('Upload error:', error);
-        return null;
-    }
-}
-
-// For now, store file as dataURL (works great for small files)
-function simulateCloudUpload(file, resourceId) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            resolve({
-                success: true,
-                fileData: e.target.result,
-                fileName: file.name,
-                fileSize: file.size
-            });
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-// Download file from storage
-function downloadFromStorage(fileData, fileName) {
-    const link = document.createElement('a');
-    link.href = fileData;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-}
-
-// ==================== ADMIN FUNCTIONS ====================
+// ==================== ADMIN FUNCTIONS WITH R2 ====================
 function adminLogin() {
-    console.log('=== ADMIN LOGIN FUNCTION CALLED ===');
-    
-    const emailInput = document.getElementById('adminEmail');
-    const passwordInput = document.getElementById('adminPassword');
-    
-    if (!emailInput || !passwordInput) {
-        console.error('Email or password input not found!');
-        alert('Form inputs not found. Please refresh the page.');
-        return;
-    }
-    
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    console.log('Email entered:', email);
-    console.log('Password length:', password.length);
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
     
     if (email === 'admin@nexalearn.com' && password === 'admin123') {
-        console.log('✅ ADMIN LOGIN SUCCESSFUL!');
-        isAdminLoggedIn = true;
-        window.isAdminLoggedIn = true;
-        
-        // Close the modal
-        const adminModal = document.getElementById('adminModal');
-        if (adminModal) {
-            adminModal.style.display = 'none';
-            console.log('Admin modal closed');
-        } else {
-            console.error('Admin modal not found');
-        }
-        
-        // Show the dashboard
-        const adminDashboard = document.getElementById('adminDashboard');
-        if (adminDashboard) {
-            adminDashboard.style.display = 'block';
-            console.log('✅ Admin dashboard opened!');
-            
-            // Load admin data
-            loadAdminData();
-        } else {
-            console.error('Admin dashboard element not found!');
-            alert('Dashboard element not found. Check if ID "adminDashboard" exists.');
-        }
-        
-        // Clear error if exists
-        const loginError = document.getElementById('loginError');
-        if (loginError) loginError.style.display = 'none';
-        
+        document.getElementById('adminModal').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        loadAdminData();
+        alert('✅ Admin login successful!');
     } else {
-        console.log('❌ ADMIN LOGIN FAILED - Invalid credentials');
-        const loginError = document.getElementById('loginError');
-        if (loginError) {
-            loginError.style.display = 'block';
-            setTimeout(() => {
-                loginError.style.display = 'none';
-            }, 3000);
-        } else {
-            alert('Invalid credentials. Use admin@nexalearn.com / admin123');
-        }
+        alert('Invalid credentials. Use admin@nexalearn.com / admin123');
     }
 }
 
 function adminLogout() {
-    console.log('Admin logout called');
-    const adminDashboard = document.getElementById('adminDashboard');
-    if (adminDashboard) adminDashboard.style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'none';
     isAdminLoggedIn = false;
-    window.isAdminLoggedIn = false;
     alert('Logged out of admin dashboard');
 }
 
 function loadAdminData() {
-    console.log('Loading admin data...');
-    
-    // Calculate stats
     const totalRevenue = purchases.reduce((sum, p) => sum + (p.price || 0), 0);
     const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
     
-    // Update stats in dashboard
     const statResources = document.getElementById('statTotalResources');
     const statRevenue = document.getElementById('statTotalRevenue');
     const statDownloads = document.getElementById('statTotalDownloads');
@@ -520,14 +418,12 @@ function loadAdminData() {
     if (statDownloads) statDownloads.textContent = totalDownloads;
     if (statVideos) statVideos.textContent = videos.length;
     
-    console.log('Stats updated - Resources:', resources.length, 'Revenue:', totalRevenue);
-    
     // Load documents list
     const docsList = document.getElementById('adminDocumentsList');
     if (docsList) {
         const documents = resources.filter(r => r.category !== 'exam');
         if (documents.length === 0) {
-            docsList.innerHTML = '<p class="no-data">No documents yet</p>';
+            docsList.innerHTML = '<p class="no-data">No documents yet. Upload files to R2 bucket first, then add them here.</p>';
         } else {
             docsList.innerHTML = documents.map(doc => `
                 <div class="admin-item">
@@ -535,6 +431,7 @@ function loadAdminData() {
                         <strong>${doc.title}</strong><br>
                         <small>${doc.subject} | KES ${doc.price.toLocaleString()}</small>
                         <br><small>Downloads: ${doc.downloads || 0}</small>
+                        ${doc.r2Url ? `<br><small style="color:#10b981;">✓ Cloud Storage</small>` : '<br><small style="color:#f59e0b;">⚠ No R2 URL set</small>'}
                     </div>
                     <div class="admin-item-actions">
                         <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
@@ -585,27 +482,59 @@ function loadAdminData() {
             `).join('');
         }
     }
+}
+
+// Updated: Add resource with R2 URL
+function addResourceWithR2() {
+    const title = document.getElementById('docTitle')?.value;
+    const subject = document.getElementById('docSubject')?.value;
+    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
+    const level = document.getElementById('docLevel')?.value || 'university';
+    const category = document.getElementById('docCategory')?.value || 'textbook';
+    const description = document.getElementById('docDescription')?.value;
+    const r2FileUrl = document.getElementById('docR2Url')?.value;
     
-    // Load recent purchases
-    const activityList = document.getElementById('recentActivityList');
-    if (activityList) {
-        const recent = [...purchases].reverse().slice(0, 10);
-        if (recent.length === 0) {
-            activityList.innerHTML = '<p class="no-data">No purchases yet</p>';
-        } else {
-            activityList.innerHTML = recent.map(p => `
-                <div class="admin-item">
-                    <div>
-                        <strong>${p.resourceTitle}</strong><br>
-                        <small>${p.email || 'Anonymous'} | KES ${p.price.toLocaleString()}</small>
-                    </div>
-                    <small>${new Date(p.date).toLocaleDateString()}</small>
-                </div>
-            `).join('');
-        }
+    if (!title || !subject) {
+        alert('Please enter title and subject');
+        return;
     }
     
-    console.log('Admin data loaded successfully');
+    if (!r2FileUrl) {
+        alert('Please enter the R2 file URL (upload your file to R2 bucket first)');
+        return;
+    }
+    
+    const newResource = {
+        id: Date.now(),
+        title: title,
+        level: level,
+        subject: subject,
+        category: category,
+        price: price,
+        description: description || `Resource: ${title}`,
+        downloads: 0,
+        date: new Date().toISOString().split('T')[0],
+        r2Url: r2FileUrl,
+        fileName: r2FileUrl.split('/').pop()
+    };
+    
+    resources.push(newResource);
+    saveResources();
+    
+    alert(`✅ "${title}" added with R2 cloud storage!`);
+    
+    // Reset form
+    document.getElementById('docTitle').value = '';
+    document.getElementById('docSubject').value = '';
+    document.getElementById('docPrice').value = '';
+    document.getElementById('docDescription').value = '';
+    document.getElementById('docR2Url').value = '';
+    
+    loadMarketplace();
+    if (document.getElementById('adminDashboard').style.display === 'block') {
+        loadAdminData();
+    }
+    updateHeroStats();
 }
 
 function deleteResource(id) {
@@ -624,51 +553,13 @@ function deleteResource(id) {
 function deleteVideo(id) {
     if (confirm('Delete this video?')) {
         videos = videos.filter(v => v.id !== id);
-        saveVideos();
+        localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
         loadVideos();
         if (document.getElementById('adminDashboard').style.display === 'block') {
             loadAdminData();
         }
         alert('✅ Video deleted');
     }
-}
-
-function adminUploadDocument() {
-    const title = document.getElementById('docTitle')?.value;
-    const subject = document.getElementById('docSubject')?.value;
-    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
-    
-    if (!title || !subject) {
-        alert('Please enter title and subject');
-        return;
-    }
-    
-    const newResource = {
-        id: Date.now(),
-        title: title,
-        level: document.getElementById('docLevel')?.value || 'university',
-        subject: subject,
-        category: document.getElementById('docCategory')?.value || 'textbook',
-        price: price,
-        description: document.getElementById('docDescription')?.value || `Admin uploaded: ${title}`,
-        downloads: 0,
-        date: new Date().toISOString().split('T')[0]
-    };
-    
-    resources.push(newResource);
-    saveResources();
-    alert(`✅ "${title}" uploaded!`);
-    
-    document.getElementById('docTitle').value = '';
-    document.getElementById('docSubject').value = '';
-    document.getElementById('docPrice').value = '';
-    document.getElementById('docDescription').value = '';
-    
-    loadMarketplace();
-    if (document.getElementById('adminDashboard').style.display === 'block') {
-        loadAdminData();
-    }
-    updateHeroStats();
 }
 
 // ==================== USER UPLOAD ====================
@@ -679,6 +570,9 @@ function setupUploadForm() {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         
+        alert('📌 Note: For cloud storage, please upload your file to R2 bucket first (via Cloudflare Dashboard), then use the Admin panel to add resources with the R2 URL.');
+        
+        // Store in localStorage for now
         const newResource = {
             id: Date.now(),
             title: document.getElementById('resourceTitle')?.value,
@@ -688,7 +582,8 @@ function setupUploadForm() {
             price: parseInt(document.getElementById('resourcePrice')?.value) || 0,
             description: document.getElementById('resourceDescription')?.value || 'No description',
             downloads: 0,
-            date: new Date().toISOString().split('T')[0]
+            date: new Date().toISOString().split('T')[0],
+            isLocalOnly: true
         };
         
         if (!newResource.title || !newResource.level || !newResource.subject || !newResource.category) {
@@ -698,7 +593,7 @@ function setupUploadForm() {
         
         resources.push(newResource);
         saveResources();
-        alert(`✅ "${newResource.title}" uploaded!`);
+        alert(`✅ "${newResource.title}" saved locally! For cloud storage, upload to R2 bucket.`);
         form.reset();
         loadMarketplace();
         updateHeroStats();
@@ -738,33 +633,129 @@ function setupSearch() {
     });
 }
 
-// ==================== ADMIN BUTTON SETUP ====================
-function setupAdminButton() {
-    const adminBtn = document.getElementById('adminBtn');
-    if (adminBtn) {
-        console.log('Admin button found - setting up click handler');
-        adminBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Admin button clicked!');
-            const adminModal = document.getElementById('adminModal');
-            if (adminModal) {
-                adminModal.style.display = 'flex';
-                // Clear previous values
-                const emailInput = document.getElementById('adminEmail');
-                const passwordInput = document.getElementById('adminPassword');
-                const loginError = document.getElementById('loginError');
-                if (emailInput) emailInput.value = '';
-                if (passwordInput) passwordInput.value = '';
-                if (loginError) loginError.style.display = 'none';
-                console.log('Admin modal opened');
-            } else {
-                console.error('Admin modal not found!');
-            }
-        };
-    } else {
-        console.error('Admin button not found!');
+// ==================== PAYMENT FUNCTIONS ====================
+let pendingPayment = null;
+
+function openPaymentModal(resourceId) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) {
+        alert('Resource not found');
+        return;
     }
+    
+    pendingPayment = resource;
+    
+    const paymentTitle = document.getElementById('paymentProductTitle');
+    const paymentDesc = document.getElementById('paymentProductDesc');
+    const paymentAmount = document.getElementById('paymentAmount');
+    const mpesaAmount = document.getElementById('mpesaAmount');
+    const bankAmount = document.getElementById('bankAmount');
+    
+    if (paymentTitle) paymentTitle.textContent = resource.title;
+    if (paymentDesc) paymentDesc.textContent = resource.description;
+    if (paymentAmount) paymentAmount.textContent = `KES ${resource.price.toLocaleString()}`;
+    if (mpesaAmount) mpesaAmount.textContent = `KES ${resource.price.toLocaleString()}`;
+    if (bankAmount) bankAmount.textContent = `KES ${resource.price.toLocaleString()}`;
+    
+    document.getElementById('paymentModal').style.display = 'flex';
+}
+
+function processMpesaPayment() {
+    if (!pendingPayment) {
+        alert('No pending payment');
+        return;
+    }
+    
+    const phone = document.getElementById('mpesaPhone')?.value;
+    if (!phone) {
+        alert('Please enter your M-Pesa phone number');
+        return;
+    }
+    
+    alert(`💰 M-Pesa payment initiated!\nAmount: KES ${pendingPayment.price}\nPhone: ${phone}\n\nCheck your phone for the M-Pesa prompt.`);
+    
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        
+        const purchase = {
+            id: Date.now(),
+            resourceId: pendingPayment.id,
+            resourceTitle: pendingPayment.title,
+            price: pendingPayment.price,
+            phone: phone,
+            date: new Date().toISOString()
+        };
+        purchases.push(purchase);
+        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
+        
+        alert('✅ Payment successful! Downloading...');
+        
+        // Download the resource
+        if (pendingPayment.r2Url) {
+            window.open(pendingPayment.r2Url, '_blank');
+            pendingPayment.downloads = (pendingPayment.downloads || 0) + 1;
+            saveResources();
+        } else {
+            downloadResource(pendingPayment.id);
+        }
+        
+        pendingPayment = null;
+    }, 2000);
+}
+
+function processCardPayment() {
+    if (!pendingPayment) return;
+    alert('💳 Card payment processing...');
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        alert('✅ Payment successful!');
+        if (pendingPayment.r2Url) {
+            window.open(pendingPayment.r2Url, '_blank');
+        } else {
+            downloadResource(pendingPayment.id);
+        }
+        pendingPayment = null;
+    }, 1500);
+}
+
+function processBankPayment() {
+    if (!pendingPayment) return;
+    const reference = document.getElementById('bankReference')?.value;
+    if (!reference) {
+        alert('Please enter bank reference number');
+        return;
+    }
+    alert('🏦 Bank transfer confirmed. Processing...');
+    setTimeout(() => {
+        document.getElementById('paymentModal').style.display = 'none';
+        alert('✅ Payment successful!');
+        if (pendingPayment.r2Url) {
+            window.open(pendingPayment.r2Url, '_blank');
+        } else {
+            downloadResource(pendingPayment.id);
+        }
+        pendingPayment = null;
+    }, 1500);
+}
+
+function showPaymentMethod(method) {
+    const mpesaForm = document.getElementById('mpesaForm');
+    const cardForm = document.getElementById('cardForm');
+    const bankForm = document.getElementById('bankForm');
+    
+    if (mpesaForm) mpesaForm.style.display = method === 'mpesa' ? 'block' : 'none';
+    if (cardForm) cardForm.style.display = method === 'card' ? 'block' : 'none';
+    if (bankForm) bankForm.style.display = method === 'bank' ? 'block' : 'none';
+}
+
+function sendReceiptAndDownload() {
+    const email = document.getElementById('recipientEmail')?.value;
+    if (!email) {
+        alert('Please enter your email');
+        return;
+    }
+    alert(`✅ Receipt sent to ${email}`);
+    document.getElementById('receiptModal').style.display = 'none';
 }
 
 // ==================== EVENT LISTENERS ====================
@@ -796,13 +787,11 @@ function setupEventListeners() {
         });
     });
     
-    // Mega menu toggle
-    const levelsNavLink = document.querySelector('a[href="#levels"]');
-    const levelsMenu = document.getElementById('levelsMenu');
-    if (levelsNavLink) {
-        levelsNavLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (levelsMenu) levelsMenu.classList.toggle('active');
+    // Admin button
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) {
+        adminBtn.addEventListener('click', () => {
+            document.getElementById('adminModal').style.display = 'flex';
         });
     }
     
@@ -819,6 +808,16 @@ function setupEventListeners() {
             showPaymentMethod(e.target.value);
         });
     });
+    
+    // Mega menu toggle
+    const levelsNavLink = document.querySelector('a[href="#levels"]');
+    const levelsMenu = document.getElementById('levelsMenu');
+    if (levelsNavLink) {
+        levelsNavLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (levelsMenu) levelsMenu.classList.toggle('active');
+        });
+    }
 }
 
 // ==================== SCROLL FUNCTIONS ====================
@@ -833,20 +832,22 @@ function scrollToMarketplace() {
 // ==================== INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('=== NEXALEARN INITIALIZING ===');
+    console.log('R2 Public URL:', R2_PUBLIC_URL);
+    
     initializeData();
     loadMarketplace();
     loadVideos();
     setupUploadForm();
     setupSearch();
     setupEventListeners();
-    setupAdminButton();  // This is critical!
     updateHeroStats();
+    
     console.log(`✅ Loaded ${resources.length} resources, ${videos.length} videos`);
     console.log('Admin login: admin@nexalearn.com / admin123');
-    console.log('Click the shield icon to open admin login');
+    console.log('R2 Cloud Storage is ready!');
 });
 
-// Make functions global for HTML onclick
+// Make functions global
 window.viewResource = viewResource;
 window.downloadResource = downloadResource;
 window.viewVideo = viewVideo;
@@ -860,6 +861,6 @@ window.showPaymentMethod = showPaymentMethod;
 window.sendReceiptAndDownload = sendReceiptAndDownload;
 window.adminLogin = adminLogin;
 window.adminLogout = adminLogout;
-window.adminUploadDocument = adminUploadDocument;
+window.addResourceWithR2 = addResourceWithR2;
 window.scrollToLevels = scrollToLevels;
 window.scrollToMarketplace = scrollToMarketplace;

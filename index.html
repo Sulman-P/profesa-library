@@ -714,38 +714,46 @@
             </div>
         </div>
         
-        <!-- Documents Tab -->
-        <div id="documentsTab" class="admin-tab-pane">
-            <h3>Upload New Document</h3>
-            <div class="admin-upload-area" onclick="document.getElementById('adminDocFile').click()">
-                <i class="fas fa-cloud-upload-alt" style="font-size: 48px;"></i>
-                <p>Click to upload document (PDF, DOC, DOCX)</p>
-                <input type="file" id="adminDocFile" accept=".pdf,.doc,.docx" style="display: none;">
-            </div>
-            
-            <div id="docUploadForm" style="margin-top: 20px; display: none;">
-                <input type="text" id="docTitle" placeholder="Document Title" class="form-input">
-                <select id="docLevel" class="form-input">
-                    <option value="primary">Primary School</option>
-                    <option value="junior">Junior School</option>
-                    <option value="senior">Senior School</option>
-                    <option value="university">University</option>
-                    <option value="lifelong">Lifelong Learning</option>
-                </select>
-                <input type="text" id="docSubject" placeholder="Subject" class="form-input">
-                <select id="docCategory" class="form-input">
-                    <option value="textbook">Textbook</option>
-                    <option value="notes">Lecture Notes</option>
-                    <option value="guide">Study Guide</option>
-                </select>
-                <input type="number" id="docPrice" placeholder="Price (KES)" class="form-input" value="0">
-                <textarea id="docDescription" placeholder="Description" class="form-input" rows="3"></textarea>
-                <button id="saveDocBtn" class="btn-submit">Save Document</button>
-            </div>
-            
-            <h3 style="margin-top: 30px;">Existing Documents</h3>
-            <div id="adminDocumentsList"></div>
-        </div>
+       <!-- Documents Tab - Add R2 URL field -->
+<div id="documentsTab" class="admin-tab-pane">
+    <h3>Add Resource with R2 Cloud Storage</h3>
+    <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0; font-size: 14px;">
+            <i class="fas fa-cloud-upload-alt"></i> 
+            <strong>How to add files from R2:</strong><br>
+            1. Upload your PDF/DOCX file to your R2 bucket via Cloudflare Dashboard<br>
+            2. Copy the file URL (e.g., https://pub-xxxx.r2.dev/filename.pdf)<br>
+            3. Paste the URL in the field below and fill in the resource details
+        </p>
+    </div>
+    
+    <div class="admin-form">
+        <input type="text" id="docTitle" placeholder="Resource Title" class="form-input">
+        <select id="docLevel" class="form-input">
+            <option value="primary">Primary School</option>
+            <option value="junior">Junior School</option>
+            <option value="senior">Senior School</option>
+            <option value="university">University</option>
+            <option value="lifelong">Lifelong Learning</option>
+        </select>
+        <input type="text" id="docSubject" placeholder="Subject" class="form-input">
+        <select id="docCategory" class="form-input">
+            <option value="textbook">Textbook</option>
+            <option value="exam">Exam Paper</option>
+            <option value="notes">Lecture Notes</option>
+            <option value="guide">Study Guide</option>
+        </select>
+        <input type="number" id="docPrice" placeholder="Price (KES)" class="form-input" value="0">
+        <textarea id="docDescription" placeholder="Description" class="form-input" rows="3"></textarea>
+        <input type="url" id="docR2Url" placeholder="R2 File URL (e.g., https://pub-xxxx.r2.dev/file.pdf)" class="form-input">
+        <button onclick="addResourceWithR2()" class="btn-submit" style="background: #10b981;">
+            <i class="fas fa-cloud-upload-alt"></i> Add Resource from R2
+        </button>
+    </div>
+    
+    <h3>Existing Documents</h3>
+    <div id="adminDocumentsList"></div>
+</div>
         
         <!-- Videos Tab -->
         <div id="videosTab" class="admin-tab-pane">

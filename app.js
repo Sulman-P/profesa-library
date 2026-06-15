@@ -939,7 +939,271 @@ function scrollToLevels() {
 function scrollToMarketplace() {
     document.getElementById('marketplace').scrollIntoView({ behavior: 'smooth' });
 }
+// ==================== ADD VIDEO FUNCTION ====================
+function addVideo() {
+    const title = document.getElementById('videoTitle')?.value;
+    const subject = document.getElementById('videoSubject')?.value;
+    const level = document.getElementById('videoLevel')?.value;
+    const url = document.getElementById('videoUrl')?.value;
+    
+    if (!title || !subject || !url) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    // Validate YouTube URL
+    if (!url.includes('youtube.com/embed/') && !url.includes('youtu.be')) {
+        alert('Please enter a valid YouTube embed URL (e.g., https://www.youtube.com/embed/VIDEO_ID)');
+        return;
+    }
+    
+    const newVideo = {
+        id: Date.now(),
+        title: title,
+        subject: subject,
+        level: level,
+        url: url,
+        date: new Date().toISOString().split('T')[0]
+    };
+    
+    videos.push(newVideo);
+    localStorage.setItem('nexalearn_videos', JSON.stringify(videos));
+    
+    alert(`✅ Video "${title}" added successfully!`);
+    
+    // Clear form
+    document.getElementById('videoTitle').value = '';
+    document.getElementById('videoSubject').value = '';
+    document.getElementById('videoUrl').value = '';
+    
+    // Refresh displays
+    loadVideos();
+    loadAdminData();
+}
 
+// ==================== ADD EXAM FUNCTION ====================
+function addExam() {
+    const title = document.getElementById('examTitle')?.value;
+    const level = document.getElementById('examLevel')?.value;
+    const subject = document.getElementById('examSubject')?.value;
+    const price = parseInt(document.getElementById('examPrice')?.value);
+    const r2Url = document.getElementById('examR2Url')?.value;
+    
+    if (!title || !subject || !price) {
+        alert('Please fill in title, subject, and price');
+        return;
+    }
+    
+    if (!r2Url) {
+        alert('Please upload the exam PDF to R2 first and paste the URL');
+        return;
+    }
+    
+    const newExam = {
+        id: Date.now(),
+        title: title,
+        level: level,
+        subject: subject,
+        category: 'exam',
+        price: price,
+        description: `Exam paper: ${title}`,
+        downloads: 0,
+        date: new Date().toISOString().split('T')[0],
+        r2Url: r2Url,
+        fileName: r2Url.split('/').pop()
+    };
+    
+    resources.push(newExam);
+    saveResources();
+    
+    alert(`✅ Exam "${title}" added successfully!`);
+    
+    // Clear form
+    document.getElementById('examTitle').value = '';
+    document.getElementById('examSubject').value = '';
+    document.getElementById('examPrice').value = '';
+    document.getElementById('examR2Url').value = '';
+    
+    // Refresh displays
+    loadMarketplace();
+    loadAdminData();
+    updateHeroStats();
+}
+
+// ==================== ADD RESOURCE WITH R2 ====================
+function addResourceWithR2() {
+    const title = document.getElementById('docTitle')?.value;
+    const level = document.getElementById('docLevel')?.value;
+    const subject = document.getElementById('docSubject')?.value;
+    const category = document.getElementById('docCategory')?.value;
+    const price = parseInt(document.getElementById('docPrice')?.value) || 0;
+    const description = document.getElementById('docDescription')?.value;
+    const r2Url = document.getElementById('docR2Url')?.value;
+    
+    if (!title || !subject) {
+        alert('Please enter title and subject');
+        return;
+    }
+    
+    if (!r2Url) {
+        alert('Please upload your file to R2 bucket first and paste the URL');
+        return;
+    }
+    
+    const newResource = {
+        id: Date.now(),
+        title: title,
+        level: level,
+        subject: subject,
+        category: category,
+        price: price,
+        description: description || `Resource: ${title}`,
+        downloads: 0,
+        date: new Date().toISOString().split('T')[0],
+        r2Url: r2Url,
+        fileName: r2Url.split('/').pop()
+    };
+    
+    resources.push(newResource);
+    saveResources();
+    
+    alert(`✅ "${title}" added with R2 cloud storage!`);
+    
+    // Clear form
+    document.getElementById('docTitle').value = '';
+    document.getElementById('docSubject').value = '';
+    document.getElementById('docPrice').value = '';
+    document.getElementById('docDescription').value = '';
+    document.getElementById('docR2Url').value = '';
+    
+    // Refresh displays
+    loadMarketplace();
+    loadAdminData();
+    updateHeroStats();
+}
+
+// ==================== UPDATE LOAD ADMIN DATA ====================
+function loadAdminData() {
+    const totalRevenue = purchases.reduce((sum, p) => sum + (p.price || 0), 0);
+    const totalDownloads = resources.reduce((sum, r) => sum + (r.downloads || 0), 0);
+    
+    const statResources = document.getElementById('statTotalResources');
+    const statRevenue = document.getElementById('statTotalRevenue');
+    const statDownloads = document.getElementById('statTotalDownloads');
+    const statVideos = document.getElementById('statTotalVideos');
+    
+    if (statResources) statResources.textContent = resources.length;
+    if (statRevenue) statRevenue.textContent = totalRevenue.toLocaleString();
+    if (statDownloads) statDownloads.textContent = totalDownloads;
+    if (statVideos) statVideos.textContent = videos.length;
+    
+    // Load documents list (non-exam resources)
+    const docsList = document.getElementById('adminDocumentsList');
+    if (docsList) {
+        const documents = resources.filter(r => r.category !== 'exam');
+        if (documents.length === 0) {
+            docsList.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No documents yet. Add one using the form above.</p>';
+        } else {
+            docsList.innerHTML = documents.map(doc => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${doc.title}</strong><br>
+                        <small>${doc.subject} | ${formatLevelName(doc.level)} | KES ${doc.price.toLocaleString()}</small>
+                        <br><small>Downloads: ${doc.downloads || 0}</small>
+                        ${doc.r2Url ? `<br><small style="color:#10b981;">✓ Cloud Storage (R2)</small>` : '<br><small style="color:#f59e0b;">⚠ Local Only</small>'}
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteResource(${doc.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Load exams list
+    const examsList = document.getElementById('adminExamsList');
+    if (examsList) {
+        const exams = resources.filter(r => r.category === 'exam');
+        if (exams.length === 0) {
+            examsList.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No exams yet. Add one using the form above.</p>';
+        } else {
+            examsList.innerHTML = exams.map(exam => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${exam.title}</strong><br>
+                        <small>${exam.subject} | ${formatLevelName(exam.level)} | KES ${exam.price.toLocaleString()}</small>
+                        <br><small>Downloads: ${exam.downloads || 0}</small>
+                        ${exam.r2Url ? '<br><small style="color:#10b981;">✓ Cloud Storage (R2)</small>' : ''}
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteResource(${exam.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Load videos list
+    const videosList = document.getElementById('adminVideosList');
+    if (videosList) {
+        if (videos.length === 0) {
+            videosList.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No videos yet. Add one using the form above.</p>';
+        } else {
+            videosList.innerHTML = videos.map(v => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${v.title}</strong><br>
+                        <small>${v.subject} | ${formatLevelName(v.level)}</small>
+                        <br><small>Added: ${v.date}</small>
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="btn-delete" onclick="deleteVideo(${v.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Load recent purchases
+    const activityList = document.getElementById('recentActivityList');
+    if (activityList) {
+        const recent = [...purchases].reverse().slice(0, 10);
+        if (recent.length === 0) {
+            activityList.innerHTML = '<p class="no-data" style="text-align:center; padding:20px;">No purchases yet</p>';
+        } else {
+            activityList.innerHTML = recent.map(p => `
+                <div class="admin-item">
+                    <div>
+                        <strong>${p.resourceTitle}</strong><br>
+                        <small>${p.email || 'Anonymous'} | KES ${p.price.toLocaleString()}</small>
+                    </div>
+                    <small>${new Date(p.date).toLocaleDateString()}</small>
+                </div>
+            `).join('');
+        }
+    }
+}
+// ==================== TAB SWITCHING ====================
+function setupAdminTabs() {
+    const tabs = document.querySelectorAll('.admin-tab-btn');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Hide all tab panes
+            const panes = document.querySelectorAll('.admin-tab-pane');
+            panes.forEach(pane => pane.classList.remove('active'));
+            
+            // Show the selected tab pane
+            const tabName = tab.dataset.tab;
+            const activePane = document.getElementById(`${tabName}Tab`);
+            if (activePane) activePane.classList.add('active');
+        });
+    });
+}
 // Make functions global
 window.viewResource = viewResource;
 window.downloadResource = downloadResource;

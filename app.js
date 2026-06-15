@@ -924,7 +924,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupUploadForm();
     setupSearch();
     setupEventListeners();
-    setupAdminButton();  // MAKE SURE THIS LINE IS HERE!
+    setupAdminButton();
+    setupAdminTabs();   // <-- ADD THIS LINE to make admin tabs work
     updateHeroStats();
     
     console.log(`✅ Loaded ${resources.length} resources, ${videos.length} videos`);

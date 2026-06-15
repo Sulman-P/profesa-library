@@ -378,6 +378,54 @@ function sendReceiptAndDownload() {
     }
     alert(`✅ Receipt sent to ${email}`);
     document.getElementById('receiptModal').style.display = 'none';
+    // ==================== CLOUDFLARE R2 DIRECT UPLOAD ====================
+const R2_PUBLIC_URL = 'https://pub-xxxxxxxxxxxxxx.r2.dev'; // YOUR public URL from above
+
+// Upload file directly to R2 using presigned URL
+async function uploadToR2Directly(file, resourceId) {
+    try {
+        // We'll use Cloudflare's direct upload via API
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Note: For direct upload, you need to generate a presigned URL
+        // Since you don't have a Worker, we'll use localStorage for now
+        // and upgrade later
+        
+        console.log('File ready for upload:', file.name);
+        return simulateCloudUpload(file, resourceId);
+        
+    } catch (error) {
+        console.error('Upload error:', error);
+        return null;
+    }
+}
+
+// For now, store file as dataURL (works great for small files)
+function simulateCloudUpload(file, resourceId) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            resolve({
+                success: true,
+                fileData: e.target.result,
+                fileName: file.name,
+                fileSize: file.size
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Download file from storage
+function downloadFromStorage(fileData, fileName) {
+    const link = document.createElement('a');
+    link.href = fileData;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 }
 
 // ==================== ADMIN FUNCTIONS ====================

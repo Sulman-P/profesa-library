@@ -378,8 +378,9 @@ function sendReceiptAndDownload() {
     }
     alert(`✅ Receipt sent to ${email}`);
     document.getElementById('receiptModal').style.display = 'none';
+    
     // ==================== CLOUDFLARE R2 DIRECT UPLOAD ====================
-const R2_PUBLIC_URL = 'https://pub-xxxxxxxxxxxxxx.r2.dev'; // YOUR public URL from above
+const R2_PUBLIC_URL = 'https://pub-3133156f64f840d78860a966ba458b7b.r2.dev'; // YOUR public URL from above
 
 // Upload file directly to R2 using presigned URL
 async function uploadToR2Directly(file, resourceId) {

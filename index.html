@@ -711,7 +711,62 @@
         </div>
     </div>
 </div>
+<!-- User/Account Modal -->
+<div id="userModal" class="modal">
+    <div class="modal-content user-modal">
+        <div class="modal-header">
+            <i class="fas fa-user-circle"></i>
+            <h2 id="userModalTitle">Create Account</h2>
+            <span class="close-modal" onclick="closeUserModal()">&times;</span>
+        </div>
+        <div style="padding: 20px;">
+            <!-- Login Form -->
+            <div id="loginForm" style="display: none;">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password">
+                </div>
+                <button onclick="userLogin()" class="btn-submit">Login</button>
+                <div class="switch-link" onclick="switchToRegister()">Don't have an account? Register</div>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="registerName" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="registerPhone" placeholder="0712345678">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create password (min 6 chars)">
+                </div>
+                <button onclick="userRegister()" class="btn-submit">Create Account</button>
+                <div class="switch-link" onclick="switchToLogin()">Already have an account? Login</div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Shopping Basket Dropdown -->
+<div class="basket-dropdown" id="basketDropdown">
+    <div id="basketItems">
+        <div class="basket-empty">Your basket is empty</div>
+    </div>
+    <div class="basket-total" id="basketTotal">Total: KES 0</div>
+    <button class="basket-checkout" onclick="checkoutBasket()">Checkout</button>
+</div>
 <!-- Payment Modal -->
 <div id="paymentModal" class="modal" style="display: none;">
     <div class="modal-content">

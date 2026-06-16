@@ -1291,6 +1291,512 @@ function setupAdminTabs() {
         });
     });
 }
+// ==================== USER ACCOUNT SYSTEM ====================
+let currentUser = null;
+let shoppingBasket = [];
+let currentUserEmail = localStorage.getItem('currentUserEmail');
+
+// Load user from localStorage
+function loadUser() {
+    const userData = localStorage.getItem('nexalearn_user');
+    if (userData) {
+        currentUser = JSON.parse(userData);
+        currentUserEmail = currentUser.email;
+        updateUserDisplay();
+    }
+}
+
+// Open user modal
+function openUserModal() {
+    document.getElementById('userModal').style.display = 'flex';
+    document.getElementById('userModalTitle').textContent = 'Create Account';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'none';
+}
+
+// Close user modal
+function closeUserModal() {
+    document.getElementById('userModal').style.display = 'none';
+}
+
+// Switch to login form
+function switchToLogin() {
+    document.getElementById('userModalTitle').textContent = 'Login';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+}
+
+// Switch to register form
+function switchToRegister() {
+    document.getElementById('userModalTitle').textContent = 'Create Account';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'none';
+}
+
+// User Registration
+function userRegister() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const phone = document.getElementById('registerPhone').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    
+    if (!name || !email || !phone || !password) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+    }
+    
+    if (!email.includes('@')) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    // Check if user already exists
+    const users = JSON.parse(localStorage.getItem('nexalearn_users')) || [];
+    if (users.find(u => u.email === email)) {
+        alert('This email is already registered. Please login.');
+        switchToLogin();
+        return;
+    }
+    
+    // Create user
+    const newUser = {
+        id: Date.now(),
+        name: name,
+        email: email,
+        phone: phone,
+        password: password,
+        joined: new Date().toISOString(),
+        balance: 0
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('nexalearn_users', JSON.stringify(users));
+    
+    // Auto-login
+    currentUser = newUser;
+    currentUserEmail = email;
+    localStorage.setItem('currentUserEmail', email);
+    localStorage.setItem('nexalearn_user', JSON.stringify(newUser));
+    
+    alert(`✅ Welcome ${name}! Your account has been created.`);
+    closeUserModal();
+    updateUserDisplay();
+    loadBasket();
+}
+
+// User Login
+function userLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('nexalearn_users')) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+    
+    if (!user) {
+        alert('❌ Invalid email or password. Please try again or register.');
+        return;
+    }
+    
+    currentUser = user;
+    currentUserEmail = email;
+    localStorage.setItem('currentUserEmail', email);
+    localStorage.setItem('nexalearn_user', JSON.stringify(user));
+    
+    alert(`✅ Welcome back ${user.name}!`);
+    closeUserModal();
+    updateUserDisplay();
+    loadBasket();
+}
+
+// User Logout
+function userLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        currentUser = null;
+        currentUserEmail = null;
+        localStorage.removeItem('currentUserEmail');
+        localStorage.removeItem('nexalearn_user');
+        shoppingBasket = [];
+        localStorage.removeItem('nexalearn_basket');
+        updateUserDisplay();
+        updateBasketDisplay();
+        alert('Logged out successfully');
+    }
+}
+
+// Update user display in navbar
+function updateUserDisplay() {
+    const display = document.getElementById('userDisplayName');
+    if (currentUser) {
+        display.innerHTML = `${currentUser.name} <span class="user-greeting">👋</span>`;
+        // Add logout option on click
+        display.onclick = function(e) {
+            e.stopPropagation();
+            if (confirm('Logout?')) {
+                userLogout();
+            }
+        };
+    } else {
+        display.textContent = 'Account';
+        display.onclick = function() {
+            openUserModal();
+        };
+    }
+}
+
+// ==================== SHOPPING BASKET FUNCTIONS ====================
+
+// Load basket from localStorage
+function loadBasket() {
+    const savedBasket = localStorage.getItem('nexalearn_basket');
+    if (savedBasket) {
+        shoppingBasket = JSON.parse(savedBasket);
+    } else {
+        shoppingBasket = [];
+    }
+    updateBasketDisplay();
+}
+
+// Save basket to localStorage
+function saveBasket() {
+    localStorage.setItem('nexalearn_basket', JSON.stringify(shoppingBasket));
+}
+
+// Add item to basket
+function addToBasket(resourceId) {
+    if (!currentUser) {
+        alert('Please create an account or login first to add items to your basket');
+        openUserModal();
+        return;
+    }
+    
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) {
+        alert('Resource not found');
+        return;
+    }
+    
+    // Check if already in basket
+    const existing = shoppingBasket.find(item => item.id === resourceId);
+    if (existing) {
+        alert('⚠️ This item is already in your basket');
+        return;
+    }
+    
+    // Check if already purchased
+    const hasPurchased = purchases.some(p => p.resourceId === resourceId && p.email === currentUserEmail);
+    if (hasPurchased) {
+        alert('✅ You have already purchased this resource');
+        return;
+    }
+    
+    // Add to basket
+    shoppingBasket.push({
+        id: resource.id,
+        title: resource.title,
+        price: resource.price,
+        level: resource.level,
+        subject: resource.subject,
+        r2Url: resource.r2Url
+    });
+    
+    saveBasket();
+    updateBasketDisplay();
+    
+    // Show feedback
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✅ Added!';
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+    }, 1500);
+    
+    alert(`✅ "${resource.title}" added to your basket!`);
+}
+
+// Update basket display (count and dropdown)
+function updateBasketDisplay() {
+    const count = shoppingBasket.length;
+    const countElement = document.getElementById('basketCount');
+    if (countElement) {
+        countElement.textContent = count;
+        countElement.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    
+    // Update dropdown
+    const itemsDiv = document.getElementById('basketItems');
+    const totalDiv = document.getElementById('basketTotal');
+    
+    if (count === 0) {
+        itemsDiv.innerHTML = '<div class="basket-empty">Your basket is empty</div>';
+        if (totalDiv) totalDiv.textContent = 'Total: KES 0';
+        return;
+    }
+    
+    let total = 0;
+    let html = '';
+    shoppingBasket.forEach((item, index) => {
+        total += item.price || 0;
+        html += `
+            <div class="basket-item">
+                <div>
+                    <div class="basket-item-title">${item.title}</div>
+                    <div style="font-size:12px; color:#6b7280;">${item.subject}</div>
+                </div>
+                <div>
+                    <span class="basket-item-price">KES ${(item.price || 0).toLocaleString()}</span>
+                    <button class="basket-item-remove" onclick="removeFromBasket(${index})">✕</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    itemsDiv.innerHTML = html;
+    if (totalDiv) totalDiv.textContent = `Total: KES ${total.toLocaleString()}`;
+}
+
+// Remove item from basket
+function removeFromBasket(index) {
+    const item = shoppingBasket[index];
+    if (confirm(`Remove "${item.title}" from basket?`)) {
+        shoppingBasket.splice(index, 1);
+        saveBasket();
+        updateBasketDisplay();
+        alert('✅ Removed from basket');
+    }
+}
+
+// Toggle basket dropdown
+function toggleBasket() {
+    const dropdown = document.getElementById('basketDropdown');
+    if (!currentUser) {
+        alert('Please login first to view your basket');
+        openUserModal();
+        return;
+    }
+    dropdown.classList.toggle('active');
+}
+
+// Close basket dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('basketDropdown');
+    const basketBtn = document.getElementById('basketBtn');
+    if (dropdown && basketBtn && !dropdown.contains(e.target) && !basketBtn.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
+// Checkout basket
+function checkoutBasket() {
+    if (shoppingBasket.length === 0) {
+        alert('Your basket is empty');
+        return;
+    }
+    
+    if (!currentUser) {
+        alert('Please login first');
+        openUserModal();
+        return;
+    }
+    
+    const total = shoppingBasket.reduce((sum, item) => sum + (item.price || 0), 0);
+    
+    if (confirm(`🛒 Checkout ${shoppingBasket.length} items?\nTotal: KES ${total.toLocaleString()}`)) {
+        // Process all items in basket
+        let allPurchased = true;
+        let failedItems = [];
+        
+        shoppingBasket.forEach(item => {
+            const purchase = {
+                id: Date.now(),
+                resourceId: item.id,
+                resourceTitle: item.title,
+                price: item.price,
+                email: currentUserEmail,
+                date: new Date().toISOString()
+            };
+            purchases.push(purchase);
+            
+            // Update download count
+            const resource = resources.find(r => r.id === item.id);
+            if (resource) {
+                resource.downloads = (resource.downloads || 0) + 1;
+            }
+        });
+        
+        localStorage.setItem('nexalearn_purchases', JSON.stringify(purchases));
+        saveResources();
+        
+        // Clear basket
+        shoppingBasket = [];
+        saveBasket();
+        updateBasketDisplay();
+        
+        alert(`✅ Checkout complete! ${shoppingBasket.length} items purchased.\nTotal: KES ${total.toLocaleString()}\n\nYou can now download your resources.`);
+        
+        // Close dropdown
+        document.getElementById('basketDropdown').classList.remove('active');
+        
+        // Refresh marketplace
+        loadMarketplace();
+    }
+}
+
+// ==================== UPDATE VIEW RESOURCE WITH ADD TO BASKET ====================
+
+// Override viewResource to include Add to Basket button
+function viewResource(resourceId) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) return;
+    
+    const hasPurchased = purchases.some(p => p.resourceId === resourceId && p.email === currentUserEmail);
+    const isFree = resource.price === 0;
+    const canDownload = isFree || hasPurchased;
+    const inBasket = shoppingBasket.some(item => item.id === resourceId);
+    
+    // Generate buttons based on status
+    let actionButton = '';
+    if (canDownload) {
+        if (resource.r2Url) {
+            actionButton = `<a href="${resource.r2Url}" target="_blank" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; text-align:center; display:inline-block; text-decoration:none;">
+                <i class="fas fa-cloud-download-alt"></i> Download from Cloud
+            </a>`;
+        } else {
+            actionButton = `<button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-download"></i> Download
+            </button>`;
+        }
+    } else if (inBasket) {
+        actionButton = `<button style="width:100%; padding:12px; background:#f59e0b; color:white; border:none; border-radius:8px; cursor:pointer;">
+            <i class="fas fa-check"></i> In Basket
+        </button>`;
+    } else {
+        actionButton = `
+            <button onclick="addToBasket(${resource.id})" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-cart-plus"></i> Add to Basket (KES ${resource.price.toLocaleString()})
+            </button>
+            <button onclick="openPaymentModal(${resource.id})" style="width:100%; margin-top:8px; padding:12px; background:#f59e0b; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-shopping-cart"></i> Buy Now
+            </button>
+        `;
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; display:flex; align-items:center; justify-content:center;';
+    
+    modal.innerHTML = `
+        <div style="background:white; border-radius:16px; max-width:500px; width:90%; padding:20px; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3>${resource.title}</h3>
+                <span style="cursor:pointer; font-size:24px;" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div style="margin-bottom:10px;">
+                <p><strong>Subject:</strong> ${resource.subject}</p>
+                <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+                <p><strong>Category:</strong> ${resource.category}</p>
+                <p><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</p>
+                <p><strong>Status:</strong> ${canDownload ? '✅ Available for download' : '🔒 Requires purchase'}</p>
+            </div>
+            <div style="margin-bottom:15px;">
+                <strong>Description:</strong>
+                <p>${resource.description}</p>
+            </div>
+            <div style="background:#f3f4f6; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                <i class="fas fa-file-pdf" style="font-size:48px; color:#ef4444;"></i>
+                <p>${canDownload ? 'Document ready for download' : 'Purchase to access this document'}</p>
+                ${resource.r2Url ? `<p style="font-size:12px; margin-top:5px;">Stored in Cloudflare R2</p>` : ''}
+            </div>
+            ${actionButton}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// ==================== UPDATE MARKETPLACE WITH ADD TO BASKET ====================
+function loadMarketplace() {
+    const grid = document.getElementById('marketplaceGrid');
+    if (!grid) return;
+    
+    if (resources.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><h3>No resources yet</h3></div>';
+        return;
+    }
+    
+    grid.innerHTML = resources.map(resource => {
+        const hasPurchased = purchases.some(p => p.resourceId === resource.id && p.email === currentUserEmail);
+        const isFree = resource.price === 0;
+        const canDownload = isFree || hasPurchased;
+        const inBasket = shoppingBasket.some(item => item.id === resource.id);
+        
+        let buttonText = 'View Details';
+        let buttonColor = '#4F46E5';
+        let icon = 'fa-eye';
+        
+        if (canDownload) {
+            buttonText = 'View & Download';
+            buttonColor = '#10b981';
+            icon = 'fa-download';
+        } else if (inBasket) {
+            buttonText = 'In Basket';
+            buttonColor = '#f59e0b';
+            icon = 'fa-check';
+        }
+        
+        return `
+        <div class="resource-card">
+            <span class="resource-badge">${resource.category.toUpperCase()}</span>
+            <h3>${resource.title}</h3>
+            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+            <p><strong>Subject:</strong> ${resource.subject}</p>
+            <div class="price">${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</div>
+            <div style="margin-bottom: 10px; font-size: 12px; color: ${canDownload ? '#10b981' : '#f59e0b'};">
+                ${canDownload ? '✅ Available' : '🔒 Purchase to access'}
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button onclick="viewResource(${resource.id})" style="flex:1; padding:0.6rem; background:${buttonColor}; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    <i class="fas ${icon}"></i> ${buttonText}
+                </button>
+                ${!canDownload && !inBasket ? `<button onclick="addToBasket(${resource.id})" style="padding:0.6rem 0.8rem; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-cart-plus"></i>
+                </button>` : ''}
+            </div>
+        </div>
+    `}).join('');
+}
+
+// ==================== INITIALIZE USER SYSTEM ====================
+
+// Add to DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== NEXALEARN INITIALIZING ===');
+    
+    initializeData();
+    loadUser();
+    loadBasket();
+    loadMarketplace();
+    loadVideos();
+    setupUploadForm();
+    setupSearch();
+    setupEventListeners();
+    setupAdminButton();
+    setupAdminTabs();
+    updateHeroStats();
+    
+    console.log(`✅ Loaded ${resources.length} resources, ${videos.length} videos`);
+    console.log('Admin login: admin@nexalearn.com / admin123');
+    console.log('Create account or login to shop');
+});
 // Make functions global
 window.viewResource = viewResource;
 window.downloadResource = downloadResource;
@@ -1308,3 +1814,16 @@ window.adminLogout = adminLogout;
 window.addResourceWithR2 = addResourceWithR2;
 window.scrollToLevels = scrollToLevels;
 window.scrollToMarketplace = scrollToMarketplace;
+window.openUserModal = openUserModal;
+window.closeUserModal = closeUserModal;
+window.switchToLogin = switchToLogin;
+window.switchToRegister = switchToRegister;
+window.userLogin = userLogin;
+window.userRegister = userRegister;
+window.userLogout = userLogout;
+window.addToBasket = addToBasket;
+window.removeFromBasket = removeFromBasket;
+window.toggleBasket = toggleBasket;
+window.checkoutBasket = checkoutBasket;
+window.loadBasket = loadBasket;
+window.updateBasketDisplay = updateBasketDisplay;

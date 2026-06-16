@@ -280,19 +280,92 @@ function loadResourcesBySubject(level, subject) {
 }
 
 // ==================== RESOURCE FUNCTIONS ====================
+function downloadResource(resourceId) {
+    const resource = resources.find(r => r.id === resourceId);
+    if (!resource) {
+        alert('Resource not found');
+        return;
+    }
+    
+    // FIRST: Check if user has already purchased or resource is free
+    const hasPurchased = purchases.some(p => p.resourceId === resourceId);
+    
+    // If not free and not purchased, show payment prompt
+    if (resource.price > 0 && !hasPurchased) {
+        alert(`⚠️ Please purchase this resource for KES ${resource.price.toLocaleString()}`);
+        openPaymentModal(resourceId);
+        return;
+    }
+    
+    // If we get here, user can download (free or already purchased)
+    
+    // If R2 URL exists, open it in new tab
+    if (resource.r2Url) {
+        window.open(resource.r2Url, '_blank');
+        resource.downloads = (resource.downloads || 0) + 1;
+        saveResources();
+        updateHeroStats();
+        alert(`✅ "${resource.title}" opened from cloud storage!`);
+        document.querySelectorAll('.modal').forEach(m => m.remove());
+        return;
+    }
+    
+    // Fallback to generated content if no R2 URL
+    const content = generateDocumentContent(resource);
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${resource.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    resource.downloads = (resource.downloads || 0) + 1;
+    saveResources();
+    updateHeroStats();
+    
+    alert(`✅ "${resource.title}" downloaded!`);
+    document.querySelectorAll('.modal').forEach(m => m.remove());
+}
+
+function generateDocumentContent(resource) {
+    return `NEXALEARN INTERNATIONAL
+
+Title: ${resource.title}
+Subject: ${resource.subject}
+Level: ${formatLevelName(resource.level)}
+Download Date: ${new Date().toLocaleDateString()}
+
+Description:
+${resource.description}
+
+© ${new Date().getFullYear()} NexaLearn International
+Knowledge for Global Excellence`;
+}
 function viewResource(resourceId) {
     const resource = resources.find(r => r.id === resourceId);
     if (!resource) return;
     
-    // Generate download button based on whether R2 URL exists
+    const hasPurchased = purchases.some(p => p.resourceId === resourceId);
+    const isFree = resource.price === 0;
+    const canDownload = isFree || hasPurchased;
+    
+    // Generate download button based on payment status
     let downloadButton = '';
-    if (resource.r2Url) {
-        downloadButton = `<a href="${resource.r2Url}" target="_blank" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer; text-align:center; display:inline-block; text-decoration:none;">
-            <i class="fas fa-cloud-download-alt"></i> Download from Cloud
-        </a>`;
+    if (canDownload) {
+        if (resource.r2Url) {
+            downloadButton = `<a href="${resource.r2Url}" target="_blank" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; text-align:center; display:inline-block; text-decoration:none;">
+                <i class="fas fa-cloud-download-alt"></i> Download from Cloud
+            </a>`;
+        } else {
+            downloadButton = `<button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-download"></i> Download
+            </button>`;
+        }
     } else {
-        downloadButton = `<button onclick="downloadResource(${resource.id})" style="width:100%; padding:12px; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
-            <i class="fas fa-download"></i> Download
+        // Show purchase button
+        downloadButton = `<button onclick="openPaymentModal(${resource.id})" style="width:100%; padding:12px; background:#f59e0b; color:white; border:none; border-radius:8px; cursor:pointer;">
+            <i class="fas fa-shopping-cart"></i> Purchase for KES ${resource.price.toLocaleString()}
         </button>`;
     }
     
@@ -311,6 +384,7 @@ function viewResource(resourceId) {
                 <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
                 <p><strong>Category:</strong> ${resource.category}</p>
                 <p><strong>Price:</strong> ${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</p>
+                <p><strong>Status:</strong> ${canDownload ? '✅ Available for download' : '🔒 Requires purchase'}</p>
             </div>
             <div style="margin-bottom:15px;">
                 <strong>Description:</strong>
@@ -318,7 +392,7 @@ function viewResource(resourceId) {
             </div>
             <div style="background:#f3f4f6; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
                 <i class="fas fa-file-pdf" style="font-size:48px; color:#ef4444;"></i>
-                <p>Document ready for download</p>
+                <p>${canDownload ? 'Document ready for download' : 'Purchase to access this document'}</p>
                 ${resource.r2Url ? `<p style="font-size:12px; margin-top:5px;">Stored in Cloudflare R2</p>` : ''}
             </div>
             ${downloadButton}
@@ -326,61 +400,6 @@ function viewResource(resourceId) {
     `;
     
     document.body.appendChild(modal);
-}
-
-function downloadResource(resourceId) {
-    const resource = resources.find(r => r.id === resourceId);
-    if (!resource) return;
-    
-    const hasPurchased = purchases.some(p => p.resourceId === resourceId);
-    
-    if (resource.price === 0 || hasPurchased) {
-        // If R2 URL exists, open it in new tab
-        if (resource.r2Url) {
-            window.open(resource.r2Url, '_blank');
-            resource.downloads = (resource.downloads || 0) + 1;
-            saveResources();
-            updateHeroStats();
-            alert(`✅ "${resource.title}" opened from cloud storage!`);
-            document.querySelectorAll('.modal').forEach(m => m.remove());
-            return;
-        }
-        
-        // Fallback to generated content
-        const content = generateDocumentContent(resource);
-        const blob = new Blob([content], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${resource.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        resource.downloads = (resource.downloads || 0) + 1;
-        saveResources();
-        updateHeroStats();
-        
-        alert(`✅ "${resource.title}" downloaded!`);
-        document.querySelectorAll('.modal').forEach(m => m.remove());
-    } else {
-        alert(`⚠️ Please purchase this resource for KES ${resource.price.toLocaleString()}`);
-        openPaymentModal(resourceId);
-    }
-}
-
-function generateDocumentContent(resource) {
-    return `NEXALEARN INTERNATIONAL
-
-Title: ${resource.title}
-Subject: ${resource.subject}
-Level: ${formatLevelName(resource.level)}
-Download Date: ${new Date().toLocaleDateString()}
-
-Description:
-${resource.description}
-
-© ${new Date().getFullYear()} NexaLearn International
-Knowledge for Global Excellence`;
 }
 
 // ==================== ADMIN FUNCTIONS ====================
@@ -841,7 +860,37 @@ function showPaymentMethod(method) {
     if (cardForm) cardForm.style.display = method === 'card' ? 'block' : 'none';
     if (bankForm) bankForm.style.display = method === 'bank' ? 'block' : 'none';
 }
-
+function loadMarketplace() {
+    const grid = document.getElementById('marketplaceGrid');
+    if (!grid) return;
+    
+    if (resources.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i><h3>No resources yet</h3></div>';
+        return;
+    }
+    
+    grid.innerHTML = resources.map(resource => {
+        // Check if user has purchased or resource is free
+        const hasPurchased = purchases.some(p => p.resourceId === resource.id);
+        const isFree = resource.price === 0;
+        const canDownload = isFree || hasPurchased;
+        
+        return `
+        <div class="resource-card">
+            <span class="resource-badge">${resource.category.toUpperCase()}</span>
+            <h3>${resource.title}</h3>
+            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+            <p><strong>Subject:</strong> ${resource.subject}</p>
+            <div class="price">${resource.price === 0 ? 'FREE' : `KES ${resource.price.toLocaleString()}`}</div>
+            <div style="margin-bottom: 10px; font-size: 12px; color: ${canDownload ? '#10b981' : '#f59e0b'};">
+                ${canDownload ? '✅ Available' : '🔒 Purchase to access'}
+            </div>
+            <button onclick="viewResource(${resource.id})" style="width:100%; padding:0.6rem; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-eye"></i> ${canDownload ? 'View & Download' : 'View Details'}
+            </button>
+        </div>
+    `}).join('');
+}
 function sendReceiptAndDownload() {
     const email = document.getElementById('recipientEmail')?.value;
     if (!email) {
@@ -851,7 +900,44 @@ function sendReceiptAndDownload() {
     alert(`✅ Receipt sent to ${email}`);
     document.getElementById('receiptModal').style.display = 'none';
 }
-
+// ==================== USER PURCHASES ====================
+function showMyPurchases() {
+    const userEmail = localStorage.getItem('currentUserEmail');
+    if (!userEmail) {
+        alert('Please log in first');
+        return;
+    }
+    
+    const userPurchases = purchases.filter(p => p.email === userEmail);
+    if (userPurchases.length === 0) {
+        alert('You have no purchases yet');
+        return;
+    }
+    
+    const purchasedResources = resources.filter(r => 
+        userPurchases.some(p => p.resourceId === r.id)
+    );
+    
+    // Display purchased resources
+    const grid = document.getElementById('marketplaceGrid');
+    if (purchasedResources.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><i class="fas fa-shopping-bag"></i><h3>No purchased resources</h3></div>';
+        return;
+    }
+    
+    grid.innerHTML = purchasedResources.map(resource => `
+        <div class="resource-card" style="border: 2px solid #10b981;">
+            <span class="resource-badge" style="background: #10b981; color: white;">PURCHASED</span>
+            <h3>${resource.title}</h3>
+            <p><strong>Subject:</strong> ${resource.subject}</p>
+            <p><strong>Level:</strong> ${formatLevelName(resource.level)}</p>
+            <div class="price">Purchased: KES ${resource.price.toLocaleString()}</div>
+            <button onclick="viewResource(${resource.id})" style="width:100%; padding:0.6rem; background:#4F46E5; color:white; border:none; border-radius:8px; cursor:pointer;">
+                <i class="fas fa-download"></i> Download
+            </button>
+        </div>
+    `).join('');
+}
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Level cards

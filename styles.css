@@ -1905,3 +1905,162 @@ section {
 .admin-trigger {
     cursor: pointer;
 }
+/* User & Basket Styles */
+.user-badge {
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.basket-count {
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 10px;
+    margin-left: 5px;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+}
+
+.basket-btn {
+    position: relative;
+}
+
+.basket-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 300px;
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 1000;
+    padding: 10px;
+}
+
+.basket-dropdown.active {
+    display: block;
+}
+
+.basket-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.basket-item:last-child {
+    border-bottom: none;
+}
+
+.basket-item-title {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.basket-item-price {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.basket-item-remove {
+    color: #ef4444;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 16px;
+}
+
+.basket-total {
+    padding: 15px;
+    font-weight: 700;
+    text-align: center;
+    border-top: 2px solid #e5e7eb;
+}
+
+.basket-checkout {
+    width: 100%;
+    padding: 10px;
+    background: #4F46E5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.basket-empty {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+}
+
+/* User Profile Modal */
+.user-modal {
+    max-width: 400px;
+}
+
+.user-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.user-modal .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.user-modal .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.user-modal .btn-submit {
+    width: 100%;
+    padding: 10px;
+    background: #4F46E5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.user-modal .btn-submit:hover {
+    background: #4338CA;
+}
+
+.user-modal .switch-link {
+    color: #4F46E5;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.user-modal .switch-link:hover {
+    text-decoration: underline;
+}
+
+/* User Greeting */
+.user-greeting {
+    font-size: 12px;
+    color: #6b7280;
+    display: block;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1f2937;
+}
